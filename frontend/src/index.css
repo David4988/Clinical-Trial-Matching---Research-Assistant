@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/600.css";
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+
+/*
+  Design direction: a clinical instrument readout, not a dashboard.
+
+  Verdicts are carried by MARK and POSITION first — a solid, hatched, or
+  crimson rail on each row, plus a typographic token. Colour only reinforces.
+  There is deliberately no red/amber/green scale: it is hostile to colour-blind
+  readers, and "green = good patient" implies a clinical judgement this system
+  does not make. Crimson is the only saturated hue in the whole interface, and
+  it means exactly one thing: this criterion blocks enrolment.
+*/
+@theme {
+  --color-paper: #f6f7f5;
+  --color-panel: #ffffff;
+  --color-ink: #14201c;
+  --color-ink-mid: #55625e;
+  --color-ink-faint: #8a9591;
+  --color-rule: #d8ddda;
+  --color-rule-strong: #b8c0bc;
+  --color-band: #e8ece9;
+  --color-alert: #9f1239;
+  --color-alert-wash: #fdf2f5;
+
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Absence rendered as absence: UNKNOWN is hatched, never a grey pill. */
+.hatch {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-rule-strong) 0 1.5px,
+    transparent 1.5px 6px
+  );
+}
+
+.hatch-band {
+  background-color: var(--color-band);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-rule-strong) 0 1px,
+    transparent 1px 5px
+  );
+}
+
+.eyebrow {
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  font-weight: 500;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+.animate-sweep {
+  animation: sweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}

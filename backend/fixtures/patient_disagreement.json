@@ -1,0 +1,21 @@
+{
+  "patient_id": "P-4501",
+  "age": 58,
+  "sex": "MALE",
+  "conditions": [
+    { "name": "Type 2 Diabetes", "icd10": "E11", "status": "ACTIVE" },
+    { "name": "Stable Angina", "icd10": "I20.9", "status": "ACTIVE" }
+  ],
+  "medications": [
+    { "name": "Metformin", "status": "ACTIVE", "duration_text": "3 years" },
+    { "name": "Atorvastatin", "status": "ACTIVE" }
+  ],
+  "labs": [
+    { "name": "HbA1c", "value": 8.5, "unit": "%", "observed_at": "2026-04-02" },
+    { "name": "eGFR", "value": 70, "unit": "mL/min", "observed_at": "2026-04-02" }
+  ],
+  "notes": [
+    "Angina described as stable and well controlled; not documented as severe.",
+    "This record exists to exercise the AI/rule disagreement path: the rule engine matches condition names literally and finds no 'severe cardiovascular disease', while the mock AI maps 'Stable Angina' to the cardiovascular concept."
+  ]
+}

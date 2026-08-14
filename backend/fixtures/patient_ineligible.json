@@ -1,0 +1,18 @@
+{
+  "patient_id": "P-2087",
+  "age": 61,
+  "sex": "FEMALE",
+  "conditions": [
+    { "name": "Type 2 Diabetes", "icd10": "E11", "status": "ACTIVE" },
+    { "name": "Chronic Kidney Disease Stage 3b", "icd10": "N18.32", "status": "ACTIVE" }
+  ],
+  "medications": [],
+  "labs": [
+    { "name": "HbA1c", "value": 9.1, "unit": "%", "observed_at": "2026-02-04" },
+    { "name": "eGFR", "value": 38, "unit": "mL/min", "observed_at": "2026-02-04" }
+  ],
+  "notes": [
+    "Medication reconciliation not completed at last visit.",
+    "eGFR below the protocol floor; renal referral pending."
+  ]
+}

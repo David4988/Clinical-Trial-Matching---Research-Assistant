@@ -1,0 +1,74 @@
+{
+  "trial_id": "CT-002",
+  "title": "Glycaemic Control Study",
+  "criteria": [
+    {
+      "criterion_id": "INC-01",
+      "kind": "INCLUSION",
+      "text": "Age between 18 and 65 years",
+      "rule": {
+        "type": "numeric",
+        "field": "age",
+        "op": "between",
+        "low": 18,
+        "high": 65,
+        "unit": "years"
+      }
+    },
+    {
+      "criterion_id": "INC-02",
+      "kind": "INCLUSION",
+      "text": "Diagnosis: Type 2 Diabetes",
+      "rule": {
+        "type": "presence",
+        "domain": "condition",
+        "target": "Type 2 Diabetes"
+      }
+    },
+    {
+      "criterion_id": "INC-03",
+      "kind": "INCLUSION",
+      "text": "HbA1c between 7 and 10 %",
+      "rule": {
+        "type": "numeric",
+        "field": "lab:HbA1c",
+        "op": "between",
+        "low": 7,
+        "high": 10,
+        "unit": "%"
+      }
+    },
+    {
+      "criterion_id": "INC-04",
+      "kind": "INCLUSION",
+      "text": "eGFR at least 45 mL/min",
+      "rule": {
+        "type": "numeric",
+        "field": "lab:eGFR",
+        "op": "gte",
+        "low": 45,
+        "unit": "mL/min"
+      }
+    },
+    {
+      "criterion_id": "INC-05",
+      "kind": "INCLUSION",
+      "text": "Medication: Metformin",
+      "rule": {
+        "type": "presence",
+        "domain": "medication",
+        "target": "Metformin"
+      }
+    },
+    {
+      "criterion_id": "EXC-01",
+      "kind": "EXCLUSION",
+      "text": "Diagnosis: Severe cardiovascular disease",
+      "rule": {
+        "type": "presence",
+        "domain": "condition",
+        "target": "Severe cardiovascular disease"
+      }
+    }
+  ]
+}

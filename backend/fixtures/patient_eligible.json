@@ -1,0 +1,17 @@
+{
+  "patient_id": "P-1001",
+  "age": 54,
+  "sex": "MALE",
+  "conditions": [
+    { "name": "Type 2 Diabetes", "status": "ACTIVE" },
+    { "name": "Hypertension", "status": "ACTIVE" }
+  ],
+  "medications": [
+    { "name": "Metformin", "status": "ACTIVE", "duration_text": "5 months" }
+  ],
+  "labs": [
+    { "name": "HbA1c", "value": 8.2, "unit": "%", "observed_at": "2026-03-11" },
+    { "name": "eGFR", "value": 62, "unit": "mL/min", "observed_at": "2026-03-11" }
+  ],
+  "notes": []
+}

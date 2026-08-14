@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/api/client.ts","./src/api/sample.ts","./src/components/aipanel.tsx","./src/components/criterionledger.tsx","./src/components/rangebar.tsx","./src/components/screeningheader.tsx","./src/components/uploadpanel.tsx","./src/components/verdict.tsx","./src/types/canonical.ts"],"version":"5.9.3"}

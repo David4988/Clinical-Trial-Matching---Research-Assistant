@@ -1,0 +1,18 @@
+{
+  "patient_id": "P-6100",
+  "age": 44,
+  "sex": "FEMALE",
+  "conditions": [
+    { "name": "Type 2 Diabetes", "icd10": "E11", "status": "ACTIVE" }
+  ],
+  "medications": [
+    { "name": "Metformin", "status": "ACTIVE" }
+  ],
+  "labs": [
+    { "name": "HbA1c", "value": 66, "unit": "mmol/mol", "observed_at": "2026-05-08" },
+    { "name": "eGFR", "value": 88, "unit": "mL/min", "observed_at": "2026-05-08" }
+  ],
+  "notes": [
+    "HbA1c reported in IFCC units (mmol/mol) rather than the protocol's DCCT percentage. No conversion is applied automatically."
+  ]
+}

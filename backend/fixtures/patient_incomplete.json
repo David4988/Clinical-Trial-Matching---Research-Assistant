@@ -1,0 +1,15 @@
+{
+  "patient_id": "P-3311",
+  "age": 47,
+  "sex": "FEMALE",
+  "conditions": [
+    { "name": "Type 2 Diabetes", "icd10": "E11", "status": "ACTIVE" }
+  ],
+  "medications": [
+    { "name": "Metformin", "status": "ACTIVE", "duration_text": "unknown" }
+  ],
+  "labs": [
+    { "name": "HbA1c", "value": 7.8, "unit": "%", "observed_at": "2026-01-19" }
+  ],
+  "notes": ["Renal panel ordered but results not yet returned."]
+}
