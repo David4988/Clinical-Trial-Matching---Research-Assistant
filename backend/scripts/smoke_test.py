@@ -134,6 +134,184 @@ def main() -> int:
           f"{len(listed)} stored")
     check("unknown id returns 404", client.get("/results/SR-nope").status_code == 404)
 
+    # ------------------------------------------------------------------
+    # Phase 2: treatment monitoring
+    # ------------------------------------------------------------------
+
+    print("\nPHASE 2 · PROTOCOL")
+    protocol = client.get("/monitoring/protocol").json()
+    check("protocol declares itself synthetic", protocol.get("synthetic") is True)
+    check(
+        "protocol warns it is not clinical guidance",
+        "not clinical guidance" in protocol.get("warning", "").lower(),
+    )
+
+    print("\nPHASE 2 · ELIGIBILITY GATE")
+    # canonical_body is the P-1042 REVIEW_REQUIRED screening from earlier.
+    refused = client.post(
+        "/monitoring/treatments",
+        json={
+            "screening_result_id": canonical_body["result_id"],
+            "drug_name": "Compound X",
+        },
+    )
+    check(
+        "REVIEW_REQUIRED is refused without an override",
+        refused.status_code == 422
+        and refused.json().get("error", {}).get("code") == "OVERRIDE_REQUIRED",
+        refused.json().get("error", {}).get("code", ""),
+    )
+
+    missing = client.post(
+        "/monitoring/treatments",
+        json={"screening_result_id": "SR-nope", "drug_name": "Compound X"},
+    )
+    check("unknown screening returns 404", missing.status_code == 404)
+
+    print("\nPHASE 2 · DEMO COHORT")
+    seed = client.post(
+        "/monitoring/demo/seed",
+        json={"trial_id": "CT-001", "seed": 7, "windows": 5},
+    )
+    check("seeding returns 200", seed.status_code == 200)
+    seed_body = seed.json()
+    check("seeded data is labelled synthetic", seed_body.get("synthetic") is True)
+    check("six trajectories seeded", len(seed_body.get("patients", [])) == 6)
+
+    overview = client.get("/monitoring/trials/CT-001/overview").json()
+    check("overview counts six patients", overview.get("total_patients") == 6,
+          f"{overview.get('total_patients')} patients")
+    check("overview flags patients needing attention", bool(overview.get("requiring_attention")))
+
+    print("\nPHASE 2 · RISK TRAJECTORIES")
+    deteriorating = client.get("/monitoring/patients/P-2003/cycle").json()
+    check(
+        "deteriorating patient reaches RED",
+        deteriorating.get("effective_risk", {}).get("level") == "RED",
+        deteriorating.get("effective_risk", {}).get("level", ""),
+    )
+    check(
+        "RED holds the next dose",
+        deteriorating.get("next_dose", {}).get("decision") == "HOLD",
+        deteriorating.get("next_dose", {}).get("decision", ""),
+    )
+    check(
+        "escalation raises an urgent intervention",
+        any(
+            i["action"] == "URGENT_ESCALATION"
+            for i in deteriorating.get("interventions", [])
+        ),
+    )
+    check(
+        "a clinician notification was generated",
+        len(deteriorating.get("notifications", [])) >= 1,
+    )
+    check(
+        "contributing factors explain the verdict",
+        len(deteriorating.get("risk", {}).get("contributing_factors", [])) >= 1,
+    )
+
+    recovering = client.get("/monitoring/patients/P-2005/cycle").json()
+    check(
+        "recovering patient returns to GREEN",
+        recovering.get("effective_risk", {}).get("level") == "GREEN",
+        recovering.get("effective_risk", {}).get("level", ""),
+    )
+    check(
+        "recovered patient may proceed",
+        recovering.get("next_dose", {}).get("decision") == "PROCEED",
+        recovering.get("next_dose", {}).get("decision", ""),
+    )
+
+    print("\nPHASE 2 · DATA-QUALITY GATE")
+    failing_sensor = client.get("/monitoring/patients/P-2006/cycle").json()
+    effective = failing_sensor.get("effective_risk", {})
+    check(
+        "failing sensor produces UNKNOWN, not GREEN",
+        effective.get("level") == "UNKNOWN",
+        effective.get("level", ""),
+    )
+    check("the gate records that it fired", effective.get("gated") is True)
+    check(
+        "the model's own verdict is retained",
+        effective.get("provider_level") in {"GREEN", "AMBER", "RED"},
+        f"model said {effective.get('provider_level')}",
+    )
+    check(
+        "UNKNOWN requests repeat observations rather than reassuring",
+        any(
+            i["action"] == "REQUEST_REPEAT_OBSERVATION"
+            for i in failing_sensor.get("interventions", [])
+        ),
+    )
+    check(
+        "UNKNOWN never proceeds to the next dose",
+        failing_sensor.get("next_dose", {}).get("decision") != "PROCEED",
+        failing_sensor.get("next_dose", {}).get("decision", ""),
+    )
+
+    print("\nPHASE 2 · TIMELINE")
+    timeline = client.get("/monitoring/patients/P-2003/timeline").json()
+    types = {e["event_type"] for e in timeline}
+    for expected in (
+        "TREATMENT_REGISTERED",
+        "DOSE_ADMINISTERED",
+        "OBSERVATIONS_INGESTED",
+        "RISK_ASSESSED",
+        "RISK_TRANSITION",
+        "INTERVENTION_RAISED",
+        "NEXT_DOSE_ASSESSED",
+    ):
+        check(f"timeline records {expected}", expected in types)
+    check(
+        "timeline is chronological",
+        [e["occurred_at"] for e in timeline]
+        == sorted(e["occurred_at"] for e in timeline),
+    )
+
+    print("\nPHASE 2 · INVALID DATA")
+    bad = client.post(
+        "/monitoring/observations",
+        json={
+            "observations": [
+                {
+                    "patient_id": "P-2003",
+                    "trial_id": "CT-001",
+                    "recorded_at": "2026-08-16T12:00:00+00:00",
+                    "measurement_type": "HEART_RATE",
+                    "value": 900,
+                    "unit": "bpm",
+                }
+            ]
+        },
+    ).json()
+    check(
+        "an impossible reading is refused and reported",
+        bad.get("accepted_count") == 0 and len(bad.get("rejected", [])) == 1,
+        bad.get("rejected", [{}])[0].get("reason", "")[:60],
+    )
+
+    wrong_unit = client.post(
+        "/monitoring/observations",
+        json={
+            "observations": [
+                {
+                    "patient_id": "P-2003",
+                    "trial_id": "CT-001",
+                    "recorded_at": "2026-08-16T12:00:00+00:00",
+                    "measurement_type": "TEMPERATURE",
+                    "value": 98.6,
+                    "unit": "F",
+                }
+            ]
+        },
+    ).json()
+    check(
+        "a wrong unit is refused, never converted",
+        wrong_unit.get("accepted_count") == 0,
+        "no conversion applied",
+    )
+
     print()
     if failures:
         print(f"FAILED — {len(failures)} check(s): {', '.join(failures)}")

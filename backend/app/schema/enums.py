@@ -45,6 +45,11 @@ class EvidenceSource(str, Enum):
     CONDITION = "CONDITION"
     RULE = "RULE"
     AI = "AI"
+    # Phase 2 additions. Additive only — no existing value changed, so the
+    # Phase 1 contract is untouched. A vital sign is not a LAB, and a risk
+    # model is not the Phase 1 AI layer, so both get their own source.
+    OBSERVATION = "OBSERVATION"
+    RISK_MODEL = "RISK_MODEL"
 
 
 class Severity(str, Enum):

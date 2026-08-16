@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import fastapi, pdfplumber, pydantic; print\\('deps present'\\)\")",
+      "Bash(python3 -m venv venv)",
+      "Bash(./venv/bin/pip install *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(npm --version)"
+    ]
+  }
+}

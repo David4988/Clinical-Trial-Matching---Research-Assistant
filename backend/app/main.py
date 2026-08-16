@@ -13,7 +13,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from .api.monitoring_routes import router as monitoring_router
 from .api.routes import router
+from .monitoring.context import MonitoringContext
 from .service import ScreeningService
 
 logger = logging.getLogger("clinical-screening")
@@ -24,14 +26,19 @@ ALLOWED_ORIGINS = [
 ]
 
 
-def create_app(service: ScreeningService | None = None) -> FastAPI:
+def create_app(
+    service: ScreeningService | None = None,
+    monitoring: MonitoringContext | None = None,
+) -> FastAPI:
     app = FastAPI(
         title="Clinical Trial Matching & Research Assistant",
         description=(
-            "Phase 1. Deterministic rules are authoritative; heuristics and the "
-            "mock AI layer are advisory and cannot change an eligibility verdict."
+            "Phase 1: deterministic rules are authoritative; heuristics and the "
+            "mock AI layer are advisory and cannot change an eligibility verdict. "
+            "Phase 2: treatment monitoring, where a risk provider is advisory and "
+            "the deterministic protocol layer owns every clinical action."
         ),
-        version="0.1.0",
+        version="0.2.0",
     )
 
     app.add_middleware(
@@ -43,7 +50,13 @@ def create_app(service: ScreeningService | None = None) -> FastAPI:
     )
 
     app.state.service = service or ScreeningService()
+    # Phase 2 reads Phase 1's results through the existing Repository, so the
+    # screening store is shared rather than duplicated.
+    app.state.monitoring = monitoring or MonitoringContext.build(
+        app.state.service.repository
+    )
     app.include_router(router)
+    app.include_router(monitoring_router)
 
     # Every failure leaves through one of these three handlers, so the client
     # always receives {"error": {code, message, details}} and never a traceback.

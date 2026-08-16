@@ -28,6 +28,16 @@
   --color-alert: #9f1239;
   --color-alert-wash: #fdf2f5;
 
+  /*
+    Phase 2 needs a fourth state between "fine" and "blocking". The rule above
+    still holds: risk level is carried by PATTERN first — solid / striped /
+    crimson / hatched — and always repeated in words. Ochre only reinforces a
+    distinction the pattern has already made, so nothing is lost in greyscale
+    or to a colour-blind reader.
+  */
+  --color-caution: #8a5a08;
+  --color-caution-wash: #fbf6ec;
+
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
   --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
 }
@@ -60,6 +70,15 @@ body {
     45deg,
     var(--color-rule-strong) 0 1px,
     transparent 1px 5px
+  );
+}
+
+/* AMBER: dense stripes — "partial", distinct from solid and from sparse hatch. */
+.stripe-caution {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-caution) 0 2px,
+    transparent 2px 5px
   );
 }
 

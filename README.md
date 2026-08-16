@@ -1,13 +1,15 @@
-# Clinical Trial Matching & Research Assistant — Phase 1
+# Clinical Trial Matching & Research Assistant
 
 Hexaware Premier League Mavericks Hackathon · PS4
 
-Screens a patient against a clinical trial protocol from a structured clinical
-PDF, and explains every verdict it reaches.
+**Phase 1** screens a patient against a trial protocol from a structured
+clinical PDF. **Phase 2** monitors that patient through treatment and assesses
+readiness for the next dose. Both explain every verdict they reach.
 
-> Deterministic rules decide eligibility. Heuristics and the AI layer are
-> advisory and cannot change a verdict. Anything the engine cannot verify
-> becomes `UNKNOWN` and goes to a human.
+> Deterministic logic decides. In Phase 1 the rule engine is authoritative and
+> the AI layer is advisory; in Phase 2 the protocol table is authoritative and
+> the risk model is advisory. Anything that cannot be verified becomes
+> `UNKNOWN` and goes to a human — it is never read as "probably fine".
 
 ---
 
@@ -36,13 +38,85 @@ npm run dev
 
 Open http://localhost:5173, upload `backend/fixtures/pdf/demo_screening.pdf`.
 
+Open http://localhost:5173. **Screening** is Phase 1; switch to **Monitoring**
+and press *Load demo cohort* for Phase 2.
+
 ## Verify
 
 ```bash
 cd backend
-.venv/Scripts/python -m pytest tests -q     # 65 tests, no network, no PDF needed for the engine
+.venv/Scripts/python -m pytest tests -q     # 310 tests, no network
 .venv/Scripts/python scripts/smoke_test.py  # end-to-end against a running server
 ```
+
+---
+
+# Phase 2 — Treatment monitoring
+
+An eligible patient enters treatment; observations arrive; the system tracks
+their trajectory and advises on the next dose.
+
+```
+ELIGIBLE patient
+  → treatment + dose registration
+  → observation ingestion        (validated, never silently corrected)
+  → PatientState                 DETERMINISTIC · derived, never stored
+  → RiskProvider                 ADVISORY  → GREEN / AMBER / RED / UNKNOWN
+  → data-quality trust gate      DETERMINISTIC · can force UNKNOWN
+  → intervention engine          DETERMINISTIC · protocol table
+  → next-dose assessment         PROCEED / REVIEW_REQUIRED / HOLD
+  → dashboard + timeline
+```
+
+## The risk boundary
+
+Phase 2 inverts Phase 1's trust model: the risk layer becomes the *primary*
+signal driving clinical action. Three structural counterweights keep that safe.
+
+**The model cannot express an action.** `RiskAssessment` has no field for an
+intervention, a dose decision, or a recommendation — only a level, a score, and
+its reasons. The protocol table in `monitoring/protocol.py` maps level → action,
+and no provider can reach it. A test asserts the field list stays that way.
+
+**The model can be overruled by data quality.** Before any action is chosen,
+`monitoring/gate.py` asks whether the record can support a verdict at all. If
+observations are missing or stale, the effective level becomes `UNKNOWN`
+regardless of what the model said — and both levels are kept:
+
+```
+DATA-QUALITY GATE APPLIED
+Risk model : GREEN
+Applied    : UNKNOWN
+SPO2 has no reading within the last 90 minutes.
+```
+
+`UNKNOWN` does **not** fall back to routine monitoring. It requests repeat
+observations, alerts a clinician, and blocks `PROCEED`.
+
+**The mock computes; it does not replay.** `MockRiskProvider` derives its level
+from the actual measurements and trends in the `PatientState`, scored against
+the demo protocol's bands. A deteriorating synthetic trajectory *causes* the
+escalation — swap in a trained model and the rest of the system is unchanged.
+
+## What the demo shows
+
+Six seeded patients, one per trajectory, all reproducible from a fixed seed:
+
+| Patient | Trajectory | Risk progression | Next dose |
+| --- | --- | --- | --- |
+| P-2001 | stable | GREEN throughout | PROCEED |
+| P-2002 | improving | AMBER → GREEN | PROCEED |
+| P-2003 | gradual deterioration | **GREEN → AMBER → RED** | HOLD |
+| P-2004 | sudden deterioration | GREEN → AMBER → RED | HOLD |
+| P-2005 | recovery | **RED → AMBER → GREEN** | PROCEED |
+| P-2006 | failing sensor | GREEN → **UNKNOWN** (gated) | REVIEW_REQUIRED |
+
+P-2006 is the one to watch: the risk model still says GREEN, and the system
+refuses to act on it because the SpO2 probe stopped reporting.
+
+> **All Phase 2 thresholds are synthetic.** Every number in
+> `monitoring/protocol.py` is invented for demonstration. It is not clinical
+> guidance. `GET /monitoring/protocol` returns them with that warning attached.
 
 ---
 
@@ -125,6 +199,23 @@ Upgrade path through Phase 6: [`docs/PHASES.md`](docs/PHASES.md).
 | GET | `/results` | All stored screening results, newest first |
 | GET | `/results/{id}` | One stored result |
 
+Phase 2, all under `/monitoring`:
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/protocol` | The demo protocol's thresholds, labelled synthetic |
+| POST | `/treatments` | Register a screened patient onto a drug |
+| POST | `/treatments/{id}/doses` | Record an administered dose |
+| GET | `/treatments` | Filter by trial and/or patient |
+| POST | `/observations` | Batch ingest; invalid rows refused **and reported** |
+| POST | `/adverse-events` | Record a clinician-reported adverse event |
+| GET | `/patients/{id}/state` | The derived projection, computed on read |
+| POST | `/patients/{id}/cycle` | Run one monitoring cycle |
+| GET | `/patients/{id}/cycle` | The latest cycle |
+| GET | `/patients/{id}/timeline` | Append-only event log |
+| GET | `/trials/{id}/overview` | Dashboard aggregate |
+| POST | `/demo/seed` | Populate the synthetic cohort |
+
 Every failure returns `{"error": {"code", "message", "details"}}`. No stack
 traces escape.
 
@@ -144,27 +235,35 @@ traces escape.
 ```
 backend/
   app/
-    schema/        canonical models — the central boundary
-    engine/        deterministic rules (authoritative)
+    schema/        canonical models — the central boundary (Phase 1 + 2)
+    engine/        deterministic eligibility rules (authoritative)
     heuristics/    advisory data-quality flags
     ai/            AIProvider, MockAIProvider, disagreement detector
     extraction/    pdfplumber reader + deterministic parser
-    repository/    Repository interface + JsonRepository
-    api/           FastAPI routes
-    service.py     the single orchestration point
+    monitoring/    Phase 2: protocol, state, gate, interventions, next dose
+    risk/          RiskProvider + MockRiskProvider (the ML seam)
+    synthetic/     seeded trajectory generator
+    repository/    Repository + MonitoringRepository (sibling interfaces)
+    api/           FastAPI routes, Phase 1 and Phase 2
+    service.py     Phase 1 orchestration
   fixtures/        canonical JSON + generated demo PDFs
   scripts/         generate_demo_pdf.py, smoke_test.py
-  tests/           65 tests
+  tests/           310 tests
 frontend/
   src/
     types/         TypeScript mirror of the canonical schema
-    components/    CriterionLedger, RangeBar, AIPanel, ...
+    components/            CriterionLedger, RangeBar, AIPanel, ...
+    components/monitoring/ TrialOverview, PatientMonitor, PatientTimeline
 docs/
 ```
 
-## Not in Phase 1
+## Not built yet
 
-OCR, unstructured document understanding, real LLM calls, RAG, vector
-databases, batch screening, analytics dashboards, Supabase, cloud sync,
-authentication, and patient notification. Each has a defined place in
-[`docs/PHASES.md`](docs/PHASES.md); none is needed to prove the concept.
+Real ML/DL models, real LLM/RAG, OCR, unstructured document understanding,
+Supabase, cloud sync, event streaming, authentication, and real notification
+delivery (email/SMS/push). Every one has a defined seam — `RiskProvider`,
+`Repository`, `MonitoringRepository`, `NotificationDeliveryProvider` — and a
+place in [`docs/PHASES.md`](docs/PHASES.md).
+
+Notification *generation* is separate from *delivery*, and nothing generates a
+patient-facing message from a risk level: that stays behind human approval.

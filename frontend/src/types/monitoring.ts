@@ -1,0 +1,242 @@
+/**
+ * Mirrors backend/app/schema/monitoring*.py — the frontend half of the Phase 2
+ * contract. If a Pydantic model changes, change it here in the same commit.
+ *
+ * Note what is absent by design: `RiskAssessment` has no action field, and
+ * `PatientState` has no risk field. The frontend cannot render a clinical
+ * action attributed to the risk model, because no such field exists.
+ */
+
+import type { Evidence, Severity } from "./canonical";
+
+export type RiskLevel = "GREEN" | "AMBER" | "RED" | "UNKNOWN";
+export type TrendDirection = "RISING" | "FALLING" | "STABLE" | "INSUFFICIENT_DATA";
+export type NextDoseDecision = "PROCEED" | "REVIEW_REQUIRED" | "HOLD";
+export type DataQualityStatus = "OK" | "DEGRADED" | "UNTRUSTWORTHY";
+export type TreatmentStatus = "ACTIVE" | "COMPLETED" | "ON_HOLD" | "WITHDRAWN";
+export type MeasurementType =
+  | "HEART_RATE"
+  | "SYSTOLIC_BP"
+  | "DIASTOLIC_BP"
+  | "SPO2"
+  | "TEMPERATURE"
+  | "RESPIRATORY_RATE";
+
+export interface Observation {
+  observation_id: string;
+  patient_id: string;
+  trial_id: string;
+  recorded_at: string;
+  source: string;
+  measurement_type: MeasurementType;
+  value: number;
+  unit: string;
+  device_id: string | null;
+  quality_note: string | null;
+}
+
+export interface DoseAdministration {
+  dose_number: number;
+  administered_at: string;
+  amount: number;
+  unit: string;
+  administered_by: string | null;
+  note: string | null;
+}
+
+export interface EligibilityOverride {
+  approved_by: string;
+  reason: string;
+  approved_at: string;
+  screening_status: string;
+}
+
+export interface TreatmentAssignment {
+  treatment_id: string;
+  patient_id: string;
+  trial_id: string;
+  screening_result_id: string;
+  drug_name: string;
+  course_label: string | null;
+  status: TreatmentStatus;
+  registered_at: string;
+  doses: DoseAdministration[];
+  override: EligibilityOverride | null;
+}
+
+export interface MeasurementSummary {
+  measurement_type: MeasurementType;
+  unit: string | null;
+  baseline: number | null;
+  current: number | null;
+  latest_at: string | null;
+  delta_from_baseline: number | null;
+  trend: TrendDirection;
+  slope_per_hour: number | null;
+  sample_count: number;
+  is_stale: boolean;
+}
+
+export interface DataQualityFlag {
+  code: string;
+  severity: Severity;
+  message: string;
+  measurement_types: MeasurementType[];
+}
+
+export interface DataQuality {
+  status: DataQualityStatus;
+  flags: DataQualityFlag[];
+}
+
+export interface AdverseEvent {
+  event_id: string;
+  patient_id: string;
+  term: string;
+  severity: string;
+  onset_at: string;
+  resolved_at: string | null;
+}
+
+export interface PatientState {
+  patient_id: string;
+  trial_id: string;
+  as_of: string;
+  treatment: TreatmentAssignment | null;
+  measurements: MeasurementSummary[];
+  recent_observations: Observation[];
+  active_adverse_events: AdverseEvent[];
+  data_quality: DataQuality;
+  observation_count: number;
+}
+
+export interface ContributingFactor {
+  factor: string;
+  detail: string;
+  weight: number;
+  measurement_type: MeasurementType | null;
+}
+
+export interface RiskAssessment {
+  assessment_id: string;
+  patient_id: string;
+  assessed_at: string;
+  level: RiskLevel;
+  score: number;
+  confidence: number;
+  prediction_horizon_hours: number;
+  contributing_factors: ContributingFactor[];
+  likely_patterns: string[];
+  provider: string;
+  model_version: string;
+  degraded: boolean;
+}
+
+/** The trust gate's output: what was applied, what the model said, and why. */
+export interface EffectiveRisk {
+  level: RiskLevel;
+  provider_level: RiskLevel;
+  gated: boolean;
+  reason: string;
+}
+
+export interface RiskTransition {
+  from_level: RiskLevel | null;
+  to_level: RiskLevel;
+  occurred_at: string;
+  trigger: string;
+}
+
+export interface Intervention {
+  intervention_id: string;
+  raised_at: string;
+  action: string;
+  severity: Severity;
+  rationale: string;
+  protocol_rule_id: string;
+  risk_level: RiskLevel;
+  monitoring_interval_minutes: number | null;
+  evidence: Evidence[];
+}
+
+export interface Notification {
+  notification_id: string;
+  audience: string;
+  channel: string;
+  subject: string;
+  body: string;
+  created_at: string;
+  delivered_at: string | null;
+  delivery_provider: string | null;
+}
+
+export interface NextDoseCriterion {
+  criterion_id: string;
+  description: string;
+  satisfied: boolean | null;
+  detail: string;
+}
+
+export interface NextDoseAssessment {
+  assessment_id: string;
+  treatment_id: string;
+  assessed_at: string;
+  decision: NextDoseDecision;
+  proposed_dose_number: number | null;
+  criteria: NextDoseCriterion[];
+  reasons: string[];
+  blocking_criteria: string[];
+  risk_level: RiskLevel;
+  data_quality_status: DataQualityStatus;
+  decision_support_only: boolean;
+}
+
+export interface MonitoringCycleResult {
+  cycle_id: string;
+  patient_id: string;
+  trial_id: string;
+  generated_at: string;
+  state: PatientState;
+  risk: RiskAssessment;
+  effective_risk: EffectiveRisk;
+  transition: RiskTransition | null;
+  interventions: Intervention[];
+  notifications: Notification[];
+  next_dose: NextDoseAssessment | null;
+  summary: string;
+}
+
+export interface MonitoringEvent {
+  event_id: string;
+  patient_id: string;
+  occurred_at: string;
+  event_type: string;
+  summary: string;
+  ref_id: string | null;
+  payload: Record<string, unknown>;
+}
+
+export interface OverviewPatient {
+  patient_id: string;
+  treatment_id: string;
+  drug_name: string;
+  treatment_status: string;
+  dose_count: number;
+  risk_level: RiskLevel;
+  risk_score: number | null;
+  gated: boolean;
+  next_dose: NextDoseDecision | null;
+  last_assessed_at: string | null;
+  data_quality: DataQualityStatus | null;
+}
+
+export interface TrialOverview {
+  trial_id: string;
+  protocol_id: string;
+  protocol_label: string;
+  total_patients: number;
+  active_treatments: number;
+  risk_counts: Record<RiskLevel, number>;
+  requiring_attention: OverviewPatient[];
+  patients: OverviewPatient[];
+}
