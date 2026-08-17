@@ -19,8 +19,10 @@ from pydantic import BaseModel, ConfigDict, Field
 from .enums import OverallStatus
 from .monitoring_enums import (
     AdverseEventSeverity,
+    InvestigatorAction,
     MeasurementType,
     ObservationSource,
+    RiskLevel,
     TreatmentStatus,
 )
 
@@ -56,7 +58,12 @@ class Observation(BaseModel):
 
 
 class DoseAdministration(BaseModel):
-    """A single administered dose within a treatment course."""
+    """A single administered dose within a treatment course.
+
+    `route` is optional and free-form rather than an enum: this prototype does
+    not model a formulary, and inventing a closed route vocabulary would imply
+    a clinical completeness the system does not have.
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -64,6 +71,7 @@ class DoseAdministration(BaseModel):
     administered_at: datetime
     amount: float = Field(gt=0)
     unit: str
+    route: str | None = None
     administered_by: str | None = None
     note: str | None = None
 
@@ -123,6 +131,36 @@ class TreatmentAssignment(BaseModel):
     @property
     def next_dose_number(self) -> int:
         return self.dose_count + 1
+
+
+class InvestigatorReview(BaseModel):
+    """A named investigator's decision about one monitoring cycle.
+
+    A recorded fact, like a dose or an adverse event — which is why it lives
+    here and not in `monitoring_result.py`. It is what a human did, not
+    something the system derived.
+
+    The cycle it answers is referenced by id and the risk level at the time is
+    copied in, so the decision stays readable on the timeline without having to
+    re-open the cycle that prompted it. Recording one changes no risk level and
+    no protocol output: the cycle that produced RED still says RED afterwards.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    review_id: str
+    patient_id: str
+    trial_id: str
+    cycle_id: str
+    action: InvestigatorAction
+    reviewer: str
+    note: str
+    reviewed_at: datetime
+    #: The effective (post-gate) level the investigator was actually looking at.
+    risk_level: RiskLevel
+    #: Set only when the action changed the treatment, so a reader can tell an
+    #: acknowledgement apart from a hold without inspecting the treatment.
+    treatment_status_after: TreatmentStatus | None = None
 
 
 class AdverseEvent(BaseModel):

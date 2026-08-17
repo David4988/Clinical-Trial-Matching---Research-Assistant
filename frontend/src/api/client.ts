@@ -1,4 +1,10 @@
-import type { ApiError, Patient, ScreeningResult, Trial } from "../types/canonical";
+import type {
+  ApiError,
+  Patient,
+  ReviewDecision,
+  ScreeningResult,
+  Trial,
+} from "../types/canonical";
 
 const BASE = "/api";
 
@@ -50,4 +56,25 @@ export async function listResults(): Promise<ScreeningResult[]> {
   const response = await fetch(`${BASE}/results`);
   if (!response.ok) return [];
   return response.json();
+}
+
+/**
+ * Record a human decision about a screening.
+ *
+ * Returns the same result with `review` populated. The deterministic fields
+ * come back unchanged — the backend refuses to let a review edit a verdict.
+ */
+export async function recordReview(
+  resultId: string,
+  decision: ReviewDecision,
+  reviewer: string,
+  note: string,
+): Promise<ScreeningResult> {
+  return unwrap(
+    await fetch(`${BASE}/results/${encodeURIComponent(resultId)}/review`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ decision, reviewer, note }),
+    }),
+  );
 }

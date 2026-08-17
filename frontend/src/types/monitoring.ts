@@ -40,8 +40,52 @@ export interface DoseAdministration {
   administered_at: string;
   amount: number;
   unit: string;
+  route: string | null;
   administered_by: string | null;
   note: string | null;
+}
+
+export type InvestigatorAction =
+  | "ACKNOWLEDGE"
+  | "CONTINUE_MONITORING"
+  | "HOLD_TREATMENT";
+
+/**
+ * A named investigator's decision about one monitoring cycle.
+ *
+ * Deliberately a separate vocabulary from `Intervention.action`: an
+ * intervention is what the protocol requires, this is what a person decided
+ * after reading it. Recording one changes no risk level.
+ */
+export interface InvestigatorReview {
+  review_id: string;
+  patient_id: string;
+  trial_id: string;
+  cycle_id: string;
+  action: InvestigatorAction;
+  reviewer: string;
+  note: string;
+  reviewed_at: string;
+  risk_level: RiskLevel;
+  treatment_status_after: TreatmentStatus | null;
+}
+
+/** Provenance for whatever produced the risk verdicts on screen. */
+export interface ModelProvenance {
+  provider: string;
+  model_version: string;
+  live_inference: boolean;
+  artifact?: {
+    model_version: string | null;
+    feature_version: string | null;
+    features: string[] | null;
+    estimator: string | null;
+    training_cohort: string | null;
+    scoring: string | null;
+    created_at: string | null;
+    model_sha256: string | null;
+  };
+  artifact_error?: string;
 }
 
 export interface EligibilityOverride {

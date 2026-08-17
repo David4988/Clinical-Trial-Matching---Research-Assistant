@@ -15,9 +15,11 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Query, Request
 
 from .monitoring_models import (
+    AdvanceMonitoringRequest,
     IngestObservationsRequest,
     RecordAdverseEventRequest,
     RecordDoseRequest,
+    RecordInvestigatorReviewRequest,
     RegisterTreatmentRequest,
     RunCycleRequest,
     SeedDemoRequest,
@@ -28,7 +30,12 @@ from ..monitoring.context import MonitoringContext
 from ..monitoring.errors import MonitoringError
 from ..repository.base import RepositoryError
 from ..risk.factory import build_risk_provider
-from ..schema.monitoring import AdverseEvent, Observation, TreatmentAssignment
+from ..schema.monitoring import (
+    AdverseEvent,
+    InvestigatorReview,
+    Observation,
+    TreatmentAssignment,
+)
 from ..schema.monitoring_result import (
     IngestionResult,
     MonitoringCycleResult,
@@ -44,7 +51,10 @@ router = APIRouter(prefix="/monitoring", tags=["monitoring"])
 _STATUS_BY_CODE = {
     "SCREENING_NOT_FOUND": 404,
     "TREATMENT_NOT_FOUND": 404,
+    "CYCLE_NOT_FOUND": 404,
+    "NO_CYCLE": 404,
     "TREATMENT_ALREADY_ACTIVE": 409,
+    "REVIEW_PENDING": 409,
 }
 
 
@@ -166,6 +176,7 @@ def record_dose(
             now=_now(payload.now),
             administered_by=payload.administered_by,
             note=payload.note,
+            route=payload.route,
         )
     except MonitoringError as exc:
         _handle(exc)
@@ -280,6 +291,98 @@ def latest_cycle(request: Request, patient_id: str) -> MonitoringCycleResult:
 @router.get("/patients/{patient_id}/cycles", response_model=list[MonitoringCycleResult])
 def list_cycles(request: Request, patient_id: str) -> list[MonitoringCycleResult]:
     return _context(request).repository.list_cycles(patient_id)
+
+
+@router.post("/patients/{patient_id}/advance", response_model=MonitoringCycleResult)
+def advance_monitoring(
+    request: Request, patient_id: str, payload: AdvanceMonitoringRequest
+) -> MonitoringCycleResult:
+    """Play one synthetic observation window for one enrolled participant.
+
+    The single-participant counterpart to `/demo/seed`. It runs the same two
+    steps that endpoint runs per window — ingest, then `run_cycle` — so the
+    resulting cycle is produced by the ordinary pipeline and by the ordinary
+    risk provider. Nothing here computes or overrides a risk level.
+
+    Synthetic data only: every observation carries `ObservationSource.SYNTHETIC`.
+    """
+    context = _context(request)
+
+    treatments = context.repository.list_treatments(
+        trial_id=payload.trial_id, patient_id=patient_id
+    )
+    if not treatments:
+        _fail(
+            404,
+            "TREATMENT_NOT_FOUND",
+            f"{patient_id} is not enrolled on {payload.trial_id}.",
+            ["Register a treatment before advancing monitoring."],
+        )
+
+    if payload.window_index >= payload.windows:
+        _fail(
+            422,
+            "WINDOW_OUT_OF_RANGE",
+            f"window_index {payload.window_index} is beyond the "
+            f"{payload.windows} generated windows.",
+        )
+
+    batches = generate_windowed(
+        patient_id,
+        payload.trial_id,
+        payload.trajectory,
+        payload.start or treatments[-1].registered_at,
+        windows=payload.windows,
+        hours=payload.hours,
+        interval_minutes=payload.interval_minutes,
+        seed=payload.seed,
+    )
+    batch = batches[payload.window_index]
+    at = max(o.recorded_at for o in batch)
+
+    try:
+        context.ingestion.ingest(batch, now=at)
+        return context.monitoring.run_cycle(patient_id, payload.trial_id, at)
+    except RepositoryError as exc:
+        _fail(503, "PERSISTENCE_FAILED", "The cycle could not be saved.", [str(exc)])
+
+
+@router.post(
+    "/patients/{patient_id}/investigator-review", response_model=InvestigatorReview
+)
+def record_investigator_review(
+    request: Request, patient_id: str, payload: RecordInvestigatorReviewRequest
+) -> InvestigatorReview:
+    """Record a named investigator's decision about a monitoring cycle.
+
+    The decision is appended to the timeline. It does not change the cycle's
+    risk level or its interventions — those stay exactly as the protocol layer
+    produced them. `HOLD_TREATMENT` is the only action with a further effect,
+    and it places the treatment ON_HOLD through the treatment service.
+    """
+    try:
+        return _context(request).investigator.record(
+            patient_id=patient_id,
+            action=payload.action,
+            reviewer=payload.reviewer,
+            note=payload.note,
+            now=_now(payload.now),
+            cycle_id=payload.cycle_id,
+        )
+    except MonitoringError as exc:
+        _handle(exc)
+    except RepositoryError as exc:
+        _fail(503, "PERSISTENCE_FAILED", "The review could not be saved.", [str(exc)])
+
+
+@router.get(
+    "/patients/{patient_id}/investigator-reviews",
+    response_model=list[InvestigatorReview],
+)
+def list_investigator_reviews(
+    request: Request, patient_id: str
+) -> list[InvestigatorReview]:
+    return _context(request).investigator.list_for_patient(patient_id)
 
 
 @router.get("/patients/{patient_id}/timeline", response_model=list[MonitoringEvent])

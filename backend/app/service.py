@@ -13,6 +13,7 @@ The AI runs after the deterministic verdicts exist and cannot alter them.
 from __future__ import annotations
 
 import uuid
+from datetime import datetime, timezone
 
 from .ai.disagreement import detect_disagreements
 from .ai.mock_provider import MockAIProvider
@@ -23,8 +24,19 @@ from .heuristics.rules import collect_flags
 from .repository.base import Repository, RepositoryError
 from .repository.json_repo import JsonRepository
 from .schema.clinical import Patient
-from .schema.result import ScreeningResult
+from .schema.enums import OverallStatus, ReviewDecision
+from .schema.result import ScreeningResult, ScreeningReview
 from .schema.trial import Trial
+
+
+class ReviewError(ValueError):
+    """A human review was refused. Carries the Phase 1 error envelope fields."""
+
+    def __init__(self, code: str, message: str, details: list[str] | None = None) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
+        self.details = details or []
 
 
 class ScreeningService:
@@ -88,3 +100,65 @@ class ScreeningService:
 
     def list_results(self) -> list[ScreeningResult]:
         return self.repository.list_screening_results()
+
+    # -- human review ------------------------------------------------------
+
+    def record_review(
+        self,
+        result_id: str,
+        decision: ReviewDecision,
+        reviewer: str,
+        note: str,
+        now: datetime | None = None,
+    ) -> ScreeningResult:
+        """Attach a named human's decision to a completed screening.
+
+        The stored result is rewritten with `review` set and *nothing else*
+        touched: the rule verdicts, evidence, heuristics, AI opinions and
+        overall status are carried through by `model_copy`, so a review can
+        never launder itself into the deterministic record.
+
+        Approval is refused outright on an INELIGIBLE screening. A reviewer may
+        judge an ambiguous case; they may not talk the engine out of a criterion
+        the patient demonstrably failed.
+        """
+        result = self.repository.get_screening_result(result_id)
+        if result is None:
+            raise ReviewError(
+                "RESULT_NOT_FOUND", f"No screening result with id '{result_id}'."
+            )
+
+        if not reviewer.strip():
+            raise ReviewError(
+                "REVIEWER_REQUIRED",
+                "A review must record who made the decision.",
+                ["Supply a non-empty reviewer."],
+            )
+        if not note.strip():
+            raise ReviewError(
+                "REVIEW_NOTE_REQUIRED",
+                "A review must record why the decision was made.",
+                ["Supply a non-empty note."],
+            )
+
+        if (
+            decision is ReviewDecision.APPROVED_FOR_PHASE_2
+            and result.overall_status is OverallStatus.INELIGIBLE
+        ):
+            raise ReviewError(
+                "APPROVAL_NOT_PERMITTED",
+                f"Screening {result_id} is INELIGIBLE and cannot be approved "
+                "for Phase 2.",
+                [result.status_reason],
+            )
+
+        review = ScreeningReview(
+            decision=decision,
+            reviewer=reviewer.strip(),
+            note=note.strip(),
+            reviewed_status=result.overall_status,
+            decided_at=now or datetime.now(timezone.utc),
+        )
+        reviewed = result.model_copy(update={"review": review})
+        self.repository.save_screening_result(reviewed)
+        return reviewed

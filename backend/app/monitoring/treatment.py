@@ -14,6 +14,19 @@ The eligibility gate:
 REVIEW_REQUIRED is not silently promoted. It requires a named human and a
 reason, both stored on the treatment and both surfaced on the timeline — the
 same principle Phase 1 applies when it refuses to guess an UNKNOWN criterion.
+
+That named human can arrive two ways, and they are the same fact recorded in
+two places rather than two competing rules:
+
+  * `override_by` / `override_reason` passed directly by the caller, or
+  * a `ScreeningReview` already recorded on the screening through
+    `POST /results/{id}/review`.
+
+An approved review satisfies the override requirement on its own, so a
+reviewer who has already signed a decision is not asked to sign it twice. A
+review that asked for *further* review blocks registration outright: the
+reviewer's recorded conclusion was "not yet", and a later caller must not be
+able to route around it by supplying its own override.
 """
 
 from __future__ import annotations
@@ -24,7 +37,7 @@ from . import ids
 from .errors import MonitoringError
 from ..repository.base import Repository
 from ..repository.monitoring_base import MonitoringRepository
-from ..schema.enums import OverallStatus
+from ..schema.enums import OverallStatus, ReviewDecision
 from ..schema.monitoring import (
     DoseAdministration,
     EligibilityOverride,
@@ -32,6 +45,7 @@ from ..schema.monitoring import (
 )
 from ..schema.monitoring_enums import MonitoringEventType, TreatmentStatus
 from ..schema.monitoring_result import MonitoringEvent
+from ..schema.result import ScreeningResult
 
 # Statuses that may proceed at all. INELIGIBLE is absent by design.
 _ALLOWED = {OverallStatus.ELIGIBLE, OverallStatus.REVIEW_REQUIRED}
@@ -74,7 +88,10 @@ class TreatmentService:
                 [screening.status_reason],
             )
 
-        override = self._build_override(status, override_by, override_reason, now)
+        self._reject_pending_review(screening)
+        override = self._build_override(
+            status, override_by, override_reason, now, screening
+        )
 
         patient_id = screening.patient.patient_id
         trial_id = screening.trial.trial_id
@@ -119,36 +136,65 @@ class TreatmentService:
 
         return treatment
 
+    @staticmethod
+    def _reject_pending_review(screening: ScreeningResult) -> None:
+        """A reviewer who asked for more review has not approved anything."""
+        review = screening.review
+        if review is None:
+            return
+        if review.decision is ReviewDecision.FURTHER_REVIEW_REQUESTED:
+            raise MonitoringError(
+                "REVIEW_PENDING",
+                f"{review.reviewer} requested further review of screening "
+                f"{screening.result_id}; treatment cannot be registered.",
+                [
+                    review.note,
+                    "Record an approving review before registering treatment.",
+                ],
+            )
+
     def _build_override(
         self,
         status: OverallStatus,
         override_by: str | None,
         override_reason: str | None,
         now: datetime,
+        screening: ScreeningResult,
     ) -> EligibilityOverride | None:
         if status is not OverallStatus.REVIEW_REQUIRED:
             # An override on an already-ELIGIBLE screening would be noise in the
             # audit trail, so it is dropped rather than stored.
             return None
 
-        if not (override_by and override_by.strip()) or not (
-            override_reason and override_reason.strip()
-        ):
-            raise MonitoringError(
-                "OVERRIDE_REQUIRED",
-                "This screening is REVIEW_REQUIRED. Registering treatment "
-                "requires a named clinician and a reason.",
-                [
-                    "Supply override_by and override_reason.",
-                    "The override is stored on the treatment and shown on the timeline.",
-                ],
+        if override_by and override_by.strip() and override_reason and override_reason.strip():
+            return EligibilityOverride(
+                approved_by=override_by.strip(),
+                reason=override_reason.strip(),
+                approved_at=now,
+                screening_status=status,
             )
 
-        return EligibilityOverride(
-            approved_by=override_by.strip(),
-            reason=override_reason.strip(),
-            approved_at=now,
-            screening_status=status,
+        # No explicit override — an approving review is the other way to supply
+        # the same named human and reason. `_reject_pending_review` has already
+        # refused the non-approving case, so this is the only decision left.
+        review = screening.review
+        if review is not None:
+            return EligibilityOverride(
+                approved_by=review.reviewer,
+                reason=review.note,
+                approved_at=review.decided_at,
+                screening_status=status,
+            )
+
+        raise MonitoringError(
+            "OVERRIDE_REQUIRED",
+            "This screening is REVIEW_REQUIRED. Registering treatment "
+            "requires a named clinician and a reason.",
+            [
+                "Supply override_by and override_reason, or record a review "
+                "with POST /results/{result_id}/review.",
+                "The override is stored on the treatment and shown on the timeline.",
+            ],
         )
 
     def _reject_duplicate_active_treatment(self, patient_id: str, trial_id: str) -> None:
@@ -176,6 +222,7 @@ class TreatmentService:
         now: datetime,
         administered_by: str | None = None,
         note: str | None = None,
+        route: str | None = None,
     ) -> TreatmentAssignment:
         treatment = self._require_treatment(treatment_id)
 
@@ -191,6 +238,7 @@ class TreatmentService:
             administered_at=now,
             amount=amount,
             unit=unit,
+            route=route,
             administered_by=administered_by,
             note=note,
         )
@@ -202,8 +250,14 @@ class TreatmentService:
                     updated,
                     now,
                     MonitoringEventType.DOSE_ADMINISTERED,
-                    f"Dose {dose.dose_number} administered: {amount} {unit}.",
-                    {"dose_number": dose.dose_number, "amount": amount, "unit": unit},
+                    f"Dose {dose.dose_number} administered: {amount} {unit}"
+                    + (f" ({route})." if route else "."),
+                    {
+                        "dose_number": dose.dose_number,
+                        "amount": amount,
+                        "unit": unit,
+                        "route": route,
+                    },
                 )
             ]
         )
