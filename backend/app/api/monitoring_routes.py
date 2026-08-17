@@ -27,6 +27,7 @@ from ..monitoring import ids, protocol
 from ..monitoring.context import MonitoringContext
 from ..monitoring.errors import MonitoringError
 from ..repository.base import RepositoryError
+from ..risk.factory import build_risk_provider
 from ..schema.monitoring import AdverseEvent, Observation, TreatmentAssignment
 from ..schema.monitoring_result import (
     IngestionResult,
@@ -319,6 +320,20 @@ def seed_demo(request: Request, payload: SeedDemoRequest) -> dict:
     screening_service = request.app.state.service
     start = payload.start or datetime(2026, 8, 16, 6, 0, tzinfo=timezone.utc)
 
+    # `use_synthetic_ml` predates the three-provider split and meant "replay the
+    # precomputed research fixtures", so it maps to "synthetic", not to the live
+    # model. `risk_provider` is the explicit form and wins when both are given.
+    chosen = payload.risk_provider or (
+        "synthetic" if payload.use_synthetic_ml else None
+    )
+    if chosen:
+        context = MonitoringContext.build(
+            screening_repository=request.app.state.service.repository,
+            monitoring_repository=context.repository,
+            risk_provider=build_risk_provider(chosen),
+            notification_provider=context.monitoring.notification_provider,
+        )
+
     trial = load_trial("trial_supported").model_copy(
         update={"trial_id": payload.trial_id}
     )
@@ -383,6 +398,50 @@ def seed_demo(request: Request, payload: SeedDemoRequest) -> dict:
         "trial_id": payload.trial_id,
         "seed": payload.seed,
         "synthetic": True,
+        "risk_provider": context.monitoring.risk_provider.name,
+        "model_version": context.monitoring.risk_provider.version,
         "note": "Synthetic demonstration data. Not clinical data.",
         "patients": seeded,
     }
+
+
+# -- model provenance ------------------------------------------------------
+
+
+@router.get("/model")
+def get_model(request: Request) -> dict:
+    """What produced the risk verdicts this deployment is serving.
+
+    Every assessment already carries `provider` and `model_version`; this is the
+    same provenance one level up, so a reviewer can see which artifact is
+    loaded without opening a stored cycle.
+    """
+    provider = _context(request).monitoring.risk_provider
+    payload: dict = {
+        "provider": provider.name,
+        "model_version": provider.version,
+        "live_inference": provider.name == "synthetic_ml",
+    }
+
+    engine = getattr(provider, "_engine", None)
+    if engine is None:
+        return payload
+
+    try:
+        metadata = engine.metadata
+    except Exception as exc:  # noqa: BLE001 - provenance must not break a page
+        payload["artifact_error"] = str(exc)
+        return payload
+
+    payload["artifact"] = {
+        "model_version": metadata.get("model_version"),
+        "feature_version": metadata.get("feature_version"),
+        "features": metadata.get("features", {}).get("names"),
+        "estimator": metadata.get("estimator"),
+        "training_cohort": metadata.get("training_cohort"),
+        "scoring": metadata.get("scoring"),
+        "created_at": metadata.get("created_at"),
+        "model_sha256": metadata.get("model_sha256"),
+        "trained_with": metadata.get("environment"),
+    }
+    return payload

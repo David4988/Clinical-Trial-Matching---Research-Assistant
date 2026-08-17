@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 from .api.monitoring_routes import router as monitoring_router
 from .api.routes import router
 from .monitoring.context import MonitoringContext
+from .risk.factory import build_risk_provider
 from .service import ScreeningService
 
 logger = logging.getLogger("clinical-screening")
@@ -52,8 +53,13 @@ def create_app(
     app.state.service = service or ScreeningService()
     # Phase 2 reads Phase 1's results through the existing Repository, so the
     # screening store is shared rather than duplicated.
+    #
+    # Which risk provider answers is a deployment choice, read once from
+    # RISK_PROVIDER (mock | synthetic | synthetic_ml) and defaulting to the
+    # deterministic mock so the app still starts with no ML dependencies.
     app.state.monitoring = monitoring or MonitoringContext.build(
-        app.state.service.repository
+        app.state.service.repository,
+        risk_provider=build_risk_provider(),
     )
     app.include_router(router)
     app.include_router(monitoring_router)

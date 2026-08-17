@@ -11,6 +11,7 @@ fixed timeline while normal use just takes the server clock.
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -90,3 +91,13 @@ class SeedDemoRequest(BaseModel):
     windows: int = 5
     seed: int = 42
     start: datetime | None = None
+    #: Which risk provider runs the seeded cycles. None keeps whatever the
+    #: application was started with. "synthetic" replays the precomputed
+    #: research fixtures; "synthetic_ml" performs live Isolation Forest
+    #: inference on the generated windows. They are different things and are
+    #: named differently on purpose.
+    risk_provider: Literal["mock", "synthetic", "synthetic_ml"] | None = None
+    #: Deprecated alias for `risk_provider="synthetic"`, kept so existing demo
+    #: clients keep the behaviour they already had. Ignored when
+    #: `risk_provider` is given.
+    use_synthetic_ml: bool = False

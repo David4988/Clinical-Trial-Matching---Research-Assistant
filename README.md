@@ -98,6 +98,76 @@ from the actual measurements and trends in the `PatientState`, scored against
 the demo protocol's bands. A deteriorating synthetic trajectory *causes* the
 escalation — swap in a trained model and the rest of the system is unchanged.
 
+## The trained model is now one of the providers
+
+That swap has been made. `RISK_PROVIDER=synthetic_ml` answers the risk layer
+with a **trained Isolation Forest scoring the window that just arrived** — six
+features (HR, SpO2, RR and each one's change since the previous window), loaded
+from a versioned artifact, never refitted in the application.
+
+```bash
+cd backend
+RISK_PROVIDER=synthetic_ml python -m uvicorn app.main:app --port 8000
+.venv/bin/python scripts/live_inference_demo.py     # three windows, live
+```
+
+```
+  t      HR   SpO2     RR      ΔHR   ΔSpO2     ΔRR       score  flag  level
+t0     70.0   98.0   15.0        —       —       —           —     —  UNKNOWN
+t1     72.0   98.0   15.0       +2      +0      +0   -0.048674    no  GREEN
+t2     88.0   94.0   21.0      +16      -4      +6   +0.152504   YES  RED
+```
+
+`t0` is UNKNOWN because a patient's first window has no predecessor, so three of
+the six features do not exist — and none of them is invented. Nothing in that
+table is scripted: the model produced every score.
+
+Three providers now sit behind the one interface, and `RiskAssessment.provider`
+records which answered:
+
+| `RISK_PROVIDER` | What answers |
+| --- | --- |
+| `mock` *(default)* | Protocol bands, no ML |
+| `synthetic` | Precomputed research fixtures, matched on patient id |
+| `synthetic_ml` | Live inference on the incoming window |
+
+### A whole patient, replayed through the live endpoints
+
+```bash
+.venv/bin/python scripts/live_trajectory_demo.py --from 96 --to 126 --compact
+```
+
+`P0014` from the held-out research split — a `SUDDEN_DETERIORATION` trajectory
+whose ground-truth change point is window 103 — replayed unmodified at the
+5-minute cadence the model was trained on, one `POST /monitoring/observations`
+and one `POST /monitoring/patients/{id}/cycle` per window:
+
+```
+ win   time      HR   SpO2     RR      ΔHR   ΔSpO2     ΔRR       score    pred  risk
+ 102  06:30    82.6   94.6   17.4     +1.9    +0.2    +3.3   -0.075542  NORMAL  GREEN
+ 103 *06:35    99.3   90.4   22.5    +16.7    -4.2    +5.1   +0.212998 ANOMALY  RED
+ 104  06:40   101.5   89.8   22.3     +2.2    -0.6    -0.2   +0.071445 ANOMALY  RED
+
+effective risk path   UNKNOWN×1 -> GREEN×6 -> RED×24
+before change point     6 windows,   0% flagged      after   24 windows, 100% flagged
+```
+
+The model flags at exactly the ground-truth change point, with zero detection
+delay, and the protocol layer escalates and holds the next dose off the back of
+it. Nothing in that sequence is hard-coded — the tests assert the shape, the
+model supplies the numbers.
+
+### Parity with the research pipeline
+
+Features and scores are checked window-by-window against the pipeline that
+trained the model — 56 sampled windows across all seven scenarios, plus all 143
+scoreable windows of the replayed trajectory in sequence. Both agree **bit for
+bit**, with zero label disagreements (`tests/test_research_parity.py`,
+`tests/test_live_trajectory_e2e.py`).
+
+Full detail, including the temporal-state design and the first-window rule:
+[`docs/LIVE_INFERENCE.md`](docs/LIVE_INFERENCE.md).
+
 ## What the demo shows
 
 Six seeded patients, one per trajectory, all reproducible from a fixed seed:

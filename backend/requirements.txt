@@ -6,3 +6,11 @@ pdfplumber==0.11.4
 fpdf2==2.8.2
 pytest==8.3.4
 httpx==0.28.1
+
+# Live risk inference (RISK_PROVIDER=synthetic_ml). scikit-learn is pinned to
+# the exact version the artifact in app/synthetic/artifacts/ was fitted under:
+# unpickling an estimator across sklearn versions is not guaranteed to preserve
+# behaviour, and this application loads the model, never refits it. Bump this
+# pin only together with a regenerated artifact.
+scikit-learn==1.9.0
+joblib==1.5.3

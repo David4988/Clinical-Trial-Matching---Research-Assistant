@@ -1,0 +1,1487 @@
+{
+  "generated_by": "export_inference_fixtures.py",
+  "source": "synthetic_trial/data/observations.csv",
+  "note": "Windows from the evaluation half of the patient split \u2014 none was seen during fitting. Scores come from the serialised artifact.",
+  "model_version": "synthetic_if_v1",
+  "feature_version": "synthetic_features_v1",
+  "model_sha256": "8114caf6302beebe09d3e107a913ce27530c3d062862d98612df4e08e5f641a2",
+  "feature_order": [
+    "heart_rate",
+    "spo2",
+    "respiratory_rate",
+    "heart_rate_delta",
+    "spo2_delta",
+    "respiratory_rate_delta"
+  ],
+  "scoring": {
+    "anomaly_score": "negated_decision_function",
+    "anomaly_score_note": "anomaly_score = round(-model.decision_function(X), 6); higher means more unusual.",
+    "decimals": 6,
+    "predicted_anomaly": "1 when model.predict(X) == -1, else 0"
+  },
+  "window_minutes": 5,
+  "environment": {
+    "python": "3.14.5",
+    "sklearn": "1.9.0",
+    "numpy": "2.5.2",
+    "joblib": "1.5.3"
+  },
+  "cases": [
+    {
+      "patient_id": "P0011",
+      "scenario": "ADVERSE_EVENT",
+      "window_index": 2,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 67.6,
+        "spo2": 94.3,
+        "respiratory_rate": 16.1
+      },
+      "current": {
+        "heart_rate": 74.4,
+        "spo2": 95.2,
+        "respiratory_rate": 15.1
+      },
+      "expected_features": {
+        "heart_rate": 74.4,
+        "spo2": 95.2,
+        "respiratory_rate": 15.1,
+        "heart_rate_delta": 6.8,
+        "spo2_delta": 0.9,
+        "respiratory_rate_delta": -1.0
+      },
+      "expected_anomaly_score": -0.064395,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0011",
+      "scenario": "ADVERSE_EVENT",
+      "window_index": 3,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 74.4,
+        "spo2": 95.2,
+        "respiratory_rate": 15.1
+      },
+      "current": {
+        "heart_rate": 72.8,
+        "spo2": 94.6,
+        "respiratory_rate": 16.0
+      },
+      "expected_features": {
+        "heart_rate": 72.8,
+        "spo2": 94.6,
+        "respiratory_rate": 16.0,
+        "heart_rate_delta": -1.6,
+        "spo2_delta": -0.6,
+        "respiratory_rate_delta": 0.9
+      },
+      "expected_anomaly_score": -0.12847,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0011",
+      "scenario": "ADVERSE_EVENT",
+      "window_index": 4,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 72.8,
+        "spo2": 94.6,
+        "respiratory_rate": 16.0
+      },
+      "current": {
+        "heart_rate": 69.3,
+        "spo2": 95.2,
+        "respiratory_rate": 16.5
+      },
+      "expected_features": {
+        "heart_rate": 69.3,
+        "spo2": 95.2,
+        "respiratory_rate": 16.5,
+        "heart_rate_delta": -3.5,
+        "spo2_delta": 0.6,
+        "respiratory_rate_delta": 0.5
+      },
+      "expected_anomaly_score": -0.115564,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0011",
+      "scenario": "ADVERSE_EVENT",
+      "window_index": 5,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 69.3,
+        "spo2": 95.2,
+        "respiratory_rate": 16.5
+      },
+      "current": {
+        "heart_rate": 74.5,
+        "spo2": 95.2,
+        "respiratory_rate": 16.3
+      },
+      "expected_features": {
+        "heart_rate": 74.5,
+        "spo2": 95.2,
+        "respiratory_rate": 16.3,
+        "heart_rate_delta": 5.2,
+        "spo2_delta": 0.0,
+        "respiratory_rate_delta": -0.2
+      },
+      "expected_anomaly_score": -0.115935,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0011",
+      "scenario": "ADVERSE_EVENT",
+      "window_index": 23,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 73.9,
+        "spo2": 95.6,
+        "respiratory_rate": 18.1
+      },
+      "current": {
+        "heart_rate": 70.4,
+        "spo2": 93.7,
+        "respiratory_rate": 16.7
+      },
+      "expected_features": {
+        "heart_rate": 70.4,
+        "spo2": 93.7,
+        "respiratory_rate": 16.7,
+        "heart_rate_delta": -3.5,
+        "spo2_delta": -1.9,
+        "respiratory_rate_delta": -1.4
+      },
+      "expected_anomaly_score": 0.000236,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0011",
+      "scenario": "ADVERSE_EVENT",
+      "window_index": 74,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 74.6,
+        "spo2": 94.8,
+        "respiratory_rate": 14.4
+      },
+      "current": {
+        "heart_rate": 65.7,
+        "spo2": 93.9,
+        "respiratory_rate": 17.9
+      },
+      "expected_features": {
+        "heart_rate": 65.7,
+        "spo2": 93.9,
+        "respiratory_rate": 17.9,
+        "heart_rate_delta": -8.9,
+        "spo2_delta": -0.9,
+        "respiratory_rate_delta": 3.5
+      },
+      "expected_anomaly_score": 0.050261,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0011",
+      "scenario": "ADVERSE_EVENT",
+      "window_index": 95,
+      "ground_truth_state": "adverse_event",
+      "previous": {
+        "heart_rate": 70.6,
+        "spo2": 95.0,
+        "respiratory_rate": 18.3
+      },
+      "current": {
+        "heart_rate": 102.7,
+        "spo2": 86.9,
+        "respiratory_rate": 26.2
+      },
+      "expected_features": {
+        "heart_rate": 102.7,
+        "spo2": 86.9,
+        "respiratory_rate": 26.2,
+        "heart_rate_delta": 32.1,
+        "spo2_delta": -8.1,
+        "respiratory_rate_delta": 7.9
+      },
+      "expected_anomaly_score": 0.226868,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0011",
+      "scenario": "ADVERSE_EVENT",
+      "window_index": 96,
+      "ground_truth_state": "adverse_event",
+      "previous": {
+        "heart_rate": 102.7,
+        "spo2": 86.9,
+        "respiratory_rate": 26.2
+      },
+      "current": {
+        "heart_rate": 94.6,
+        "spo2": 87.3,
+        "respiratory_rate": 26.5
+      },
+      "expected_features": {
+        "heart_rate": 94.6,
+        "spo2": 87.3,
+        "respiratory_rate": 26.5,
+        "heart_rate_delta": -8.1,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": 0.3
+      },
+      "expected_anomaly_score": 0.124458,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0012",
+      "scenario": "DATA_QUALITY_FAILURE",
+      "window_index": 2,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 66.8,
+        "spo2": 95.5,
+        "respiratory_rate": 15.0
+      },
+      "current": {
+        "heart_rate": 63.4,
+        "spo2": 94.5,
+        "respiratory_rate": 16.9
+      },
+      "expected_features": {
+        "heart_rate": 63.4,
+        "spo2": 94.5,
+        "respiratory_rate": 16.9,
+        "heart_rate_delta": -3.4,
+        "spo2_delta": -1.0,
+        "respiratory_rate_delta": 1.9
+      },
+      "expected_anomaly_score": -0.052143,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0012",
+      "scenario": "DATA_QUALITY_FAILURE",
+      "window_index": 3,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 63.4,
+        "spo2": 94.5,
+        "respiratory_rate": 16.9
+      },
+      "current": {
+        "heart_rate": 60.9,
+        "spo2": 95.3,
+        "respiratory_rate": 16.3
+      },
+      "expected_features": {
+        "heart_rate": 60.9,
+        "spo2": 95.3,
+        "respiratory_rate": 16.3,
+        "heart_rate_delta": -2.5,
+        "spo2_delta": 0.8,
+        "respiratory_rate_delta": -0.6
+      },
+      "expected_anomaly_score": -0.075325,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0012",
+      "scenario": "DATA_QUALITY_FAILURE",
+      "window_index": 4,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 60.9,
+        "spo2": 95.3,
+        "respiratory_rate": 16.3
+      },
+      "current": {
+        "heart_rate": 62.9,
+        "spo2": 95.1,
+        "respiratory_rate": 16.9
+      },
+      "expected_features": {
+        "heart_rate": 62.9,
+        "spo2": 95.1,
+        "respiratory_rate": 16.9,
+        "heart_rate_delta": 2.0,
+        "spo2_delta": -0.2,
+        "respiratory_rate_delta": 0.6
+      },
+      "expected_anomaly_score": -0.111193,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0012",
+      "scenario": "DATA_QUALITY_FAILURE",
+      "window_index": 5,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 62.9,
+        "spo2": 95.1,
+        "respiratory_rate": 16.9
+      },
+      "current": {
+        "heart_rate": 63.3,
+        "spo2": 95.4,
+        "respiratory_rate": 15.2
+      },
+      "expected_features": {
+        "heart_rate": 63.3,
+        "spo2": 95.4,
+        "respiratory_rate": 15.2,
+        "heart_rate_delta": 0.4,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": -1.7
+      },
+      "expected_anomaly_score": -0.088608,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0012",
+      "scenario": "DATA_QUALITY_FAILURE",
+      "window_index": 19,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 62.4,
+        "spo2": 94.9,
+        "respiratory_rate": 18.0
+      },
+      "current": {
+        "heart_rate": 66.6,
+        "spo2": 95.9,
+        "respiratory_rate": 12.9
+      },
+      "expected_features": {
+        "heart_rate": 66.6,
+        "spo2": 95.9,
+        "respiratory_rate": 12.9,
+        "heart_rate_delta": 4.2,
+        "spo2_delta": 1.0,
+        "respiratory_rate_delta": -5.1
+      },
+      "expected_anomaly_score": 0.034637,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0012",
+      "scenario": "DATA_QUALITY_FAILURE",
+      "window_index": 20,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 66.6,
+        "spo2": 95.9,
+        "respiratory_rate": 12.9
+      },
+      "current": {
+        "heart_rate": 62.9,
+        "spo2": 94.1,
+        "respiratory_rate": 18.1
+      },
+      "expected_features": {
+        "heart_rate": 62.9,
+        "spo2": 94.1,
+        "respiratory_rate": 18.1,
+        "heart_rate_delta": -3.7,
+        "spo2_delta": -1.8,
+        "respiratory_rate_delta": 5.2
+      },
+      "expected_anomaly_score": 0.079492,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0012",
+      "scenario": "DATA_QUALITY_FAILURE",
+      "window_index": 46,
+      "ground_truth_state": "data_gap",
+      "previous": {
+        "heart_rate": 64.3,
+        "spo2": 95.3,
+        "respiratory_rate": 17.0
+      },
+      "current": {
+        "heart_rate": 67.1,
+        "spo2": 93.8,
+        "respiratory_rate": 14.4
+      },
+      "expected_features": {
+        "heart_rate": 67.1,
+        "spo2": 93.8,
+        "respiratory_rate": 14.4,
+        "heart_rate_delta": 2.8,
+        "spo2_delta": -1.5,
+        "respiratory_rate_delta": -2.6
+      },
+      "expected_anomaly_score": 0.012992,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0012",
+      "scenario": "DATA_QUALITY_FAILURE",
+      "window_index": 50,
+      "ground_truth_state": "data_gap",
+      "previous": {
+        "heart_rate": 65.5,
+        "spo2": 94.2,
+        "respiratory_rate": 16.6
+      },
+      "current": {
+        "heart_rate": 67.1,
+        "spo2": 96.2,
+        "respiratory_rate": 12.0
+      },
+      "expected_features": {
+        "heart_rate": 67.1,
+        "spo2": 96.2,
+        "respiratory_rate": 12.0,
+        "heart_rate_delta": 1.6,
+        "spo2_delta": 2.0,
+        "respiratory_rate_delta": -4.6
+      },
+      "expected_anomaly_score": 0.10042,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0010",
+      "scenario": "GRADUAL_DETERIORATION",
+      "window_index": 2,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 80.7,
+        "spo2": 95.1,
+        "respiratory_rate": 18.6
+      },
+      "current": {
+        "heart_rate": 73.8,
+        "spo2": 95.1,
+        "respiratory_rate": 18.4
+      },
+      "expected_features": {
+        "heart_rate": 73.8,
+        "spo2": 95.1,
+        "respiratory_rate": 18.4,
+        "heart_rate_delta": -6.9,
+        "spo2_delta": 0.0,
+        "respiratory_rate_delta": -0.2
+      },
+      "expected_anomaly_score": -0.104207,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0010",
+      "scenario": "GRADUAL_DETERIORATION",
+      "window_index": 3,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 73.8,
+        "spo2": 95.1,
+        "respiratory_rate": 18.4
+      },
+      "current": {
+        "heart_rate": 72.7,
+        "spo2": 94.4,
+        "respiratory_rate": 16.4
+      },
+      "expected_features": {
+        "heart_rate": 72.7,
+        "spo2": 94.4,
+        "respiratory_rate": 16.4,
+        "heart_rate_delta": -1.1,
+        "spo2_delta": -0.7,
+        "respiratory_rate_delta": -2.0
+      },
+      "expected_anomaly_score": -0.107413,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0010",
+      "scenario": "GRADUAL_DETERIORATION",
+      "window_index": 4,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 72.7,
+        "spo2": 94.4,
+        "respiratory_rate": 16.4
+      },
+      "current": {
+        "heart_rate": 81.1,
+        "spo2": 95.4,
+        "respiratory_rate": 16.5
+      },
+      "expected_features": {
+        "heart_rate": 81.1,
+        "spo2": 95.4,
+        "respiratory_rate": 16.5,
+        "heart_rate_delta": 8.4,
+        "spo2_delta": 1.0,
+        "respiratory_rate_delta": 0.1
+      },
+      "expected_anomaly_score": -0.054239,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0010",
+      "scenario": "GRADUAL_DETERIORATION",
+      "window_index": 5,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 81.1,
+        "spo2": 95.4,
+        "respiratory_rate": 16.5
+      },
+      "current": {
+        "heart_rate": 82.3,
+        "spo2": 95.0,
+        "respiratory_rate": 16.8
+      },
+      "expected_features": {
+        "heart_rate": 82.3,
+        "spo2": 95.0,
+        "respiratory_rate": 16.8,
+        "heart_rate_delta": 1.2,
+        "spo2_delta": -0.4,
+        "respiratory_rate_delta": 0.3
+      },
+      "expected_anomaly_score": -0.128465,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0010",
+      "scenario": "GRADUAL_DETERIORATION",
+      "window_index": 18,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 87.2,
+        "spo2": 93.8,
+        "respiratory_rate": 17.1
+      },
+      "current": {
+        "heart_rate": 76.7,
+        "spo2": 94.1,
+        "respiratory_rate": 20.8
+      },
+      "expected_features": {
+        "heart_rate": 76.7,
+        "spo2": 94.1,
+        "respiratory_rate": 20.8,
+        "heart_rate_delta": -10.5,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": 3.7
+      },
+      "expected_anomaly_score": 0.039079,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0010",
+      "scenario": "GRADUAL_DETERIORATION",
+      "window_index": 36,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 88.2,
+        "spo2": 94.1,
+        "respiratory_rate": 17.6
+      },
+      "current": {
+        "heart_rate": 89.0,
+        "spo2": 94.2,
+        "respiratory_rate": 22.5
+      },
+      "expected_features": {
+        "heart_rate": 89.0,
+        "spo2": 94.2,
+        "respiratory_rate": 22.5,
+        "heart_rate_delta": 0.8,
+        "spo2_delta": 0.1,
+        "respiratory_rate_delta": 4.9
+      },
+      "expected_anomaly_score": 0.024444,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0010",
+      "scenario": "GRADUAL_DETERIORATION",
+      "window_index": 42,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 84.6,
+        "spo2": 93.7,
+        "respiratory_rate": 22.3
+      },
+      "current": {
+        "heart_rate": 88.3,
+        "spo2": 92.7,
+        "respiratory_rate": 19.6
+      },
+      "expected_features": {
+        "heart_rate": 88.3,
+        "spo2": 92.7,
+        "respiratory_rate": 19.6,
+        "heart_rate_delta": 3.7,
+        "spo2_delta": -1.0,
+        "respiratory_rate_delta": -2.7
+      },
+      "expected_anomaly_score": 0.039451,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0010",
+      "scenario": "GRADUAL_DETERIORATION",
+      "window_index": 43,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 88.3,
+        "spo2": 92.7,
+        "respiratory_rate": 19.6
+      },
+      "current": {
+        "heart_rate": 80.4,
+        "spo2": 93.7,
+        "respiratory_rate": 20.9
+      },
+      "expected_features": {
+        "heart_rate": 80.4,
+        "spo2": 93.7,
+        "respiratory_rate": 20.9,
+        "heart_rate_delta": -7.9,
+        "spo2_delta": 1.0,
+        "respiratory_rate_delta": 1.3
+      },
+      "expected_anomaly_score": 0.02099,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0064",
+      "scenario": "IMPROVING",
+      "window_index": 5,
+      "ground_truth_state": "improving",
+      "previous": {
+        "heart_rate": 57.2,
+        "spo2": 93.5,
+        "respiratory_rate": 20.0
+      },
+      "current": {
+        "heart_rate": 60.5,
+        "spo2": 93.2,
+        "respiratory_rate": 20.1
+      },
+      "expected_features": {
+        "heart_rate": 60.5,
+        "spo2": 93.2,
+        "respiratory_rate": 20.1,
+        "heart_rate_delta": 3.3,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": 0.1
+      },
+      "expected_anomaly_score": -0.025671,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0064",
+      "scenario": "IMPROVING",
+      "window_index": 8,
+      "ground_truth_state": "improving",
+      "previous": {
+        "heart_rate": 59.7,
+        "spo2": 92.8,
+        "respiratory_rate": 19.5
+      },
+      "current": {
+        "heart_rate": 62.8,
+        "spo2": 92.9,
+        "respiratory_rate": 17.8
+      },
+      "expected_features": {
+        "heart_rate": 62.8,
+        "spo2": 92.9,
+        "respiratory_rate": 17.8,
+        "heart_rate_delta": 3.1,
+        "spo2_delta": 0.1,
+        "respiratory_rate_delta": -1.7
+      },
+      "expected_anomaly_score": -0.020095,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0064",
+      "scenario": "IMPROVING",
+      "window_index": 9,
+      "ground_truth_state": "improving",
+      "previous": {
+        "heart_rate": 62.8,
+        "spo2": 92.9,
+        "respiratory_rate": 17.8
+      },
+      "current": {
+        "heart_rate": 66.8,
+        "spo2": 93.6,
+        "respiratory_rate": 20.3
+      },
+      "expected_features": {
+        "heart_rate": 66.8,
+        "spo2": 93.6,
+        "respiratory_rate": 20.3,
+        "heart_rate_delta": 4.0,
+        "spo2_delta": 0.7,
+        "respiratory_rate_delta": 2.5
+      },
+      "expected_anomaly_score": -0.029576,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0064",
+      "scenario": "IMPROVING",
+      "window_index": 12,
+      "ground_truth_state": "improving",
+      "previous": {
+        "heart_rate": 63.1,
+        "spo2": 93.4,
+        "respiratory_rate": 19.2
+      },
+      "current": {
+        "heart_rate": 65.6,
+        "spo2": 93.9,
+        "respiratory_rate": 19.2
+      },
+      "expected_features": {
+        "heart_rate": 65.6,
+        "spo2": 93.9,
+        "respiratory_rate": 19.2,
+        "heart_rate_delta": 2.5,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": 0.0
+      },
+      "expected_anomaly_score": -0.073113,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0064",
+      "scenario": "IMPROVING",
+      "window_index": 2,
+      "ground_truth_state": "improving",
+      "previous": {
+        "heart_rate": 61.3,
+        "spo2": 92.8,
+        "respiratory_rate": 20.6
+      },
+      "current": {
+        "heart_rate": 69.7,
+        "spo2": 93.2,
+        "respiratory_rate": 17.2
+      },
+      "expected_features": {
+        "heart_rate": 69.7,
+        "spo2": 93.2,
+        "respiratory_rate": 17.2,
+        "heart_rate_delta": 8.4,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": -3.4
+      },
+      "expected_anomaly_score": 0.02644,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0064",
+      "scenario": "IMPROVING",
+      "window_index": 3,
+      "ground_truth_state": "improving",
+      "previous": {
+        "heart_rate": 69.7,
+        "spo2": 93.2,
+        "respiratory_rate": 17.2
+      },
+      "current": {
+        "heart_rate": 59.3,
+        "spo2": 93.5,
+        "respiratory_rate": 22.1
+      },
+      "expected_features": {
+        "heart_rate": 59.3,
+        "spo2": 93.5,
+        "respiratory_rate": 22.1,
+        "heart_rate_delta": -10.4,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": 4.9
+      },
+      "expected_anomaly_score": 0.126771,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0064",
+      "scenario": "IMPROVING",
+      "window_index": 4,
+      "ground_truth_state": "improving",
+      "previous": {
+        "heart_rate": 59.3,
+        "spo2": 93.5,
+        "respiratory_rate": 22.1
+      },
+      "current": {
+        "heart_rate": 57.2,
+        "spo2": 93.5,
+        "respiratory_rate": 20.0
+      },
+      "expected_features": {
+        "heart_rate": 57.2,
+        "spo2": 93.5,
+        "respiratory_rate": 20.0,
+        "heart_rate_delta": -2.1,
+        "spo2_delta": 0.0,
+        "respiratory_rate_delta": -2.1
+      },
+      "expected_anomaly_score": 0.003461,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0064",
+      "scenario": "IMPROVING",
+      "window_index": 6,
+      "ground_truth_state": "improving",
+      "previous": {
+        "heart_rate": 60.5,
+        "spo2": 93.2,
+        "respiratory_rate": 20.1
+      },
+      "current": {
+        "heart_rate": 61.3,
+        "spo2": 93.0,
+        "respiratory_rate": 21.7
+      },
+      "expected_features": {
+        "heart_rate": 61.3,
+        "spo2": 93.0,
+        "respiratory_rate": 21.7,
+        "heart_rate_delta": 0.8,
+        "spo2_delta": -0.2,
+        "respiratory_rate_delta": 1.6
+      },
+      "expected_anomaly_score": 0.014731,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0002",
+      "scenario": "RECOVERY",
+      "window_index": 2,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 65.1,
+        "spo2": 94.7,
+        "respiratory_rate": 16.4
+      },
+      "current": {
+        "heart_rate": 70.9,
+        "spo2": 94.7,
+        "respiratory_rate": 16.6
+      },
+      "expected_features": {
+        "heart_rate": 70.9,
+        "spo2": 94.7,
+        "respiratory_rate": 16.6,
+        "heart_rate_delta": 5.8,
+        "spo2_delta": 0.0,
+        "respiratory_rate_delta": 0.2
+      },
+      "expected_anomaly_score": -0.108959,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0002",
+      "scenario": "RECOVERY",
+      "window_index": 3,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 70.9,
+        "spo2": 94.7,
+        "respiratory_rate": 16.6
+      },
+      "current": {
+        "heart_rate": 68.5,
+        "spo2": 94.5,
+        "respiratory_rate": 16.5
+      },
+      "expected_features": {
+        "heart_rate": 68.5,
+        "spo2": 94.5,
+        "respiratory_rate": 16.5,
+        "heart_rate_delta": -2.4,
+        "spo2_delta": -0.2,
+        "respiratory_rate_delta": -0.1
+      },
+      "expected_anomaly_score": -0.120472,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0002",
+      "scenario": "RECOVERY",
+      "window_index": 4,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 68.5,
+        "spo2": 94.5,
+        "respiratory_rate": 16.5
+      },
+      "current": {
+        "heart_rate": 68.1,
+        "spo2": 93.9,
+        "respiratory_rate": 15.0
+      },
+      "expected_features": {
+        "heart_rate": 68.1,
+        "spo2": 93.9,
+        "respiratory_rate": 15.0,
+        "heart_rate_delta": -0.4,
+        "spo2_delta": -0.6,
+        "respiratory_rate_delta": -1.5
+      },
+      "expected_anomaly_score": -0.081027,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0002",
+      "scenario": "RECOVERY",
+      "window_index": 5,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 68.1,
+        "spo2": 93.9,
+        "respiratory_rate": 15.0
+      },
+      "current": {
+        "heart_rate": 63.7,
+        "spo2": 94.2,
+        "respiratory_rate": 15.3
+      },
+      "expected_features": {
+        "heart_rate": 63.7,
+        "spo2": 94.2,
+        "respiratory_rate": 15.3,
+        "heart_rate_delta": -4.4,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": 0.3
+      },
+      "expected_anomaly_score": -0.064355,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0002",
+      "scenario": "RECOVERY",
+      "window_index": 12,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 74.7,
+        "spo2": 94.1,
+        "respiratory_rate": 18.6
+      },
+      "current": {
+        "heart_rate": 62.8,
+        "spo2": 93.2,
+        "respiratory_rate": 19.2
+      },
+      "expected_features": {
+        "heart_rate": 62.8,
+        "spo2": 93.2,
+        "respiratory_rate": 19.2,
+        "heart_rate_delta": -11.9,
+        "spo2_delta": -0.9,
+        "respiratory_rate_delta": 0.6
+      },
+      "expected_anomaly_score": 0.044192,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0002",
+      "scenario": "RECOVERY",
+      "window_index": 17,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 72.1,
+        "spo2": 93.6,
+        "respiratory_rate": 21.0
+      },
+      "current": {
+        "heart_rate": 77.4,
+        "spo2": 92.9,
+        "respiratory_rate": 17.2
+      },
+      "expected_features": {
+        "heart_rate": 77.4,
+        "spo2": 92.9,
+        "respiratory_rate": 17.2,
+        "heart_rate_delta": 5.3,
+        "spo2_delta": -0.7,
+        "respiratory_rate_delta": -3.8
+      },
+      "expected_anomaly_score": 0.034796,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0002",
+      "scenario": "RECOVERY",
+      "window_index": 19,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 72.6,
+        "spo2": 92.9,
+        "respiratory_rate": 18.6
+      },
+      "current": {
+        "heart_rate": 79.6,
+        "spo2": 93.3,
+        "respiratory_rate": 21.8
+      },
+      "expected_features": {
+        "heart_rate": 79.6,
+        "spo2": 93.3,
+        "respiratory_rate": 21.8,
+        "heart_rate_delta": 7.0,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": 3.2
+      },
+      "expected_anomaly_score": 0.022495,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0002",
+      "scenario": "RECOVERY",
+      "window_index": 20,
+      "ground_truth_state": "deteriorating",
+      "previous": {
+        "heart_rate": 79.6,
+        "spo2": 93.3,
+        "respiratory_rate": 21.8
+      },
+      "current": {
+        "heart_rate": 72.2,
+        "spo2": 93.2,
+        "respiratory_rate": 16.9
+      },
+      "expected_features": {
+        "heart_rate": 72.2,
+        "spo2": 93.2,
+        "respiratory_rate": 16.9,
+        "heart_rate_delta": -7.4,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": -4.9
+      },
+      "expected_anomaly_score": 0.047774,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0005",
+      "scenario": "STABLE",
+      "window_index": 2,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 54.4,
+        "spo2": 95.2,
+        "respiratory_rate": 14.2
+      },
+      "current": {
+        "heart_rate": 52.2,
+        "spo2": 94.4,
+        "respiratory_rate": 15.2
+      },
+      "expected_features": {
+        "heart_rate": 52.2,
+        "spo2": 94.4,
+        "respiratory_rate": 15.2,
+        "heart_rate_delta": -2.2,
+        "spo2_delta": -0.8,
+        "respiratory_rate_delta": 1.0
+      },
+      "expected_anomaly_score": -0.006368,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0005",
+      "scenario": "STABLE",
+      "window_index": 3,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 52.2,
+        "spo2": 94.4,
+        "respiratory_rate": 15.2
+      },
+      "current": {
+        "heart_rate": 54.4,
+        "spo2": 94.8,
+        "respiratory_rate": 13.0
+      },
+      "expected_features": {
+        "heart_rate": 54.4,
+        "spo2": 94.8,
+        "respiratory_rate": 13.0,
+        "heart_rate_delta": 2.2,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": -2.2
+      },
+      "expected_anomaly_score": -0.024648,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0005",
+      "scenario": "STABLE",
+      "window_index": 4,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 54.4,
+        "spo2": 94.8,
+        "respiratory_rate": 13.0
+      },
+      "current": {
+        "heart_rate": 60.6,
+        "spo2": 94.6,
+        "respiratory_rate": 12.9
+      },
+      "expected_features": {
+        "heart_rate": 60.6,
+        "spo2": 94.6,
+        "respiratory_rate": 12.9,
+        "heart_rate_delta": 6.2,
+        "spo2_delta": -0.2,
+        "respiratory_rate_delta": -0.1
+      },
+      "expected_anomaly_score": -0.043457,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0005",
+      "scenario": "STABLE",
+      "window_index": 5,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 60.6,
+        "spo2": 94.6,
+        "respiratory_rate": 12.9
+      },
+      "current": {
+        "heart_rate": 55.3,
+        "spo2": 95.1,
+        "respiratory_rate": 13.9
+      },
+      "expected_features": {
+        "heart_rate": 55.3,
+        "spo2": 95.1,
+        "respiratory_rate": 13.9,
+        "heart_rate_delta": -5.3,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": 1.0
+      },
+      "expected_anomaly_score": -0.014903,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0005",
+      "scenario": "STABLE",
+      "window_index": 11,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 57.5,
+        "spo2": 95.7,
+        "respiratory_rate": 12.5
+      },
+      "current": {
+        "heart_rate": 52.4,
+        "spo2": 95.2,
+        "respiratory_rate": 16.2
+      },
+      "expected_features": {
+        "heart_rate": 52.4,
+        "spo2": 95.2,
+        "respiratory_rate": 16.2,
+        "heart_rate_delta": -5.1,
+        "spo2_delta": -0.5,
+        "respiratory_rate_delta": 3.7
+      },
+      "expected_anomaly_score": 0.033678,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0005",
+      "scenario": "STABLE",
+      "window_index": 17,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 54.9,
+        "spo2": 95.3,
+        "respiratory_rate": 14.4
+      },
+      "current": {
+        "heart_rate": 51.8,
+        "spo2": 95.5,
+        "respiratory_rate": 10.3
+      },
+      "expected_features": {
+        "heart_rate": 51.8,
+        "spo2": 95.5,
+        "respiratory_rate": 10.3,
+        "heart_rate_delta": -3.1,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": -4.1
+      },
+      "expected_anomaly_score": 0.066352,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0005",
+      "scenario": "STABLE",
+      "window_index": 18,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 51.8,
+        "spo2": 95.5,
+        "respiratory_rate": 10.3
+      },
+      "current": {
+        "heart_rate": 55.2,
+        "spo2": 94.7,
+        "respiratory_rate": 15.2
+      },
+      "expected_features": {
+        "heart_rate": 55.2,
+        "spo2": 94.7,
+        "respiratory_rate": 15.2,
+        "heart_rate_delta": 3.4,
+        "spo2_delta": -0.8,
+        "respiratory_rate_delta": 4.9
+      },
+      "expected_anomaly_score": 0.046511,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0005",
+      "scenario": "STABLE",
+      "window_index": 19,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 55.2,
+        "spo2": 94.7,
+        "respiratory_rate": 15.2
+      },
+      "current": {
+        "heart_rate": 52.3,
+        "spo2": 94.3,
+        "respiratory_rate": 12.9
+      },
+      "expected_features": {
+        "heart_rate": 52.3,
+        "spo2": 94.3,
+        "respiratory_rate": 12.9,
+        "heart_rate_delta": -2.9,
+        "spo2_delta": -0.4,
+        "respiratory_rate_delta": -2.3
+      },
+      "expected_anomaly_score": 0.003123,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0014",
+      "scenario": "SUDDEN_DETERIORATION",
+      "window_index": 2,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 78.2,
+        "spo2": 94.5,
+        "respiratory_rate": 14.0
+      },
+      "current": {
+        "heart_rate": 82.0,
+        "spo2": 95.2,
+        "respiratory_rate": 12.6
+      },
+      "expected_features": {
+        "heart_rate": 82.0,
+        "spo2": 95.2,
+        "respiratory_rate": 12.6,
+        "heart_rate_delta": 3.8,
+        "spo2_delta": 0.7,
+        "respiratory_rate_delta": -1.4
+      },
+      "expected_anomaly_score": -0.069534,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0014",
+      "scenario": "SUDDEN_DETERIORATION",
+      "window_index": 3,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 82.0,
+        "spo2": 95.2,
+        "respiratory_rate": 12.6
+      },
+      "current": {
+        "heart_rate": 81.0,
+        "spo2": 95.7,
+        "respiratory_rate": 12.9
+      },
+      "expected_features": {
+        "heart_rate": 81.0,
+        "spo2": 95.7,
+        "respiratory_rate": 12.9,
+        "heart_rate_delta": -1.0,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": 0.3
+      },
+      "expected_anomaly_score": -0.091948,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0014",
+      "scenario": "SUDDEN_DETERIORATION",
+      "window_index": 4,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 81.0,
+        "spo2": 95.7,
+        "respiratory_rate": 12.9
+      },
+      "current": {
+        "heart_rate": 75.5,
+        "spo2": 95.1,
+        "respiratory_rate": 14.8
+      },
+      "expected_features": {
+        "heart_rate": 75.5,
+        "spo2": 95.1,
+        "respiratory_rate": 14.8,
+        "heart_rate_delta": -5.5,
+        "spo2_delta": -0.6,
+        "respiratory_rate_delta": 1.9
+      },
+      "expected_anomaly_score": -0.079816,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0014",
+      "scenario": "SUDDEN_DETERIORATION",
+      "window_index": 5,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 75.5,
+        "spo2": 95.1,
+        "respiratory_rate": 14.8
+      },
+      "current": {
+        "heart_rate": 83.8,
+        "spo2": 94.8,
+        "respiratory_rate": 14.0
+      },
+      "expected_features": {
+        "heart_rate": 83.8,
+        "spo2": 94.8,
+        "respiratory_rate": 14.0,
+        "heart_rate_delta": 8.3,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": -0.8
+      },
+      "expected_anomaly_score": -0.049057,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "patient_id": "P0014",
+      "scenario": "SUDDEN_DETERIORATION",
+      "window_index": 10,
+      "ground_truth_state": "normal",
+      "previous": {
+        "heart_rate": 73.9,
+        "spo2": 94.7,
+        "respiratory_rate": 15.1
+      },
+      "current": {
+        "heart_rate": 82.5,
+        "spo2": 95.9,
+        "respiratory_rate": 18.0
+      },
+      "expected_features": {
+        "heart_rate": 82.5,
+        "spo2": 95.9,
+        "respiratory_rate": 18.0,
+        "heart_rate_delta": 8.6,
+        "spo2_delta": 1.2,
+        "respiratory_rate_delta": 2.9
+      },
+      "expected_anomaly_score": 0.022011,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0014",
+      "scenario": "SUDDEN_DETERIORATION",
+      "window_index": 103,
+      "ground_truth_state": "acute_change",
+      "previous": {
+        "heart_rate": 82.6,
+        "spo2": 94.6,
+        "respiratory_rate": 17.4
+      },
+      "current": {
+        "heart_rate": 99.3,
+        "spo2": 90.4,
+        "respiratory_rate": 22.5
+      },
+      "expected_features": {
+        "heart_rate": 99.3,
+        "spo2": 90.4,
+        "respiratory_rate": 22.5,
+        "heart_rate_delta": 16.7,
+        "spo2_delta": -4.2,
+        "respiratory_rate_delta": 5.1
+      },
+      "expected_anomaly_score": 0.212998,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0014",
+      "scenario": "SUDDEN_DETERIORATION",
+      "window_index": 104,
+      "ground_truth_state": "acute_change",
+      "previous": {
+        "heart_rate": 99.3,
+        "spo2": 90.4,
+        "respiratory_rate": 22.5
+      },
+      "current": {
+        "heart_rate": 101.5,
+        "spo2": 89.8,
+        "respiratory_rate": 22.3
+      },
+      "expected_features": {
+        "heart_rate": 101.5,
+        "spo2": 89.8,
+        "respiratory_rate": 22.3,
+        "heart_rate_delta": 2.2,
+        "spo2_delta": -0.6,
+        "respiratory_rate_delta": -0.2
+      },
+      "expected_anomaly_score": 0.071445,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "patient_id": "P0014",
+      "scenario": "SUDDEN_DETERIORATION",
+      "window_index": 105,
+      "ground_truth_state": "acute_change",
+      "previous": {
+        "heart_rate": 101.5,
+        "spo2": 89.8,
+        "respiratory_rate": 22.3
+      },
+      "current": {
+        "heart_rate": 101.7,
+        "spo2": 90.3,
+        "respiratory_rate": 24.0
+      },
+      "expected_features": {
+        "heart_rate": 101.7,
+        "spo2": 90.3,
+        "respiratory_rate": 24.0,
+        "heart_rate_delta": 0.2,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": 1.7
+      },
+      "expected_anomaly_score": 0.103907,
+      "expected_predicted_anomaly": 1
+    }
+  ]
+}

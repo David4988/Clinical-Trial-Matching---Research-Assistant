@@ -1,0 +1,3477 @@
+{
+  "generated_by": "export_inference_fixtures.py",
+  "source": "synthetic_trial/data/observations.csv",
+  "note": "One complete patient trajectory from the evaluation half, exported unmodified. The application replays it through its own ingestion and compares every scoreable window.",
+  "patient_id": "P0014",
+  "scenario": "SUDDEN_DETERIORATION",
+  "change_point_window": 103,
+  "window_minutes": 5,
+  "model_version": "synthetic_if_v1",
+  "feature_version": "synthetic_features_v1",
+  "model_sha256": "8114caf6302beebe09d3e107a913ce27530c3d062862d98612df4e08e5f641a2",
+  "feature_order": [
+    "heart_rate",
+    "spo2",
+    "respiratory_rate",
+    "heart_rate_delta",
+    "spo2_delta",
+    "respiratory_rate_delta"
+  ],
+  "environment": {
+    "python": "3.14.5",
+    "sklearn": "1.9.0",
+    "numpy": "2.5.2",
+    "joblib": "1.5.3"
+  },
+  "windows": [
+    {
+      "window_index": 0,
+      "timestamp_minutes": 0,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 82.9,
+        "spo2": 94.9,
+        "respiratory_rate": 14.7,
+        "systolic_bp": 117.4
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": null,
+      "expected_anomaly_score": null,
+      "expected_predicted_anomaly": null
+    },
+    {
+      "window_index": 1,
+      "timestamp_minutes": 5,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.2,
+        "spo2": 94.5,
+        "respiratory_rate": 14.0,
+        "systolic_bp": 108.5
+      },
+      "coverage_percent": 96.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.2,
+        "spo2": 94.5,
+        "respiratory_rate": 14.0,
+        "heart_rate_delta": -4.7,
+        "spo2_delta": -0.4,
+        "respiratory_rate_delta": -0.7
+      },
+      "expected_anomaly_score": -0.10141,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 2,
+      "timestamp_minutes": 10,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 82.0,
+        "spo2": 95.2,
+        "respiratory_rate": 12.6,
+        "systolic_bp": 108.3
+      },
+      "coverage_percent": 99.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 82.0,
+        "spo2": 95.2,
+        "respiratory_rate": 12.6,
+        "heart_rate_delta": 3.8,
+        "spo2_delta": 0.7,
+        "respiratory_rate_delta": -1.4
+      },
+      "expected_anomaly_score": -0.069534,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 3,
+      "timestamp_minutes": 15,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 81.0,
+        "spo2": 95.7,
+        "respiratory_rate": 12.9,
+        "systolic_bp": 112.3
+      },
+      "coverage_percent": 98.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 81.0,
+        "spo2": 95.7,
+        "respiratory_rate": 12.9,
+        "heart_rate_delta": -1.0,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": 0.3
+      },
+      "expected_anomaly_score": -0.091948,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 4,
+      "timestamp_minutes": 20,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.5,
+        "spo2": 95.1,
+        "respiratory_rate": 14.8,
+        "systolic_bp": 107.8
+      },
+      "coverage_percent": 95.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.5,
+        "spo2": 95.1,
+        "respiratory_rate": 14.8,
+        "heart_rate_delta": -5.5,
+        "spo2_delta": -0.6,
+        "respiratory_rate_delta": 1.9
+      },
+      "expected_anomaly_score": -0.079816,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 5,
+      "timestamp_minutes": 25,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 83.8,
+        "spo2": 94.8,
+        "respiratory_rate": 14.0,
+        "systolic_bp": 104.9
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 83.8,
+        "spo2": 94.8,
+        "respiratory_rate": 14.0,
+        "heart_rate_delta": 8.3,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": -0.8
+      },
+      "expected_anomaly_score": -0.049057,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 6,
+      "timestamp_minutes": 30,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.2,
+        "spo2": 95.9,
+        "respiratory_rate": 16.5,
+        "systolic_bp": 117.3
+      },
+      "coverage_percent": 97.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.2,
+        "spo2": 95.9,
+        "respiratory_rate": 16.5,
+        "heart_rate_delta": -4.6,
+        "spo2_delta": 1.1,
+        "respiratory_rate_delta": 2.5
+      },
+      "expected_anomaly_score": -0.034945,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 7,
+      "timestamp_minutes": 35,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 82.9,
+        "spo2": 94.5,
+        "respiratory_rate": 16.9,
+        "systolic_bp": 103.9
+      },
+      "coverage_percent": 98.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 82.9,
+        "spo2": 94.5,
+        "respiratory_rate": 16.9,
+        "heart_rate_delta": 3.7,
+        "spo2_delta": -1.4,
+        "respiratory_rate_delta": 0.4
+      },
+      "expected_anomaly_score": -0.054011,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 8,
+      "timestamp_minutes": 40,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.4,
+        "spo2": 95.0,
+        "respiratory_rate": 14.5,
+        "systolic_bp": 99.2
+      },
+      "coverage_percent": 97.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.4,
+        "spo2": 95.0,
+        "respiratory_rate": 14.5,
+        "heart_rate_delta": -3.5,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": -2.4
+      },
+      "expected_anomaly_score": -0.099262,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 9,
+      "timestamp_minutes": 45,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 73.9,
+        "spo2": 94.7,
+        "respiratory_rate": 15.1,
+        "systolic_bp": 114.8
+      },
+      "coverage_percent": 98.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 73.9,
+        "spo2": 94.7,
+        "respiratory_rate": 15.1,
+        "heart_rate_delta": -5.5,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": 0.6
+      },
+      "expected_anomaly_score": -0.102729,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 10,
+      "timestamp_minutes": 50,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 82.5,
+        "spo2": 95.9,
+        "respiratory_rate": 18.0,
+        "systolic_bp": 116.3
+      },
+      "coverage_percent": 95.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 82.5,
+        "spo2": 95.9,
+        "respiratory_rate": 18.0,
+        "heart_rate_delta": 8.6,
+        "spo2_delta": 1.2,
+        "respiratory_rate_delta": 2.9
+      },
+      "expected_anomaly_score": 0.022011,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 11,
+      "timestamp_minutes": 55,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 81.0,
+        "spo2": 94.8,
+        "respiratory_rate": 15.3,
+        "systolic_bp": 115.4
+      },
+      "coverage_percent": 96.8,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 81.0,
+        "spo2": 94.8,
+        "respiratory_rate": 15.3,
+        "heart_rate_delta": -1.5,
+        "spo2_delta": -1.1,
+        "respiratory_rate_delta": -2.7
+      },
+      "expected_anomaly_score": -0.057092,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 12,
+      "timestamp_minutes": 60,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.4,
+        "spo2": 95.1,
+        "respiratory_rate": 13.6,
+        "systolic_bp": 108.3
+      },
+      "coverage_percent": 99.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.4,
+        "spo2": 95.1,
+        "respiratory_rate": 13.6,
+        "heart_rate_delta": -1.6,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": -1.7
+      },
+      "expected_anomaly_score": -0.102944,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 13,
+      "timestamp_minutes": 65,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 82.0,
+        "spo2": 94.7,
+        "respiratory_rate": 16.5,
+        "systolic_bp": 113.4
+      },
+      "coverage_percent": 99.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 82.0,
+        "spo2": 94.7,
+        "respiratory_rate": 16.5,
+        "heart_rate_delta": 2.6,
+        "spo2_delta": -0.4,
+        "respiratory_rate_delta": 2.9
+      },
+      "expected_anomaly_score": -0.092992,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 14,
+      "timestamp_minutes": 70,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 74.6,
+        "spo2": 95.1,
+        "respiratory_rate": 12.9,
+        "systolic_bp": 111.8
+      },
+      "coverage_percent": 98.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 74.6,
+        "spo2": 95.1,
+        "respiratory_rate": 12.9,
+        "heart_rate_delta": -7.4,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": -3.6
+      },
+      "expected_anomaly_score": -0.011153,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 15,
+      "timestamp_minutes": 75,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 76.7,
+        "spo2": 94.6,
+        "respiratory_rate": 12.4,
+        "systolic_bp": 109.4
+      },
+      "coverage_percent": 95.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 76.7,
+        "spo2": 94.6,
+        "respiratory_rate": 12.4,
+        "heart_rate_delta": 2.1,
+        "spo2_delta": -0.5,
+        "respiratory_rate_delta": -0.5
+      },
+      "expected_anomaly_score": -0.088389,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 16,
+      "timestamp_minutes": 80,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.0,
+        "spo2": 95.7,
+        "respiratory_rate": 14.4,
+        "systolic_bp": 115.3
+      },
+      "coverage_percent": 97.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.0,
+        "spo2": 95.7,
+        "respiratory_rate": 14.4,
+        "heart_rate_delta": 0.3,
+        "spo2_delta": 1.1,
+        "respiratory_rate_delta": 2.0
+      },
+      "expected_anomaly_score": -0.07559,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 17,
+      "timestamp_minutes": 85,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.4,
+        "spo2": 95.0,
+        "respiratory_rate": 14.0,
+        "systolic_bp": 112.9
+      },
+      "coverage_percent": 98.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.4,
+        "spo2": 95.0,
+        "respiratory_rate": 14.0,
+        "heart_rate_delta": 0.4,
+        "spo2_delta": -0.7,
+        "respiratory_rate_delta": -0.4
+      },
+      "expected_anomaly_score": -0.106779,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 18,
+      "timestamp_minutes": 90,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.4,
+        "spo2": 95.4,
+        "respiratory_rate": 14.8,
+        "systolic_bp": 113.2
+      },
+      "coverage_percent": 98.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.4,
+        "spo2": 95.4,
+        "respiratory_rate": 14.8,
+        "heart_rate_delta": 2.0,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": 0.8
+      },
+      "expected_anomaly_score": -0.120727,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 19,
+      "timestamp_minutes": 95,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 76.6,
+        "spo2": 95.0,
+        "respiratory_rate": 14.0,
+        "systolic_bp": 115.6
+      },
+      "coverage_percent": 97.7,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 76.6,
+        "spo2": 95.0,
+        "respiratory_rate": 14.0,
+        "heart_rate_delta": -2.8,
+        "spo2_delta": -0.4,
+        "respiratory_rate_delta": -0.8
+      },
+      "expected_anomaly_score": -0.115631,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 20,
+      "timestamp_minutes": 100,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.2,
+        "spo2": 95.6,
+        "respiratory_rate": 13.8,
+        "systolic_bp": 104.9
+      },
+      "coverage_percent": 97.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.2,
+        "spo2": 95.6,
+        "respiratory_rate": 13.8,
+        "heart_rate_delta": 1.6,
+        "spo2_delta": 0.6,
+        "respiratory_rate_delta": -0.2
+      },
+      "expected_anomaly_score": -0.110755,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 21,
+      "timestamp_minutes": 105,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.9,
+        "spo2": 94.7,
+        "respiratory_rate": 13.5,
+        "systolic_bp": 107.5
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.9,
+        "spo2": 94.7,
+        "respiratory_rate": 13.5,
+        "heart_rate_delta": 1.7,
+        "spo2_delta": -0.9,
+        "respiratory_rate_delta": -0.3
+      },
+      "expected_anomaly_score": -0.082218,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 22,
+      "timestamp_minutes": 110,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.7,
+        "spo2": 95.2,
+        "respiratory_rate": 13.3,
+        "systolic_bp": 113.5
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.7,
+        "spo2": 95.2,
+        "respiratory_rate": 13.3,
+        "heart_rate_delta": -1.2,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": -0.2
+      },
+      "expected_anomaly_score": -0.108874,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 23,
+      "timestamp_minutes": 115,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.3,
+        "spo2": 95.1,
+        "respiratory_rate": 15.4,
+        "systolic_bp": 111.6
+      },
+      "coverage_percent": 98.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.3,
+        "spo2": 95.1,
+        "respiratory_rate": 15.4,
+        "heart_rate_delta": -0.4,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": 2.1
+      },
+      "expected_anomaly_score": -0.120196,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 24,
+      "timestamp_minutes": 120,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.8,
+        "spo2": 95.3,
+        "respiratory_rate": 15.1,
+        "systolic_bp": 111.9
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.8,
+        "spo2": 95.3,
+        "respiratory_rate": 15.1,
+        "heart_rate_delta": 1.5,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": -0.3
+      },
+      "expected_anomaly_score": -0.125756,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 25,
+      "timestamp_minutes": 125,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 80.5,
+        "spo2": 95.1,
+        "respiratory_rate": 14.3,
+        "systolic_bp": 119.5
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 80.5,
+        "spo2": 95.1,
+        "respiratory_rate": 14.3,
+        "heart_rate_delta": 0.7,
+        "spo2_delta": -0.2,
+        "respiratory_rate_delta": -0.8
+      },
+      "expected_anomaly_score": -0.1202,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 26,
+      "timestamp_minutes": 130,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.8,
+        "spo2": 94.9,
+        "respiratory_rate": 12.6,
+        "systolic_bp": 105.5
+      },
+      "coverage_percent": 97.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.8,
+        "spo2": 94.9,
+        "respiratory_rate": 12.6,
+        "heart_rate_delta": -4.7,
+        "spo2_delta": -0.2,
+        "respiratory_rate_delta": -1.7
+      },
+      "expected_anomaly_score": -0.074802,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 27,
+      "timestamp_minutes": 135,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 74.1,
+        "spo2": 94.8,
+        "respiratory_rate": 14.6,
+        "systolic_bp": 116.5
+      },
+      "coverage_percent": 98.7,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 74.1,
+        "spo2": 94.8,
+        "respiratory_rate": 14.6,
+        "heart_rate_delta": -1.7,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": 2.0
+      },
+      "expected_anomaly_score": -0.116357,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 28,
+      "timestamp_minutes": 140,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.6,
+        "spo2": 94.3,
+        "respiratory_rate": 14.9,
+        "systolic_bp": 113.0
+      },
+      "coverage_percent": 99.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.6,
+        "spo2": 94.3,
+        "respiratory_rate": 14.9,
+        "heart_rate_delta": 1.5,
+        "spo2_delta": -0.5,
+        "respiratory_rate_delta": 0.3
+      },
+      "expected_anomaly_score": -0.113762,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 29,
+      "timestamp_minutes": 145,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.6,
+        "spo2": 94.5,
+        "respiratory_rate": 14.6,
+        "systolic_bp": 112.2
+      },
+      "coverage_percent": 99.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.6,
+        "spo2": 94.5,
+        "respiratory_rate": 14.6,
+        "heart_rate_delta": 2.0,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": -0.3
+      },
+      "expected_anomaly_score": -0.121191,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 30,
+      "timestamp_minutes": 150,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.4,
+        "spo2": 94.8,
+        "respiratory_rate": 12.6,
+        "systolic_bp": 98.8
+      },
+      "coverage_percent": 97.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.4,
+        "spo2": 94.8,
+        "respiratory_rate": 12.6,
+        "heart_rate_delta": -2.2,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": -2.0
+      },
+      "expected_anomaly_score": -0.078729,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 31,
+      "timestamp_minutes": 155,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 80.2,
+        "spo2": 94.9,
+        "respiratory_rate": 16.3,
+        "systolic_bp": 114.9
+      },
+      "coverage_percent": 98.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 80.2,
+        "spo2": 94.9,
+        "respiratory_rate": 16.3,
+        "heart_rate_delta": 4.8,
+        "spo2_delta": 0.1,
+        "respiratory_rate_delta": 3.7
+      },
+      "expected_anomaly_score": -0.063578,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 32,
+      "timestamp_minutes": 160,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.4,
+        "spo2": 95.6,
+        "respiratory_rate": 13.7,
+        "systolic_bp": 106.1
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.4,
+        "spo2": 95.6,
+        "respiratory_rate": 13.7,
+        "heart_rate_delta": -1.8,
+        "spo2_delta": 0.7,
+        "respiratory_rate_delta": -2.6
+      },
+      "expected_anomaly_score": -0.079295,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 33,
+      "timestamp_minutes": 165,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 74.8,
+        "spo2": 95.5,
+        "respiratory_rate": 13.7,
+        "systolic_bp": 110.1
+      },
+      "coverage_percent": 97.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 74.8,
+        "spo2": 95.5,
+        "respiratory_rate": 13.7,
+        "heart_rate_delta": -3.6,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": 0.0
+      },
+      "expected_anomaly_score": -0.096989,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 34,
+      "timestamp_minutes": 170,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.1,
+        "spo2": 94.2,
+        "respiratory_rate": 14.3,
+        "systolic_bp": 111.8
+      },
+      "coverage_percent": 99.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.1,
+        "spo2": 94.2,
+        "respiratory_rate": 14.3,
+        "heart_rate_delta": 0.3,
+        "spo2_delta": -1.3,
+        "respiratory_rate_delta": 0.6
+      },
+      "expected_anomaly_score": -0.065352,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 35,
+      "timestamp_minutes": 175,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 73.2,
+        "spo2": 95.4,
+        "respiratory_rate": 18.3,
+        "systolic_bp": 104.5
+      },
+      "coverage_percent": 98.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 73.2,
+        "spo2": 95.4,
+        "respiratory_rate": 18.3,
+        "heart_rate_delta": -1.9,
+        "spo2_delta": 1.2,
+        "respiratory_rate_delta": 4.0
+      },
+      "expected_anomaly_score": -0.034801,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 36,
+      "timestamp_minutes": 180,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 81.6,
+        "spo2": 95.1,
+        "respiratory_rate": 14.8,
+        "systolic_bp": 107.4
+      },
+      "coverage_percent": 99.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 81.6,
+        "spo2": 95.1,
+        "respiratory_rate": 14.8,
+        "heart_rate_delta": 8.4,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": -3.5
+      },
+      "expected_anomaly_score": -0.009135,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 37,
+      "timestamp_minutes": 185,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 76.3,
+        "spo2": 95.0,
+        "respiratory_rate": 13.8,
+        "systolic_bp": 112.8
+      },
+      "coverage_percent": 99.8,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 76.3,
+        "spo2": 95.0,
+        "respiratory_rate": 13.8,
+        "heart_rate_delta": -5.3,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": -1.0
+      },
+      "expected_anomaly_score": -0.097637,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 38,
+      "timestamp_minutes": 190,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.0,
+        "spo2": 95.6,
+        "respiratory_rate": 14.3,
+        "systolic_bp": 114.7
+      },
+      "coverage_percent": 97.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.0,
+        "spo2": 95.6,
+        "respiratory_rate": 14.3,
+        "heart_rate_delta": 1.7,
+        "spo2_delta": 0.6,
+        "respiratory_rate_delta": 0.5
+      },
+      "expected_anomaly_score": -0.11375,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 39,
+      "timestamp_minutes": 195,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.8,
+        "spo2": 94.9,
+        "respiratory_rate": 16.5,
+        "systolic_bp": 104.0
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.8,
+        "spo2": 94.9,
+        "respiratory_rate": 16.5,
+        "heart_rate_delta": -0.2,
+        "spo2_delta": -0.7,
+        "respiratory_rate_delta": 2.2
+      },
+      "expected_anomaly_score": -0.107324,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 40,
+      "timestamp_minutes": 200,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.1,
+        "spo2": 95.3,
+        "respiratory_rate": 13.1,
+        "systolic_bp": 120.5
+      },
+      "coverage_percent": 97.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.1,
+        "spo2": 95.3,
+        "respiratory_rate": 13.1,
+        "heart_rate_delta": 1.3,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": -3.4
+      },
+      "expected_anomaly_score": -0.064445,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 41,
+      "timestamp_minutes": 205,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 82.3,
+        "spo2": 95.4,
+        "respiratory_rate": 15.0,
+        "systolic_bp": 111.3
+      },
+      "coverage_percent": 96.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 82.3,
+        "spo2": 95.4,
+        "respiratory_rate": 15.0,
+        "heart_rate_delta": 3.2,
+        "spo2_delta": 0.1,
+        "respiratory_rate_delta": 1.9
+      },
+      "expected_anomaly_score": -0.098965,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 42,
+      "timestamp_minutes": 210,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 83.4,
+        "spo2": 95.3,
+        "respiratory_rate": 16.3,
+        "systolic_bp": 106.5
+      },
+      "coverage_percent": 99.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 83.4,
+        "spo2": 95.3,
+        "respiratory_rate": 16.3,
+        "heart_rate_delta": 1.1,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": 1.3
+      },
+      "expected_anomaly_score": -0.119419,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 43,
+      "timestamp_minutes": 215,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 82.1,
+        "spo2": 95.7,
+        "respiratory_rate": 14.2,
+        "systolic_bp": 116.6
+      },
+      "coverage_percent": 98.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 82.1,
+        "spo2": 95.7,
+        "respiratory_rate": 14.2,
+        "heart_rate_delta": -1.3,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": -2.1
+      },
+      "expected_anomaly_score": -0.092008,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 44,
+      "timestamp_minutes": 220,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.2,
+        "spo2": 94.7,
+        "respiratory_rate": 12.7,
+        "systolic_bp": 115.6
+      },
+      "coverage_percent": 98.7,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.2,
+        "spo2": 94.7,
+        "respiratory_rate": 12.7,
+        "heart_rate_delta": -3.9,
+        "spo2_delta": -1.0,
+        "respiratory_rate_delta": -1.5
+      },
+      "expected_anomaly_score": -0.051073,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 45,
+      "timestamp_minutes": 225,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 86.1,
+        "spo2": 94.9,
+        "respiratory_rate": 12.4,
+        "systolic_bp": 108.2
+      },
+      "coverage_percent": 99.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 86.1,
+        "spo2": 94.9,
+        "respiratory_rate": 12.4,
+        "heart_rate_delta": 7.9,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": -0.3
+      },
+      "expected_anomaly_score": -0.033521,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 46,
+      "timestamp_minutes": 230,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.5,
+        "spo2": 95.1,
+        "respiratory_rate": 13.6,
+        "systolic_bp": 118.1
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.5,
+        "spo2": 95.1,
+        "respiratory_rate": 13.6,
+        "heart_rate_delta": -10.6,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": 1.2
+      },
+      "expected_anomaly_score": -0.007966,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 47,
+      "timestamp_minutes": 235,
+      "dose_number": 1,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 76.7,
+        "spo2": 94.7,
+        "respiratory_rate": 13.5,
+        "systolic_bp": 113.6
+      },
+      "coverage_percent": 96.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 76.7,
+        "spo2": 94.7,
+        "respiratory_rate": 13.5,
+        "heart_rate_delta": 1.2,
+        "spo2_delta": -0.4,
+        "respiratory_rate_delta": -0.1
+      },
+      "expected_anomaly_score": -0.114754,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 48,
+      "timestamp_minutes": 240,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 80.1,
+        "spo2": 94.7,
+        "respiratory_rate": 14.9,
+        "systolic_bp": 107.7
+      },
+      "coverage_percent": 96.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 80.1,
+        "spo2": 94.7,
+        "respiratory_rate": 14.9,
+        "heart_rate_delta": 3.4,
+        "spo2_delta": 0.0,
+        "respiratory_rate_delta": 1.4
+      },
+      "expected_anomaly_score": -0.116135,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 49,
+      "timestamp_minutes": 245,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.9,
+        "spo2": 95.6,
+        "respiratory_rate": 16.2,
+        "systolic_bp": 103.1
+      },
+      "coverage_percent": 99.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.9,
+        "spo2": 95.6,
+        "respiratory_rate": 16.2,
+        "heart_rate_delta": -1.2,
+        "spo2_delta": 0.9,
+        "respiratory_rate_delta": 1.3
+      },
+      "expected_anomaly_score": -0.094783,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 50,
+      "timestamp_minutes": 250,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.3,
+        "spo2": 95.6,
+        "respiratory_rate": 14.3,
+        "systolic_bp": 109.9
+      },
+      "coverage_percent": 97.7,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.3,
+        "spo2": 95.6,
+        "respiratory_rate": 14.3,
+        "heart_rate_delta": -1.6,
+        "spo2_delta": 0.0,
+        "respiratory_rate_delta": -1.9
+      },
+      "expected_anomaly_score": -0.101982,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 51,
+      "timestamp_minutes": 255,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.6,
+        "spo2": 93.7,
+        "respiratory_rate": 15.2,
+        "systolic_bp": 97.7
+      },
+      "coverage_percent": 98.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.6,
+        "spo2": 93.7,
+        "respiratory_rate": 15.2,
+        "heart_rate_delta": 2.3,
+        "spo2_delta": -1.9,
+        "respiratory_rate_delta": 0.9
+      },
+      "expected_anomaly_score": -0.009238,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 52,
+      "timestamp_minutes": 260,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 80.0,
+        "spo2": 93.9,
+        "respiratory_rate": 14.7,
+        "systolic_bp": 108.8
+      },
+      "coverage_percent": 96.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 80.0,
+        "spo2": 93.9,
+        "respiratory_rate": 14.7,
+        "heart_rate_delta": 0.4,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": -0.5
+      },
+      "expected_anomaly_score": -0.096017,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 53,
+      "timestamp_minutes": 265,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 83.9,
+        "spo2": 94.5,
+        "respiratory_rate": 13.0,
+        "systolic_bp": 112.8
+      },
+      "coverage_percent": 98.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 83.9,
+        "spo2": 94.5,
+        "respiratory_rate": 13.0,
+        "heart_rate_delta": 3.9,
+        "spo2_delta": 0.6,
+        "respiratory_rate_delta": -1.7
+      },
+      "expected_anomaly_score": -0.063317,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 54,
+      "timestamp_minutes": 270,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 76.1,
+        "spo2": 94.9,
+        "respiratory_rate": 14.1,
+        "systolic_bp": 108.7
+      },
+      "coverage_percent": 98.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 76.1,
+        "spo2": 94.9,
+        "respiratory_rate": 14.1,
+        "heart_rate_delta": -7.8,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": 1.1
+      },
+      "expected_anomaly_score": -0.059148,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 55,
+      "timestamp_minutes": 275,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 70.4,
+        "spo2": 95.1,
+        "respiratory_rate": 16.5,
+        "systolic_bp": 108.9
+      },
+      "coverage_percent": 98.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 70.4,
+        "spo2": 95.1,
+        "respiratory_rate": 16.5,
+        "heart_rate_delta": -5.7,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": 2.4
+      },
+      "expected_anomaly_score": -0.086506,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 56,
+      "timestamp_minutes": 280,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 81.2,
+        "spo2": 94.7,
+        "respiratory_rate": 15.3,
+        "systolic_bp": 121.3
+      },
+      "coverage_percent": 96.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 81.2,
+        "spo2": 94.7,
+        "respiratory_rate": 15.3,
+        "heart_rate_delta": 10.8,
+        "spo2_delta": -0.4,
+        "respiratory_rate_delta": -1.2
+      },
+      "expected_anomaly_score": -0.032128,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 57,
+      "timestamp_minutes": 285,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 81.3,
+        "spo2": 95.9,
+        "respiratory_rate": 14.3,
+        "systolic_bp": 126.2
+      },
+      "coverage_percent": 99.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 81.3,
+        "spo2": 95.9,
+        "respiratory_rate": 14.3,
+        "heart_rate_delta": 0.1,
+        "spo2_delta": 1.2,
+        "respiratory_rate_delta": -1.0
+      },
+      "expected_anomaly_score": -0.058679,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 58,
+      "timestamp_minutes": 290,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.0,
+        "spo2": 94.7,
+        "respiratory_rate": 15.4,
+        "systolic_bp": 101.7
+      },
+      "coverage_percent": 98.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.0,
+        "spo2": 94.7,
+        "respiratory_rate": 15.4,
+        "heart_rate_delta": -4.3,
+        "spo2_delta": -1.2,
+        "respiratory_rate_delta": 1.1
+      },
+      "expected_anomaly_score": -0.080043,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 59,
+      "timestamp_minutes": 295,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.8,
+        "spo2": 95.5,
+        "respiratory_rate": 14.6,
+        "systolic_bp": 111.0
+      },
+      "coverage_percent": 97.7,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.8,
+        "spo2": 95.5,
+        "respiratory_rate": 14.6,
+        "heart_rate_delta": -1.2,
+        "spo2_delta": 0.8,
+        "respiratory_rate_delta": -0.8
+      },
+      "expected_anomaly_score": -0.110893,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 60,
+      "timestamp_minutes": 300,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.1,
+        "spo2": 94.8,
+        "respiratory_rate": 15.3,
+        "systolic_bp": 109.1
+      },
+      "coverage_percent": 97.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.1,
+        "spo2": 94.8,
+        "respiratory_rate": 15.3,
+        "heart_rate_delta": 3.3,
+        "spo2_delta": -0.7,
+        "respiratory_rate_delta": 0.7
+      },
+      "expected_anomaly_score": -0.108077,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 61,
+      "timestamp_minutes": 305,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 74.3,
+        "spo2": 94.5,
+        "respiratory_rate": 13.4,
+        "systolic_bp": 105.2
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 74.3,
+        "spo2": 94.5,
+        "respiratory_rate": 13.4,
+        "heart_rate_delta": -4.8,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": -1.9
+      },
+      "expected_anomaly_score": -0.084019,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 62,
+      "timestamp_minutes": 310,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 74.0,
+        "spo2": 94.9,
+        "respiratory_rate": 16.4,
+        "systolic_bp": 114.6
+      },
+      "coverage_percent": 96.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 74.0,
+        "spo2": 94.9,
+        "respiratory_rate": 16.4,
+        "heart_rate_delta": -0.3,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": 3.0
+      },
+      "expected_anomaly_score": -0.095465,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 63,
+      "timestamp_minutes": 315,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.0,
+        "spo2": 95.2,
+        "respiratory_rate": 13.4,
+        "systolic_bp": 106.3
+      },
+      "coverage_percent": 98.7,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.0,
+        "spo2": 95.2,
+        "respiratory_rate": 13.4,
+        "heart_rate_delta": 3.0,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": -3.0
+      },
+      "expected_anomaly_score": -0.089502,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 64,
+      "timestamp_minutes": 320,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 80.5,
+        "spo2": 95.4,
+        "respiratory_rate": 14.3,
+        "systolic_bp": 116.5
+      },
+      "coverage_percent": 98.7,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 80.5,
+        "spo2": 95.4,
+        "respiratory_rate": 14.3,
+        "heart_rate_delta": 3.5,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": 0.9
+      },
+      "expected_anomaly_score": -0.111797,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 65,
+      "timestamp_minutes": 325,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.9,
+        "spo2": 94.9,
+        "respiratory_rate": 15.6,
+        "systolic_bp": 110.4
+      },
+      "coverage_percent": 97.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.9,
+        "spo2": 94.9,
+        "respiratory_rate": 15.6,
+        "heart_rate_delta": -1.6,
+        "spo2_delta": -0.5,
+        "respiratory_rate_delta": 1.3
+      },
+      "expected_anomaly_score": -0.118636,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 66,
+      "timestamp_minutes": 330,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.3,
+        "spo2": 95.0,
+        "respiratory_rate": 11.9,
+        "systolic_bp": 113.5
+      },
+      "coverage_percent": 98.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.3,
+        "spo2": 95.0,
+        "respiratory_rate": 11.9,
+        "heart_rate_delta": -1.6,
+        "spo2_delta": 0.1,
+        "respiratory_rate_delta": -3.7
+      },
+      "expected_anomaly_score": -0.04615,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 67,
+      "timestamp_minutes": 335,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 76.4,
+        "spo2": 94.9,
+        "respiratory_rate": 14.1,
+        "systolic_bp": 117.0
+      },
+      "coverage_percent": 98.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 76.4,
+        "spo2": 94.9,
+        "respiratory_rate": 14.1,
+        "heart_rate_delta": -0.9,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": 2.2
+      },
+      "expected_anomaly_score": -0.106267,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 68,
+      "timestamp_minutes": 340,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.5,
+        "spo2": 95.4,
+        "respiratory_rate": 14.8,
+        "systolic_bp": 114.5
+      },
+      "coverage_percent": 99.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.5,
+        "spo2": 95.4,
+        "respiratory_rate": 14.8,
+        "heart_rate_delta": 2.1,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": 0.7
+      },
+      "expected_anomaly_score": -0.121783,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 69,
+      "timestamp_minutes": 345,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.9,
+        "spo2": 94.0,
+        "respiratory_rate": 17.4,
+        "systolic_bp": 111.1
+      },
+      "coverage_percent": 99.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.9,
+        "spo2": 94.0,
+        "respiratory_rate": 17.4,
+        "heart_rate_delta": -0.6,
+        "spo2_delta": -1.4,
+        "respiratory_rate_delta": 2.6
+      },
+      "expected_anomaly_score": -0.043105,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 70,
+      "timestamp_minutes": 350,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.9,
+        "spo2": 95.0,
+        "respiratory_rate": 14.8,
+        "systolic_bp": 120.6
+      },
+      "coverage_percent": 97.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.9,
+        "spo2": 95.0,
+        "respiratory_rate": 14.8,
+        "heart_rate_delta": 0.0,
+        "spo2_delta": 1.0,
+        "respiratory_rate_delta": -2.6
+      },
+      "expected_anomaly_score": -0.077518,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 71,
+      "timestamp_minutes": 355,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.4,
+        "spo2": 94.9,
+        "respiratory_rate": 15.0,
+        "systolic_bp": 113.1
+      },
+      "coverage_percent": 96.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.4,
+        "spo2": 94.9,
+        "respiratory_rate": 15.0,
+        "heart_rate_delta": -0.5,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": 0.2
+      },
+      "expected_anomaly_score": -0.135612,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 72,
+      "timestamp_minutes": 360,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.3,
+        "spo2": 95.1,
+        "respiratory_rate": 14.5,
+        "systolic_bp": 107.1
+      },
+      "coverage_percent": 98.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.3,
+        "spo2": 95.1,
+        "respiratory_rate": 14.5,
+        "heart_rate_delta": 1.9,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": -0.5
+      },
+      "expected_anomaly_score": -0.124088,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 73,
+      "timestamp_minutes": 365,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.6,
+        "spo2": 94.2,
+        "respiratory_rate": 14.1,
+        "systolic_bp": 110.7
+      },
+      "coverage_percent": 98.8,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.6,
+        "spo2": 94.2,
+        "respiratory_rate": 14.1,
+        "heart_rate_delta": 0.3,
+        "spo2_delta": -0.9,
+        "respiratory_rate_delta": -0.4
+      },
+      "expected_anomaly_score": -0.089489,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 74,
+      "timestamp_minutes": 370,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.6,
+        "spo2": 94.6,
+        "respiratory_rate": 16.9,
+        "systolic_bp": 111.2
+      },
+      "coverage_percent": 95.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.6,
+        "spo2": 94.6,
+        "respiratory_rate": 16.9,
+        "heart_rate_delta": -2.0,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": 2.8
+      },
+      "expected_anomaly_score": -0.0984,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 75,
+      "timestamp_minutes": 375,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.4,
+        "spo2": 95.3,
+        "respiratory_rate": 15.7,
+        "systolic_bp": 116.8
+      },
+      "coverage_percent": 99.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.4,
+        "spo2": 95.3,
+        "respiratory_rate": 15.7,
+        "heart_rate_delta": 1.8,
+        "spo2_delta": 0.7,
+        "respiratory_rate_delta": -1.2
+      },
+      "expected_anomaly_score": -0.114137,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 76,
+      "timestamp_minutes": 380,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 76.2,
+        "spo2": 94.4,
+        "respiratory_rate": 14.6,
+        "systolic_bp": 115.3
+      },
+      "coverage_percent": 99.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 76.2,
+        "spo2": 94.4,
+        "respiratory_rate": 14.6,
+        "heart_rate_delta": -3.2,
+        "spo2_delta": -0.9,
+        "respiratory_rate_delta": -1.1
+      },
+      "expected_anomaly_score": -0.085929,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 77,
+      "timestamp_minutes": 385,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.7,
+        "spo2": 94.6,
+        "respiratory_rate": 16.1,
+        "systolic_bp": 116.6
+      },
+      "coverage_percent": 97.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.7,
+        "spo2": 94.6,
+        "respiratory_rate": 16.1,
+        "heart_rate_delta": -0.5,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": 1.5
+      },
+      "expected_anomaly_score": -0.122675,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 78,
+      "timestamp_minutes": 390,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 82.6,
+        "spo2": 95.6,
+        "respiratory_rate": 13.7,
+        "systolic_bp": 106.8
+      },
+      "coverage_percent": 98.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 82.6,
+        "spo2": 95.6,
+        "respiratory_rate": 13.7,
+        "heart_rate_delta": 6.9,
+        "spo2_delta": 1.0,
+        "respiratory_rate_delta": -2.4
+      },
+      "expected_anomaly_score": -0.019415,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 79,
+      "timestamp_minutes": 395,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.1,
+        "spo2": 94.5,
+        "respiratory_rate": 14.2,
+        "systolic_bp": 113.4
+      },
+      "coverage_percent": 98.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.1,
+        "spo2": 94.5,
+        "respiratory_rate": 14.2,
+        "heart_rate_delta": -7.5,
+        "spo2_delta": -1.1,
+        "respiratory_rate_delta": 0.5
+      },
+      "expected_anomaly_score": -0.049063,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 80,
+      "timestamp_minutes": 400,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.5,
+        "spo2": 94.8,
+        "respiratory_rate": 13.5,
+        "systolic_bp": 108.6
+      },
+      "coverage_percent": 96.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.5,
+        "spo2": 94.8,
+        "respiratory_rate": 13.5,
+        "heart_rate_delta": 0.4,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": -0.7
+      },
+      "expected_anomaly_score": -0.112813,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 81,
+      "timestamp_minutes": 405,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.5,
+        "spo2": 95.8,
+        "respiratory_rate": 14.1,
+        "systolic_bp": 110.9
+      },
+      "coverage_percent": 96.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.5,
+        "spo2": 95.8,
+        "respiratory_rate": 14.1,
+        "heart_rate_delta": 2.0,
+        "spo2_delta": 1.0,
+        "respiratory_rate_delta": 0.6
+      },
+      "expected_anomaly_score": -0.082829,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 82,
+      "timestamp_minutes": 410,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.2,
+        "spo2": 95.2,
+        "respiratory_rate": 16.6,
+        "systolic_bp": 115.8
+      },
+      "coverage_percent": 99.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.2,
+        "spo2": 95.2,
+        "respiratory_rate": 16.6,
+        "heart_rate_delta": 0.7,
+        "spo2_delta": -0.6,
+        "respiratory_rate_delta": 2.5
+      },
+      "expected_anomaly_score": -0.097464,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 83,
+      "timestamp_minutes": 415,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.3,
+        "spo2": 96.2,
+        "respiratory_rate": 15.3,
+        "systolic_bp": 109.8
+      },
+      "coverage_percent": 97.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.3,
+        "spo2": 96.2,
+        "respiratory_rate": 15.3,
+        "heart_rate_delta": -0.9,
+        "spo2_delta": 1.0,
+        "respiratory_rate_delta": -1.3
+      },
+      "expected_anomaly_score": -0.063718,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 84,
+      "timestamp_minutes": 420,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.4,
+        "spo2": 95.1,
+        "respiratory_rate": 14.8,
+        "systolic_bp": 101.1
+      },
+      "coverage_percent": 98.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.4,
+        "spo2": 95.1,
+        "respiratory_rate": 14.8,
+        "heart_rate_delta": 0.1,
+        "spo2_delta": -1.1,
+        "respiratory_rate_delta": -0.5
+      },
+      "expected_anomaly_score": -0.085476,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 85,
+      "timestamp_minutes": 425,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 81.1,
+        "spo2": 95.7,
+        "respiratory_rate": 13.0,
+        "systolic_bp": 110.3
+      },
+      "coverage_percent": 97.8,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 81.1,
+        "spo2": 95.7,
+        "respiratory_rate": 13.0,
+        "heart_rate_delta": 3.7,
+        "spo2_delta": 0.6,
+        "respiratory_rate_delta": -1.8
+      },
+      "expected_anomaly_score": -0.080175,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 86,
+      "timestamp_minutes": 430,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 79.4,
+        "spo2": 95.4,
+        "respiratory_rate": 15.7,
+        "systolic_bp": 111.9
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 79.4,
+        "spo2": 95.4,
+        "respiratory_rate": 15.7,
+        "heart_rate_delta": -1.7,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": 2.7
+      },
+      "expected_anomaly_score": -0.092124,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 87,
+      "timestamp_minutes": 435,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.7,
+        "spo2": 94.8,
+        "respiratory_rate": 15.0,
+        "systolic_bp": 107.3
+      },
+      "coverage_percent": 96.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.7,
+        "spo2": 94.8,
+        "respiratory_rate": 15.0,
+        "heart_rate_delta": -0.7,
+        "spo2_delta": -0.6,
+        "respiratory_rate_delta": -0.7
+      },
+      "expected_anomaly_score": -0.115464,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 88,
+      "timestamp_minutes": 440,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 83.8,
+        "spo2": 95.3,
+        "respiratory_rate": 12.7,
+        "systolic_bp": 108.3
+      },
+      "coverage_percent": 97.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 83.8,
+        "spo2": 95.3,
+        "respiratory_rate": 12.7,
+        "heart_rate_delta": 5.1,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": -2.3
+      },
+      "expected_anomaly_score": -0.046606,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 89,
+      "timestamp_minutes": 445,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 75.6,
+        "spo2": 95.5,
+        "respiratory_rate": 16.2,
+        "systolic_bp": 111.1
+      },
+      "coverage_percent": 98.8,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 75.6,
+        "spo2": 95.5,
+        "respiratory_rate": 16.2,
+        "heart_rate_delta": -8.2,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": 3.5
+      },
+      "expected_anomaly_score": -0.021357,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 90,
+      "timestamp_minutes": 450,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.0,
+        "spo2": 95.5,
+        "respiratory_rate": 13.5,
+        "systolic_bp": 104.9
+      },
+      "coverage_percent": 97.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.0,
+        "spo2": 95.5,
+        "respiratory_rate": 13.5,
+        "heart_rate_delta": 2.4,
+        "spo2_delta": 0.0,
+        "respiratory_rate_delta": -2.7
+      },
+      "expected_anomaly_score": -0.080689,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 91,
+      "timestamp_minutes": 455,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 85.3,
+        "spo2": 95.8,
+        "respiratory_rate": 14.8,
+        "systolic_bp": 110.6
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 85.3,
+        "spo2": 95.8,
+        "respiratory_rate": 14.8,
+        "heart_rate_delta": 7.3,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": 1.3
+      },
+      "expected_anomaly_score": -0.039819,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 92,
+      "timestamp_minutes": 460,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.6,
+        "spo2": 94.5,
+        "respiratory_rate": 13.7,
+        "systolic_bp": 117.4
+      },
+      "coverage_percent": 97.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.6,
+        "spo2": 94.5,
+        "respiratory_rate": 13.7,
+        "heart_rate_delta": -7.7,
+        "spo2_delta": -1.3,
+        "respiratory_rate_delta": -1.1
+      },
+      "expected_anomaly_score": -0.001349,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 93,
+      "timestamp_minutes": 465,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 83.0,
+        "spo2": 95.3,
+        "respiratory_rate": 15.8,
+        "systolic_bp": 109.8
+      },
+      "coverage_percent": 95.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 83.0,
+        "spo2": 95.3,
+        "respiratory_rate": 15.8,
+        "heart_rate_delta": 5.4,
+        "spo2_delta": 0.8,
+        "respiratory_rate_delta": 2.1
+      },
+      "expected_anomaly_score": -0.055968,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 94,
+      "timestamp_minutes": 470,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.7,
+        "spo2": 95.1,
+        "respiratory_rate": 16.8,
+        "systolic_bp": 115.1
+      },
+      "coverage_percent": 99.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.7,
+        "spo2": 95.1,
+        "respiratory_rate": 16.8,
+        "heart_rate_delta": -4.3,
+        "spo2_delta": -0.2,
+        "respiratory_rate_delta": 1.0
+      },
+      "expected_anomaly_score": -0.124338,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 95,
+      "timestamp_minutes": 475,
+      "dose_number": 2,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 73.7,
+        "spo2": 96.2,
+        "respiratory_rate": 15.3,
+        "systolic_bp": 112.1
+      },
+      "coverage_percent": 98.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 73.7,
+        "spo2": 96.2,
+        "respiratory_rate": 15.3,
+        "heart_rate_delta": -5.0,
+        "spo2_delta": 1.1,
+        "respiratory_rate_delta": -1.5
+      },
+      "expected_anomaly_score": -0.035351,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 96,
+      "timestamp_minutes": 480,
+      "dose_number": 3,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 83.7,
+        "spo2": 95.6,
+        "respiratory_rate": 14.2,
+        "systolic_bp": 116.2
+      },
+      "coverage_percent": 97.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 83.7,
+        "spo2": 95.6,
+        "respiratory_rate": 14.2,
+        "heart_rate_delta": 10.0,
+        "spo2_delta": -0.6,
+        "respiratory_rate_delta": -1.1
+      },
+      "expected_anomaly_score": -0.005292,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 97,
+      "timestamp_minutes": 485,
+      "dose_number": 3,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 77.7,
+        "spo2": 94.3,
+        "respiratory_rate": 14.9,
+        "systolic_bp": 110.1
+      },
+      "coverage_percent": 97.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 77.7,
+        "spo2": 94.3,
+        "respiratory_rate": 14.9,
+        "heart_rate_delta": -6.0,
+        "spo2_delta": -1.3,
+        "respiratory_rate_delta": 0.7
+      },
+      "expected_anomaly_score": -0.040291,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 98,
+      "timestamp_minutes": 490,
+      "dose_number": 3,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 76.7,
+        "spo2": 94.7,
+        "respiratory_rate": 14.3,
+        "systolic_bp": 115.0
+      },
+      "coverage_percent": 98.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 76.7,
+        "spo2": 94.7,
+        "respiratory_rate": 14.3,
+        "heart_rate_delta": -1.0,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": -0.6
+      },
+      "expected_anomaly_score": -0.118625,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 99,
+      "timestamp_minutes": 495,
+      "dose_number": 3,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.8,
+        "spo2": 95.0,
+        "respiratory_rate": 16.6,
+        "systolic_bp": 106.7
+      },
+      "coverage_percent": 98.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.8,
+        "spo2": 95.0,
+        "respiratory_rate": 16.6,
+        "heart_rate_delta": 2.1,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": 2.3
+      },
+      "expected_anomaly_score": -0.110788,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 100,
+      "timestamp_minutes": 500,
+      "dose_number": 3,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 78.0,
+        "spo2": 94.7,
+        "respiratory_rate": 12.8,
+        "systolic_bp": 115.4
+      },
+      "coverage_percent": 97.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 78.0,
+        "spo2": 94.7,
+        "respiratory_rate": 12.8,
+        "heart_rate_delta": -0.8,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": -3.8
+      },
+      "expected_anomaly_score": -0.055344,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 101,
+      "timestamp_minutes": 505,
+      "dose_number": 3,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 80.7,
+        "spo2": 94.4,
+        "respiratory_rate": 14.1,
+        "systolic_bp": 108.5
+      },
+      "coverage_percent": 98.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 80.7,
+        "spo2": 94.4,
+        "respiratory_rate": 14.1,
+        "heart_rate_delta": 2.7,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": 1.3
+      },
+      "expected_anomaly_score": -0.110966,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 102,
+      "timestamp_minutes": 510,
+      "dose_number": 3,
+      "ground_truth_state": "normal",
+      "observed": {
+        "heart_rate": 82.6,
+        "spo2": 94.6,
+        "respiratory_rate": 17.4,
+        "systolic_bp": 119.8
+      },
+      "coverage_percent": 95.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 82.6,
+        "spo2": 94.6,
+        "respiratory_rate": 17.4,
+        "heart_rate_delta": 1.9,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": 3.3
+      },
+      "expected_anomaly_score": -0.075542,
+      "expected_predicted_anomaly": 0
+    },
+    {
+      "window_index": 103,
+      "timestamp_minutes": 515,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 99.3,
+        "spo2": 90.4,
+        "respiratory_rate": 22.5,
+        "systolic_bp": 89.2
+      },
+      "coverage_percent": 97.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 99.3,
+        "spo2": 90.4,
+        "respiratory_rate": 22.5,
+        "heart_rate_delta": 16.7,
+        "spo2_delta": -4.2,
+        "respiratory_rate_delta": 5.1
+      },
+      "expected_anomaly_score": 0.212998,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 104,
+      "timestamp_minutes": 520,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 101.5,
+        "spo2": 89.8,
+        "respiratory_rate": 22.3,
+        "systolic_bp": 84.7
+      },
+      "coverage_percent": 97.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 101.5,
+        "spo2": 89.8,
+        "respiratory_rate": 22.3,
+        "heart_rate_delta": 2.2,
+        "spo2_delta": -0.6,
+        "respiratory_rate_delta": -0.2
+      },
+      "expected_anomaly_score": 0.071445,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 105,
+      "timestamp_minutes": 525,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 101.7,
+        "spo2": 90.3,
+        "respiratory_rate": 24.0,
+        "systolic_bp": 85.3
+      },
+      "coverage_percent": 97.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 101.7,
+        "spo2": 90.3,
+        "respiratory_rate": 24.0,
+        "heart_rate_delta": 0.2,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": 1.7
+      },
+      "expected_anomaly_score": 0.103907,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 106,
+      "timestamp_minutes": 530,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 99.0,
+        "spo2": 90.5,
+        "respiratory_rate": 22.6,
+        "systolic_bp": 86.6
+      },
+      "coverage_percent": 98.8,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 99.0,
+        "spo2": 90.5,
+        "respiratory_rate": 22.6,
+        "heart_rate_delta": -2.7,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": -1.4
+      },
+      "expected_anomaly_score": 0.084753,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 107,
+      "timestamp_minutes": 535,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 97.9,
+        "spo2": 89.8,
+        "respiratory_rate": 22.9,
+        "systolic_bp": 88.6
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 97.9,
+        "spo2": 89.8,
+        "respiratory_rate": 22.9,
+        "heart_rate_delta": -1.1,
+        "spo2_delta": -0.7,
+        "respiratory_rate_delta": 0.3
+      },
+      "expected_anomaly_score": 0.087554,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 108,
+      "timestamp_minutes": 540,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 95.5,
+        "spo2": 89.8,
+        "respiratory_rate": 23.6,
+        "systolic_bp": 84.7
+      },
+      "coverage_percent": 97.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 95.5,
+        "spo2": 89.8,
+        "respiratory_rate": 23.6,
+        "heart_rate_delta": -2.4,
+        "spo2_delta": 0.0,
+        "respiratory_rate_delta": 0.7
+      },
+      "expected_anomaly_score": 0.091543,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 109,
+      "timestamp_minutes": 545,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 99.3,
+        "spo2": 89.5,
+        "respiratory_rate": 24.2,
+        "systolic_bp": 102.7
+      },
+      "coverage_percent": 99.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 99.3,
+        "spo2": 89.5,
+        "respiratory_rate": 24.2,
+        "heart_rate_delta": 3.8,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": 0.6
+      },
+      "expected_anomaly_score": 0.096108,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 110,
+      "timestamp_minutes": 550,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 99.3,
+        "spo2": 90.9,
+        "respiratory_rate": 23.7,
+        "systolic_bp": 93.0
+      },
+      "coverage_percent": 99.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 99.3,
+        "spo2": 90.9,
+        "respiratory_rate": 23.7,
+        "heart_rate_delta": 0.0,
+        "spo2_delta": 1.4,
+        "respiratory_rate_delta": -0.5
+      },
+      "expected_anomaly_score": 0.133999,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 111,
+      "timestamp_minutes": 555,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 100.5,
+        "spo2": 91.1,
+        "respiratory_rate": 22.9,
+        "systolic_bp": 88.9
+      },
+      "coverage_percent": 98.8,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 100.5,
+        "spo2": 91.1,
+        "respiratory_rate": 22.9,
+        "heart_rate_delta": 1.2,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": -0.8
+      },
+      "expected_anomaly_score": 0.089753,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 112,
+      "timestamp_minutes": 560,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 102.6,
+        "spo2": 90.5,
+        "respiratory_rate": 23.9,
+        "systolic_bp": 86.5
+      },
+      "coverage_percent": 99.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 102.6,
+        "spo2": 90.5,
+        "respiratory_rate": 23.9,
+        "heart_rate_delta": 2.1,
+        "spo2_delta": -0.6,
+        "respiratory_rate_delta": 1.0
+      },
+      "expected_anomaly_score": 0.0938,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 113,
+      "timestamp_minutes": 565,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 101.3,
+        "spo2": 89.2,
+        "respiratory_rate": 21.8,
+        "systolic_bp": 87.5
+      },
+      "coverage_percent": 96.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 101.3,
+        "spo2": 89.2,
+        "respiratory_rate": 21.8,
+        "heart_rate_delta": -1.3,
+        "spo2_delta": -1.3,
+        "respiratory_rate_delta": -2.1
+      },
+      "expected_anomaly_score": 0.111122,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 114,
+      "timestamp_minutes": 570,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 95.8,
+        "spo2": 91.0,
+        "respiratory_rate": 21.5,
+        "systolic_bp": 88.1
+      },
+      "coverage_percent": 96.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 95.8,
+        "spo2": 91.0,
+        "respiratory_rate": 21.5,
+        "heart_rate_delta": -5.5,
+        "spo2_delta": 1.8,
+        "respiratory_rate_delta": -0.3
+      },
+      "expected_anomaly_score": 0.141982,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 115,
+      "timestamp_minutes": 575,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 99.3,
+        "spo2": 91.1,
+        "respiratory_rate": 22.1,
+        "systolic_bp": 85.9
+      },
+      "coverage_percent": 96.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 99.3,
+        "spo2": 91.1,
+        "respiratory_rate": 22.1,
+        "heart_rate_delta": 3.5,
+        "spo2_delta": 0.1,
+        "respiratory_rate_delta": 0.6
+      },
+      "expected_anomaly_score": 0.077177,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 116,
+      "timestamp_minutes": 580,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 99.6,
+        "spo2": 89.8,
+        "respiratory_rate": 21.3,
+        "systolic_bp": 91.2
+      },
+      "coverage_percent": 96.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 99.6,
+        "spo2": 89.8,
+        "respiratory_rate": 21.3,
+        "heart_rate_delta": 0.3,
+        "spo2_delta": -1.3,
+        "respiratory_rate_delta": -0.8
+      },
+      "expected_anomaly_score": 0.096431,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 117,
+      "timestamp_minutes": 585,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 97.6,
+        "spo2": 90.6,
+        "respiratory_rate": 25.7,
+        "systolic_bp": 86.3
+      },
+      "coverage_percent": 99.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 97.6,
+        "spo2": 90.6,
+        "respiratory_rate": 25.7,
+        "heart_rate_delta": -2.0,
+        "spo2_delta": 0.8,
+        "respiratory_rate_delta": 4.4
+      },
+      "expected_anomaly_score": 0.15288,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 118,
+      "timestamp_minutes": 590,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 99.7,
+        "spo2": 89.4,
+        "respiratory_rate": 23.4,
+        "systolic_bp": 84.4
+      },
+      "coverage_percent": 99.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 99.7,
+        "spo2": 89.4,
+        "respiratory_rate": 23.4,
+        "heart_rate_delta": 2.1,
+        "spo2_delta": -1.2,
+        "respiratory_rate_delta": -2.3
+      },
+      "expected_anomaly_score": 0.117857,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 119,
+      "timestamp_minutes": 595,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 98.1,
+        "spo2": 90.5,
+        "respiratory_rate": 23.4,
+        "systolic_bp": 86.3
+      },
+      "coverage_percent": 97.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 98.1,
+        "spo2": 90.5,
+        "respiratory_rate": 23.4,
+        "heart_rate_delta": -1.6,
+        "spo2_delta": 1.1,
+        "respiratory_rate_delta": 0.0
+      },
+      "expected_anomaly_score": 0.11962,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 120,
+      "timestamp_minutes": 600,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 99.9,
+        "spo2": 90.2,
+        "respiratory_rate": 24.7,
+        "systolic_bp": 84.4
+      },
+      "coverage_percent": 99.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 99.9,
+        "spo2": 90.2,
+        "respiratory_rate": 24.7,
+        "heart_rate_delta": 1.8,
+        "spo2_delta": -0.3,
+        "respiratory_rate_delta": 1.3
+      },
+      "expected_anomaly_score": 0.099901,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 121,
+      "timestamp_minutes": 605,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 97.3,
+        "spo2": 89.5,
+        "respiratory_rate": 20.8,
+        "systolic_bp": 90.4
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 97.3,
+        "spo2": 89.5,
+        "respiratory_rate": 20.8,
+        "heart_rate_delta": -2.6,
+        "spo2_delta": -0.7,
+        "respiratory_rate_delta": -3.9
+      },
+      "expected_anomaly_score": 0.093412,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 122,
+      "timestamp_minutes": 610,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 100.9,
+        "spo2": 89.6,
+        "respiratory_rate": 25.9,
+        "systolic_bp": 86.6
+      },
+      "coverage_percent": 97.6,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 100.9,
+        "spo2": 89.6,
+        "respiratory_rate": 25.9,
+        "heart_rate_delta": 3.6,
+        "spo2_delta": 0.1,
+        "respiratory_rate_delta": 5.1
+      },
+      "expected_anomaly_score": 0.161248,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 123,
+      "timestamp_minutes": 615,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 103.8,
+        "spo2": 90.0,
+        "respiratory_rate": 24.0,
+        "systolic_bp": 81.9
+      },
+      "coverage_percent": 97.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 103.8,
+        "spo2": 90.0,
+        "respiratory_rate": 24.0,
+        "heart_rate_delta": 2.9,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": -1.9
+      },
+      "expected_anomaly_score": 0.098474,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 124,
+      "timestamp_minutes": 620,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 95.6,
+        "spo2": 90.3,
+        "respiratory_rate": 23.6,
+        "systolic_bp": 87.7
+      },
+      "coverage_percent": 97.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 95.6,
+        "spo2": 90.3,
+        "respiratory_rate": 23.6,
+        "heart_rate_delta": -8.2,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": -0.4
+      },
+      "expected_anomaly_score": 0.133501,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 125,
+      "timestamp_minutes": 625,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 103.8,
+        "spo2": 90.2,
+        "respiratory_rate": 20.8,
+        "systolic_bp": 89.0
+      },
+      "coverage_percent": 99.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 103.8,
+        "spo2": 90.2,
+        "respiratory_rate": 20.8,
+        "heart_rate_delta": 8.2,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": -2.8
+      },
+      "expected_anomaly_score": 0.113744,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 126,
+      "timestamp_minutes": 630,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 98.3,
+        "spo2": 89.7,
+        "respiratory_rate": 21.7,
+        "systolic_bp": 92.8
+      },
+      "coverage_percent": 97.8,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 98.3,
+        "spo2": 89.7,
+        "respiratory_rate": 21.7,
+        "heart_rate_delta": -5.5,
+        "spo2_delta": -0.5,
+        "respiratory_rate_delta": 0.9
+      },
+      "expected_anomaly_score": 0.072007,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 127,
+      "timestamp_minutes": 635,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 94.7,
+        "spo2": 91.1,
+        "respiratory_rate": 24.7,
+        "systolic_bp": 93.1
+      },
+      "coverage_percent": 99.5,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 94.7,
+        "spo2": 91.1,
+        "respiratory_rate": 24.7,
+        "heart_rate_delta": -3.6,
+        "spo2_delta": 1.4,
+        "respiratory_rate_delta": 3.0
+      },
+      "expected_anomaly_score": 0.156406,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 128,
+      "timestamp_minutes": 640,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 95.9,
+        "spo2": 89.9,
+        "respiratory_rate": 22.5,
+        "systolic_bp": 85.4
+      },
+      "coverage_percent": 98.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 95.9,
+        "spo2": 89.9,
+        "respiratory_rate": 22.5,
+        "heart_rate_delta": 1.2,
+        "spo2_delta": -1.2,
+        "respiratory_rate_delta": -2.2
+      },
+      "expected_anomaly_score": 0.105478,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 129,
+      "timestamp_minutes": 645,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 96.2,
+        "spo2": 90.2,
+        "respiratory_rate": 22.1,
+        "systolic_bp": 79.7
+      },
+      "coverage_percent": 97.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 96.2,
+        "spo2": 90.2,
+        "respiratory_rate": 22.1,
+        "heart_rate_delta": 0.3,
+        "spo2_delta": 0.3,
+        "respiratory_rate_delta": -0.4
+      },
+      "expected_anomaly_score": 0.075958,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 130,
+      "timestamp_minutes": 650,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 98.6,
+        "spo2": 90.1,
+        "respiratory_rate": 22.7,
+        "systolic_bp": 89.2
+      },
+      "coverage_percent": 97.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 98.6,
+        "spo2": 90.1,
+        "respiratory_rate": 22.7,
+        "heart_rate_delta": 2.4,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": 0.6
+      },
+      "expected_anomaly_score": 0.085479,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 131,
+      "timestamp_minutes": 655,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 102.0,
+        "spo2": 90.0,
+        "respiratory_rate": 24.1,
+        "systolic_bp": 83.4
+      },
+      "coverage_percent": 97.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 102.0,
+        "spo2": 90.0,
+        "respiratory_rate": 24.1,
+        "heart_rate_delta": 3.4,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": 1.4
+      },
+      "expected_anomaly_score": 0.097427,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 132,
+      "timestamp_minutes": 660,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 100.2,
+        "spo2": 89.6,
+        "respiratory_rate": 23.4,
+        "systolic_bp": 81.6
+      },
+      "coverage_percent": 97.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 100.2,
+        "spo2": 89.6,
+        "respiratory_rate": 23.4,
+        "heart_rate_delta": -1.8,
+        "spo2_delta": -0.4,
+        "respiratory_rate_delta": -0.7
+      },
+      "expected_anomaly_score": 0.088684,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 133,
+      "timestamp_minutes": 665,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 98.7,
+        "spo2": 90.3,
+        "respiratory_rate": 26.5,
+        "systolic_bp": 85.5
+      },
+      "coverage_percent": 97.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 98.7,
+        "spo2": 90.3,
+        "respiratory_rate": 26.5,
+        "heart_rate_delta": -1.5,
+        "spo2_delta": 0.7,
+        "respiratory_rate_delta": 3.1
+      },
+      "expected_anomaly_score": 0.131978,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 134,
+      "timestamp_minutes": 670,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 98.4,
+        "spo2": 90.2,
+        "respiratory_rate": 25.0,
+        "systolic_bp": 87.3
+      },
+      "coverage_percent": 97.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 98.4,
+        "spo2": 90.2,
+        "respiratory_rate": 25.0,
+        "heart_rate_delta": -0.3,
+        "spo2_delta": -0.1,
+        "respiratory_rate_delta": -1.5
+      },
+      "expected_anomaly_score": 0.098116,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 135,
+      "timestamp_minutes": 675,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 95.9,
+        "spo2": 90.4,
+        "respiratory_rate": 23.7,
+        "systolic_bp": 87.5
+      },
+      "coverage_percent": 98.4,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 95.9,
+        "spo2": 90.4,
+        "respiratory_rate": 23.7,
+        "heart_rate_delta": -2.5,
+        "spo2_delta": 0.2,
+        "respiratory_rate_delta": -1.3
+      },
+      "expected_anomaly_score": 0.08003,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 136,
+      "timestamp_minutes": 680,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 103.8,
+        "spo2": 89.4,
+        "respiratory_rate": 22.6,
+        "systolic_bp": 87.7
+      },
+      "coverage_percent": 98.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 103.8,
+        "spo2": 89.4,
+        "respiratory_rate": 22.6,
+        "heart_rate_delta": 7.9,
+        "spo2_delta": -1.0,
+        "respiratory_rate_delta": -1.1
+      },
+      "expected_anomaly_score": 0.119209,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 137,
+      "timestamp_minutes": 685,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 96.5,
+        "spo2": 89.4,
+        "respiratory_rate": 22.2,
+        "systolic_bp": 89.9
+      },
+      "coverage_percent": 95.7,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 96.5,
+        "spo2": 89.4,
+        "respiratory_rate": 22.2,
+        "heart_rate_delta": -7.3,
+        "spo2_delta": 0.0,
+        "respiratory_rate_delta": -0.4
+      },
+      "expected_anomaly_score": 0.106904,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 138,
+      "timestamp_minutes": 690,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 98.8,
+        "spo2": 89.5,
+        "respiratory_rate": 24.9,
+        "systolic_bp": 87.4
+      },
+      "coverage_percent": 96.9,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 98.8,
+        "spo2": 89.5,
+        "respiratory_rate": 24.9,
+        "heart_rate_delta": 2.3,
+        "spo2_delta": 0.1,
+        "respiratory_rate_delta": 2.7
+      },
+      "expected_anomaly_score": 0.111006,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 139,
+      "timestamp_minutes": 695,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 97.3,
+        "spo2": 89.1,
+        "respiratory_rate": 22.2,
+        "systolic_bp": 86.1
+      },
+      "coverage_percent": 98.8,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 97.3,
+        "spo2": 89.1,
+        "respiratory_rate": 22.2,
+        "heart_rate_delta": -1.5,
+        "spo2_delta": -0.4,
+        "respiratory_rate_delta": -2.7
+      },
+      "expected_anomaly_score": 0.080222,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 140,
+      "timestamp_minutes": 700,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 103.3,
+        "spo2": 89.6,
+        "respiratory_rate": 22.3,
+        "systolic_bp": 79.3
+      },
+      "coverage_percent": 100.0,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 103.3,
+        "spo2": 89.6,
+        "respiratory_rate": 22.3,
+        "heart_rate_delta": 6.0,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": 0.1
+      },
+      "expected_anomaly_score": 0.085159,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 141,
+      "timestamp_minutes": 705,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 100.2,
+        "spo2": 90.1,
+        "respiratory_rate": 23.2,
+        "systolic_bp": 88.0
+      },
+      "coverage_percent": 97.2,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 100.2,
+        "spo2": 90.1,
+        "respiratory_rate": 23.2,
+        "heart_rate_delta": -3.1,
+        "spo2_delta": 0.5,
+        "respiratory_rate_delta": 0.9
+      },
+      "expected_anomaly_score": 0.093902,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 142,
+      "timestamp_minutes": 710,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 97.6,
+        "spo2": 90.5,
+        "respiratory_rate": 23.4,
+        "systolic_bp": 81.0
+      },
+      "coverage_percent": 98.3,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 97.6,
+        "spo2": 90.5,
+        "respiratory_rate": 23.4,
+        "heart_rate_delta": -2.6,
+        "spo2_delta": 0.4,
+        "respiratory_rate_delta": 0.2
+      },
+      "expected_anomaly_score": 0.087668,
+      "expected_predicted_anomaly": 1
+    },
+    {
+      "window_index": 143,
+      "timestamp_minutes": 715,
+      "dose_number": 3,
+      "ground_truth_state": "acute_change",
+      "observed": {
+        "heart_rate": 91.5,
+        "spo2": 89.4,
+        "respiratory_rate": 23.6,
+        "systolic_bp": 83.2
+      },
+      "coverage_percent": 96.1,
+      "data_quality": "GOOD",
+      "expected_features": {
+        "heart_rate": 91.5,
+        "spo2": 89.4,
+        "respiratory_rate": 23.6,
+        "heart_rate_delta": -6.1,
+        "spo2_delta": -1.1,
+        "respiratory_rate_delta": 0.2
+      },
+      "expected_anomaly_score": 0.112249,
+      "expected_predicted_anomaly": 1
+    }
+  ]
+}
