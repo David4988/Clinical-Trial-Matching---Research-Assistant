@@ -128,7 +128,7 @@ try {
   await send("Page.navigate", { url: APP });
   await wait(1800);
 
-  await click("sample");
+  await click("Run demo candidate");
   await wait(1600);
   check("sample screening returns REVIEW_REQUIRED", /REVIEW REQUIRED/i.test(await text()));
 
