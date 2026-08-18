@@ -8,9 +8,11 @@ export function ScreeningHeader({ result }: { result: ScreeningResult }) {
     <section className="space-y-4">
       <div className="grid gap-4 border border-rule bg-panel p-4 sm:grid-cols-2">
         <div>
-          <div className="eyebrow mb-1">Patient</div>
-          <div className="text-lg font-medium">{patient.patient_id}</div>
-          <div className="mt-0.5 text-[13px] text-ink-mid">
+          <div className="eyebrow mb-1">Candidate</div>
+          <div className="readout text-[24px] font-semibold leading-none">
+            {patient.patient_id}
+          </div>
+          <div className="mt-1.5 font-sans text-[13px] text-ink-mid">
             {[
               patient.age !== null ? `${patient.age} years` : "age not recorded",
               patient.sex !== "UNKNOWN" ? patient.sex.toLowerCase() : null,
@@ -20,9 +22,11 @@ export function ScreeningHeader({ result }: { result: ScreeningResult }) {
           </div>
         </div>
         <div className="sm:border-l sm:border-rule sm:pl-4">
-          <div className="eyebrow mb-1">Trial</div>
-          <div className="text-lg font-medium">{trial.trial_id}</div>
-          <div className="mt-0.5 font-sans text-[13px] leading-snug text-ink-mid">
+          <div className="eyebrow mb-1">Screened against</div>
+          <div className="readout text-[24px] font-semibold leading-none">
+            {trial.trial_id}
+          </div>
+          <div className="mt-1.5 font-sans text-[13px] leading-snug text-ink-mid">
             {trial.title}
           </div>
         </div>
@@ -41,7 +45,7 @@ export function ScreeningHeader({ result }: { result: ScreeningResult }) {
 
 function Tallies({ result }: { result: ScreeningResult }) {
   const items = [
-    { label: "Pass", value: result.passed_count },
+    { label: "Pass", value: result.passed_count, safe: result.passed_count > 0 },
     { label: "Fail", value: result.failed_count, alert: result.failed_count > 0 },
     { label: "Unknown", value: result.unknown_count, hatched: result.unknown_count > 0 },
     {
@@ -54,17 +58,18 @@ function Tallies({ result }: { result: ScreeningResult }) {
   return (
     // gap-px over a rule-coloured ground draws the hairlines, so they stay
     // correct however the grid wraps.
-    <div className="grid grid-cols-2 gap-px border border-rule bg-rule sm:grid-cols-4">
+    <div className="stagger grid grid-cols-2 gap-px border border-rule bg-rule sm:grid-cols-4">
       {items.map((item) => (
         <div key={item.label} className="bg-panel p-3">
           <div className="flex items-center gap-1.5">
             {item.hatched && <span className="hatch inline-block h-2.5 w-2.5" />}
             {item.alert && <span className="inline-block h-2.5 w-2.5 bg-alert" />}
+            {item.safe && <span className="inline-block h-2.5 w-2.5 bg-safe" />}
             <div className="eyebrow">{item.label}</div>
           </div>
           <div
-            className={`mt-1 text-2xl font-medium ${
-              item.alert ? "text-alert" : "text-ink"
+            className={`readout mt-1 text-[26px] font-semibold leading-none ${
+              item.alert ? "text-alert" : item.safe ? "text-safe" : "text-ink"
             }`}
           >
             {item.value}

@@ -32,7 +32,7 @@ export function CriterionLedger({ result }: { result: ScreeningResult }) {
         </span>
       </div>
 
-      <div className="border border-rule bg-panel">
+      <div className="stagger border border-rule bg-panel">
         {result.criteria_results.map((row, index) => (
           <LedgerRow
             key={row.criterion_id}

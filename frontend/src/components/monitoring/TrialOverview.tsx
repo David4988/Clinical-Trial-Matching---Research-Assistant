@@ -19,19 +19,25 @@ export function TrialOverviewView({
 }) {
   return (
     <section className="space-y-6">
-      <div className="border border-rule bg-panel p-4">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <div className="animate-rise border border-rule bg-panel">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-rule p-4">
           <div>
-            <div className="eyebrow mb-1">Trial</div>
-            <div className="text-lg font-medium">{overview.trial_id}</div>
+            <div className="eyebrow mb-1">Trial board</div>
+            <div className="readout text-[28px] font-semibold leading-none">
+              {overview.trial_id}
+            </div>
           </div>
           <div className="text-right">
             <div className="eyebrow mb-1">Protocol</div>
-            <div className="text-[12px] text-ink-mid">{overview.protocol_id}</div>
+            <div className="readout text-[12px] text-ink-mid">
+              {overview.protocol_id}
+            </div>
           </div>
         </div>
 
-        <p className="mt-3 border-l-2 border-caution/50 bg-caution-wash pl-3 py-1.5 font-sans text-[12px] leading-relaxed text-ink-mid">
+        <div className="p-4">
+
+        <p className="border-l-2 border-caution/50 bg-caution-wash pl-3 py-1.5 font-sans text-[12px] leading-relaxed text-ink-mid">
           {overview.protocol_label}. Every threshold in this view is synthetic and
           exists to demonstrate the pipeline — it is not clinical guidance.
         </p>
@@ -55,6 +61,7 @@ export function TrialOverviewView({
           {LEVELS.map((level) => (
             <RiskChip key={level} level={level} count={overview.risk_counts[level] ?? 0} />
           ))}
+        </div>
         </div>
       </div>
 
@@ -117,7 +124,9 @@ function Tally({
     <div>
       <div className="eyebrow mb-0.5">{label}</div>
       <div
-        className={`text-2xl font-medium tabular-nums ${alert ? "text-alert" : "text-ink"}`}
+        className={`readout text-[30px] font-semibold leading-none ${
+          alert ? "text-alert" : "text-ink"
+        }`}
       >
         {value}
       </div>

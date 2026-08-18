@@ -44,15 +44,26 @@ export function ReviewPanel({
 
   return (
     <section aria-labelledby="review-heading">
-      <div className="border border-rule-strong bg-panel">
-        <div className="hatch h-1.5" />
+      {/* The handover, drawn: analysis above, a person below. */}
+      <div className="flex items-center gap-3 pb-3" aria-hidden>
+        <span className="text-[10px] tracking-[0.14em] text-ink-faint">
+          SYSTEM ANALYSIS ENDS
+        </span>
+        <span className="h-px flex-1 bg-rule" />
+        <span className="text-[10px] font-semibold tracking-[0.14em] text-ink">
+          A PERSON DECIDES
+        </span>
+      </div>
 
-        <div className="p-4">
+      <div className="animate-rise border border-ink/25 bg-panel">
+        <div className="h-1.5 bg-ink" />
+
+        <div className="p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 id="review-heading" className="text-[13px] font-semibold tracking-[0.08em]">
-              REVIEWER DECISION
+            <h2 id="review-heading" className="title text-[19px]">
+              Reviewer decision
             </h2>
-            <span className="text-[11px] text-ink-faint">
+            <span className="readout text-[11px] text-ink-faint">
               result {result.result_id}
             </span>
           </div>
@@ -114,7 +125,7 @@ export function ReviewPanel({
               type="button"
               disabled={!ready || busy}
               onClick={() => decision && onSubmit(decision, reviewer.trim(), note.trim())}
-              className="border border-ink bg-ink px-4 py-2 text-[12px] font-medium text-paper transition-opacity hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-30"
+              className="border border-ink bg-ink px-5 py-2.5 text-[13px] font-semibold text-paper transition-colors hover:border-signal-deep hover:bg-signal-deep disabled:cursor-not-allowed disabled:opacity-30"
             >
               {busy ? "Recording…" : "Confirm decision"}
             </button>

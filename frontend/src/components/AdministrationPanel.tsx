@@ -43,12 +43,24 @@ export function AdministrationPanel({
   const ready = Number.isFinite(parsed) && parsed > 0 && unit.trim() !== "" && by.trim() !== "";
 
   return (
-    <section aria-labelledby="administration-heading" className="space-y-4">
+    <section aria-labelledby="administration-heading" className="animate-rise space-y-4">
+      {/* Continuity, stated once: the same person crosses the boundary. */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-l-2 border-signal bg-signal-wash px-3 py-2">
+        <span className="text-[10px] font-semibold tracking-[0.12em] text-signal-deep">
+          PHASE 1 → PHASE 2
+        </span>
+        <span className="font-sans text-[12px] text-ink">
+          <span className="readout">{treatment.patient_id}</span> is enrolled on{" "}
+          <span className="readout">{treatment.trial_id}</span> — same participant,
+          same trial, now a treatment record.
+        </span>
+      </div>
+
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="administration-heading" className="eyebrow">
-          Phase 2 · administration
+        <h2 id="administration-heading" className="title text-[19px]">
+          Administration
         </h2>
-        <span className="text-[11px] text-ink-faint">
+        <span className="readout text-[11px] text-ink-faint">
           treatment {treatment.treatment_id}
         </span>
       </div>
@@ -87,7 +99,7 @@ export function AdministrationPanel({
               <button
                 type="button"
                 onClick={onOpenMonitoring}
-                className="border border-ink bg-ink px-4 py-2 text-[12px] font-medium text-paper hover:bg-ink/90"
+                className="border border-ink bg-ink px-5 py-2.5 text-[13px] font-semibold text-paper transition-colors hover:border-signal-deep hover:bg-signal-deep"
               >
                 Open monitoring →
               </button>

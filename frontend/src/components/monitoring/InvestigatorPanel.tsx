@@ -62,14 +62,27 @@ export function InvestigatorPanel({
   const ready = action !== null && reviewer.trim() !== "" && note.trim() !== "";
   const level = cycle.effective_risk.level;
   const urgent = level === "RED";
+  // What the deterministic layer required, named beside what the human chose,
+  // so the two are never read as the same act.
+  const required = cycle.interventions.length
+    ? cycle.interventions
+        .map((i) => i.action.replace(/_/g, " ").toLowerCase())
+        .join(", ")
+    : null;
 
   return (
     <section aria-labelledby="investigator-heading" className="space-y-3">
-      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="investigator-heading" className="eyebrow">
-          Investigator review · human decision
-        </h2>
-        <span className="text-[11px] text-ink-faint">
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-rule pb-2">
+        <div className="flex items-baseline gap-3">
+          <span className="readout text-[11px] text-ink-faint">05</span>
+          <h2 id="investigator-heading" className="title text-[17px]">
+            What the investigator decides
+          </h2>
+          <span className="text-[10px] font-semibold tracking-[0.12em] text-ink">
+            HUMAN
+          </span>
+        </div>
+        <span className="readout text-[11px] text-ink-faint">
           cycle {cycle.cycle_id}
         </span>
       </div>
@@ -77,6 +90,15 @@ export function InvestigatorPanel({
       <div className="border border-rule bg-panel">
         <div className={urgent ? "h-1.5 bg-alert" : "h-1.5 bg-band"} />
         <div className="p-4">
+          <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-rule pb-3">
+            <span className="eyebrow">Protocol asked for</span>
+            <span className="font-sans text-[13px] font-medium">
+              {required ?? "no action"}
+            </span>
+            <span aria-hidden className="text-ink-faint">→</span>
+            <span className="eyebrow">a named person answers</span>
+          </div>
+
           <p className="font-sans text-[13px] leading-relaxed text-ink">
             {urgent
               ? "The protocol has escalated this participant. A named investigator must record a decision."

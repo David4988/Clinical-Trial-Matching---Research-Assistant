@@ -156,7 +156,7 @@ export default function App() {
         onReset={mode === "screening" && view.kind === "report" ? onReset : undefined}
       />
 
-      <main className="mx-auto max-w-4xl px-5 py-8">
+      <main className="mx-auto max-w-5xl px-5 py-8">
         <ErrorBoundary key={mode}>
           {mode === "monitoring" ? (
             <MonitoringApp focus={focus} />
@@ -210,6 +210,27 @@ export default function App() {
   );
 }
 
+/** The product mark: one observation window, read left to right. */
+function Mark() {
+  return (
+    <span
+      aria-hidden
+      className="flex h-8 w-8 shrink-0 items-center justify-center border border-rule bg-paper"
+    >
+      <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
+        <path
+          d="M1 9.5h3.2l1.6-6 2.4 9 2-4.5h2.2"
+          stroke="var(--color-ink)"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx="16.5" cy="8" r="2.5" fill="var(--color-signal)" />
+      </svg>
+    </span>
+  );
+}
+
 /** Shown when a recorded review did not result in enrolment. */
 function EnrolmentBlocked({ error }: { error: ApiError }) {
   return (
@@ -245,16 +266,19 @@ function Header({
 }) {
   return (
     <header className="border-b border-rule bg-panel">
-      <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-3 px-5 py-3">
-        <div className="flex items-baseline gap-3">
-          <span className="text-[13px] font-semibold tracking-[0.08em]">
-            CLINICAL TRIAL SCREENING
-          </span>
-          <span className="text-[10px] tracking-[0.12em] text-ink-faint">
-            {mode === "screening"
-              ? "PHASE 1 · RULES AUTHORITATIVE"
-              : "PHASE 2 · PROTOCOL AUTHORITATIVE"}
-          </span>
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-3">
+        <div className="flex items-center gap-3">
+          <Mark />
+          <div>
+            <div className="font-sans text-[15px] font-semibold tracking-[-0.02em] leading-none">
+              TrialGuard<span className="text-signal-deep"> AI</span>
+            </div>
+            <div className="mt-1 text-[10px] tracking-[0.12em] text-ink-faint">
+              {mode === "screening"
+                ? "PHASE 1 · RULES AUTHORITATIVE"
+                : "PHASE 2 · PROTOCOL AUTHORITATIVE"}
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

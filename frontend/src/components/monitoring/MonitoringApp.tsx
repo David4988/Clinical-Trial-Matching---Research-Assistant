@@ -215,6 +215,20 @@ export function MonitoringApp({ focus }: { focus?: MonitoringFocus | null }) {
         onAdvance={onAdvance}
       />
 
+      {focus && view.kind === "patient" && view.patientId === focus.patientId && (
+        <div className="animate-rise flex flex-wrap items-center gap-x-2.5 gap-y-1 border-l-2 border-signal bg-signal-wash px-3 py-2">
+          <span className="text-[10px] font-semibold tracking-[0.12em] text-signal-deep">
+            CARRIED FROM SCREENING
+          </span>
+          <span className="font-sans text-[12px] text-ink">
+            Same participant{" "}
+            <span className="readout">{focus.patientId}</span>, same trial{" "}
+            <span className="readout">{focus.trialId}</span> — now under protocol
+            monitoring.
+          </span>
+        </div>
+      )}
+
       {model && <ModelBadge model={model} />}
 
       {error && <ErrorNotice error={error} />}
@@ -275,7 +289,7 @@ function Toolbar({
             ← All patients
           </button>
         )}
-        <span className="eyebrow">
+        <span className={view.kind === "overview" ? "eyebrow" : "readout text-[15px] font-semibold"}>
           {view.kind === "overview" ? "Trial overview" : view.patientId}
         </span>
       </div>
@@ -289,7 +303,7 @@ function Toolbar({
             onClick={onAdvance}
             disabled={busy || !canAdvance}
             title="Ingest the next synthetic observation window and run a monitoring cycle"
-            className="border border-ink bg-ink px-3 py-1.5 text-[12px] font-medium text-paper hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-30"
+            className="border border-ink bg-ink px-4 py-1.5 text-[12px] font-semibold text-paper transition-colors hover:bg-signal-deep hover:border-signal-deep disabled:cursor-not-allowed disabled:opacity-30"
           >
             {canAdvance ? `Advance monitoring (${windowIndex + 1}/${DEMO_WINDOWS})` : "Trajectory complete"}
           </button>
@@ -327,11 +341,16 @@ function AwaitingFirstCycle({
   busy: boolean;
 }) {
   return (
-    <div className="border border-dashed border-rule-strong bg-panel p-8 text-center">
-      <div className="eyebrow">Enrolled · awaiting first observations</div>
-      <p className="mx-auto mt-2 max-w-md font-sans text-[13px] leading-relaxed text-ink-mid">
-        {patientId} is registered on this trial and has been dosed. Advance
-        monitoring to ingest the first observation window and run a cycle.
+    <div className="animate-rise border border-dashed border-rule-strong bg-panel p-10 text-center">
+      <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center border border-rule bg-paper">
+        <span className="h-2.5 w-2.5 rounded-full bg-signal" aria-hidden />
+      </div>
+      <div className="title text-[19px]">Monitoring ready</div>
+      <div className="eyebrow mt-1.5">Enrolled · awaiting first observations</div>
+      <p className="mx-auto mt-3 max-w-md font-sans text-[13px] leading-relaxed text-ink-mid">
+        <span className="readout">{patientId}</span> is registered on this trial
+        and has been dosed. Advance monitoring to ingest the first observation
+        window and run a cycle.
       </p>
       {busy && (
         <div className="relative mx-auto mt-4 h-0.5 w-40 overflow-hidden bg-band">

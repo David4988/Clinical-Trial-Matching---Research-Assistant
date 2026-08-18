@@ -3,29 +3,28 @@ import type { NextDoseDecision, RiskLevel } from "../../types/monitoring";
 /**
  * Risk level carried by PATTERN first, colour second, words always.
  *
- * index.css deliberately rejects a red/amber/green scale as hostile to
- * colour-blind readers. Phase 2 still needs four states, so each one gets a
- * distinct fill that survives greyscale:
+ * Each level keeps a fill that survives greyscale, so the screen still reads
+ * with the colour removed:
  *
- *   GREEN    solid ink        AMBER   dense ochre stripes
- *   RED      solid crimson    UNKNOWN sparse grey hatch
+ *   GREEN    solid            AMBER   dense stripes
+ *   RED      solid            UNKNOWN sparse hatch
  *
  * The written level sits beside the mark in every case, so nothing depends on
- * telling two hues apart.
+ * telling two hues apart. Colour reinforces; it never carries the state alone.
  */
 
 const RAIL: Record<RiskLevel, string> = {
-  GREEN: "bg-ink",
+  GREEN: "bg-safe",
   AMBER: "stripe-caution",
   RED: "bg-alert",
   UNKNOWN: "hatch",
 };
 
 const TOKEN: Record<RiskLevel, string> = {
-  GREEN: "text-ink border-ink/30",
+  GREEN: "text-safe border-safe/40 bg-safe-wash",
   AMBER: "text-caution border-caution/40 bg-caution-wash",
   RED: "text-alert border-alert/40 bg-alert-wash",
-  UNKNOWN: "text-ink-mid border-rule-strong border-dashed",
+  UNKNOWN: "text-ink-mid border-rule-strong border-dashed bg-panel",
 };
 
 export function RiskRail({ level }: { level: RiskLevel }) {
@@ -38,6 +37,23 @@ export function RiskToken({ level }: { level: RiskLevel }) {
       className={`inline-block border px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] ${TOKEN[level]}`}
     >
       {level}
+    </span>
+  );
+}
+
+/**
+ * The level at headline size, for the one place on the screen that answers
+ * "what state is this participant in right now".
+ */
+export function RiskDisplay({ level }: { level: RiskLevel }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-2.5 border px-3 py-1.5 ${TOKEN[level]}`}
+    >
+      <span className={`h-4 w-4 shrink-0 border border-black/10 ${RAIL[level]}`} aria-hidden />
+      <span className="text-[22px] font-semibold leading-none tracking-[0.06em]">
+        {level}
+      </span>
     </span>
   );
 }
@@ -59,7 +75,7 @@ export function RiskChip({ level, count }: { level: RiskLevel; count?: number })
 }
 
 const DOSE: Record<NextDoseDecision, string> = {
-  PROCEED: "text-ink border-ink/30",
+  PROCEED: "text-safe border-safe/40 bg-safe-wash",
   REVIEW_REQUIRED: "text-caution border-caution/40 bg-caution-wash",
   HOLD: "text-alert border-alert/40 bg-alert-wash",
 };
