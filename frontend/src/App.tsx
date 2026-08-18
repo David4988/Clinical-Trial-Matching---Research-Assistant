@@ -156,18 +156,30 @@ export default function App() {
         onReset={mode === "screening" && view.kind === "report" ? onReset : undefined}
       />
 
-      <main className="mx-auto max-w-5xl px-5 py-8">
+      <main className="mx-auto max-w-[1400px] px-6 py-7">
         <ErrorBoundary key={mode}>
           {mode === "monitoring" ? (
             <MonitoringApp focus={focus} />
           ) : view.kind === "report" ? (
-            <div className="space-y-8">
-              <ScreeningHeader result={view.result} />
-              <CriterionLedger result={view.result} />
-              <AIPanel
-                analysis={view.result.ai_analysis}
-                disagreements={view.result.disagreements}
-              />
+            <div className="space-y-6">
+              {/* Evidence workspace: the case on the left, the criteria being
+                  judged in the middle, the advisory reading on the right. The
+                  rail stays put because a reader refers back to the verdict
+                  while working down the ledger. */}
+              <div className="grid gap-6 xl:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,20rem)]">
+                <aside className="xl:sticky xl:top-6 xl:self-start">
+                  <ScreeningHeader result={view.result} />
+                </aside>
+
+                <CriterionLedger result={view.result} />
+
+                <aside className="xl:sticky xl:top-6 xl:self-start">
+                  <AIPanel
+                    analysis={view.result.ai_analysis}
+                    disagreements={view.result.disagreements}
+                  />
+                </aside>
+              </div>
 
               {view.result.review ? (
                 <ReviewRecord review={view.result.review} />
@@ -215,12 +227,12 @@ function Mark() {
   return (
     <span
       aria-hidden
-      className="flex h-8 w-8 shrink-0 items-center justify-center border border-rule bg-paper"
+      className="flex h-8 w-8 shrink-0 items-center justify-center border border-paper/25"
     >
       <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
         <path
           d="M1 9.5h3.2l1.6-6 2.4 9 2-4.5h2.2"
-          stroke="var(--color-ink)"
+          stroke="var(--color-paper)"
           strokeWidth="1.4"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -265,15 +277,15 @@ function Header({
   onReset?: () => void;
 }) {
   return (
-    <header className="border-b border-rule bg-panel">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-3">
+    <header className="border-b border-ink bg-ink text-paper">
+      <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-6 py-2.5">
         <div className="flex items-center gap-3">
           <Mark />
           <div>
-            <div className="font-sans text-[15px] font-semibold tracking-[-0.02em] leading-none">
-              TrialGuard<span className="text-signal-deep"> AI</span>
+            <div className="font-sans text-[15px] font-semibold leading-none tracking-[-0.02em]">
+              TrialGuard<span className="text-signal"> AI</span>
             </div>
-            <div className="mt-1 text-[10px] tracking-[0.12em] text-ink-faint">
+            <div className="mt-1 text-[10px] tracking-[0.12em] text-paper/55">
               {mode === "screening"
                 ? "PHASE 1 · RULES AUTHORITATIVE"
                 : "PHASE 2 · PROTOCOL AUTHORITATIVE"}
@@ -282,7 +294,7 @@ function Header({
         </div>
 
         <div className="flex items-center gap-2">
-          <nav className="flex border border-rule-strong" aria-label="Phase">
+          <nav className="flex border border-paper/25" aria-label="Phase">
             <ModeButton
               label="Screening"
               active={mode === "screening"}
@@ -299,7 +311,7 @@ function Header({
             <button
               type="button"
               onClick={onReset}
-              className="border border-rule-strong px-3 py-1.5 text-[12px] hover:border-ink"
+              className="border border-paper/25 px-3 py-1.5 text-[12px] text-paper/80 hover:border-paper hover:text-paper"
             >
               New screening
             </button>
@@ -324,8 +336,8 @@ function ModeButton({
       type="button"
       onClick={onClick}
       aria-current={active ? "page" : undefined}
-      className={`px-3 py-1.5 text-[12px] ${
-        active ? "bg-ink text-paper" : "text-ink-mid hover:text-ink"
+      className={`px-3.5 py-1.5 text-[12px] transition-colors ${
+        active ? "bg-paper text-ink" : "text-paper/70 hover:text-paper"
       }`}
     >
       {label}

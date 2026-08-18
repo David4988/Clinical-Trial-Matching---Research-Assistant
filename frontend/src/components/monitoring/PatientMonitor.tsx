@@ -1,24 +1,21 @@
 import type {
   MeasurementSummary,
   MonitoringCycleResult,
-  Observation,
+  RiskLevel,
 } from "../../types/monitoring";
-import { Sparkline } from "./Sparkline";
-import {
-  DoseToken,
-  RiskDisplay,
-  RiskRail,
-  RiskToken,
-  TrendMark,
-} from "./RiskMark";
+import { TrajectoryChart } from "./TrajectoryChart";
+import { DoseToken, RiskRail, TrendMark } from "./RiskMark";
 
 /**
- * One patient's current picture: treatment, vitals and trends, the risk read,
- * what the protocol requires, and whether the next dose can go ahead.
+ * One participant's console.
  *
- * The ordering is the architecture made visible. Deterministic state first, the
- * model's advisory read second and explicitly labelled, the protocol's response
- * third. Where the trust gate overrode the model, both verdicts are shown.
+ * The composition is the argument. A reader arriving here should take the
+ * state from the top band without reading a word, watch it happen on the
+ * trajectory, and only then meet the two columns that explain it: what the
+ * model saw on the left, what the protocol did on the right. Those two sit
+ * side by side and are typed differently on purpose — advisory against
+ * authoritative — because the product rests on them not being the same kind
+ * of statement.
  */
 
 const LABELS: Record<string, string> = {
@@ -30,22 +27,35 @@ const LABELS: Record<string, string> = {
   RESPIRATORY_RATE: "Resp. rate",
 };
 
+/** How loudly each state is allowed to speak. */
+const HERO: Record<RiskLevel, { shell: string; edge: string; text: string }> = {
+  GREEN: { shell: "border-rule bg-panel", edge: "bg-safe", text: "text-safe" },
+  AMBER: {
+    shell: "border-caution/45 bg-caution-wash",
+    edge: "stripe-caution",
+    text: "text-caution",
+  },
+  RED: { shell: "border-alert/50 bg-alert-wash", edge: "bg-alert", text: "text-alert" },
+  UNKNOWN: { shell: "border-rule-strong bg-panel", edge: "hatch", text: "text-ink-mid" },
+};
+
 export function PatientMonitor({ cycle }: { cycle: MonitoringCycleResult }) {
-  const { state, effective_risk, next_dose } = cycle;
+  const { state, effective_risk } = cycle;
 
   return (
-    <div className="space-y-7">
-      <StatusHeader cycle={cycle} />
+    <div className="space-y-5">
+      <RiskHero cycle={cycle} />
 
       {effective_risk.gated && <GateNotice cycle={cycle} />}
 
+      <Trajectory cycle={cycle} />
+
+      <div className="grid gap-5 lg:grid-cols-[1.02fr_1fr]">
+        <Signals cycle={cycle} />
+        <Response cycle={cycle} />
+      </div>
+
       <Vitals state={state} />
-
-      <RiskPanel cycle={cycle} />
-
-      <Protocol cycle={cycle} />
-
-      {next_dose && <NextDose next={next_dose} />}
 
       <p className="border-t border-rule pt-3 font-sans text-[11px] leading-relaxed text-ink-faint">
         Risk is advisory. Every action shown here comes from the deterministic
@@ -57,167 +67,363 @@ export function PatientMonitor({ cycle }: { cycle: MonitoringCycleResult }) {
 }
 
 /**
- * The four questions a reader has on arrival, answered in one band: who is
- * this, what state are they in, is that state moving, and what does the
- * protocol require next. Everything below this is the evidence for it.
+ * The band that answers everything at a glance: who, what state, whether it
+ * moved, and what the protocol wants done about it.
  */
-function StatusHeader({ cycle }: { cycle: MonitoringCycleResult }) {
-  const { state, effective_risk, next_dose, transition } = cycle;
+function RiskHero({ cycle }: { cycle: MonitoringCycleResult }) {
+  const { state, effective_risk, next_dose, transition, risk } = cycle;
   const treatment = state.treatment;
   const latestDose = treatment?.doses[treatment.doses.length - 1];
+  const tone = HERO[effective_risk.level];
 
   return (
-    <section className="animate-rise border border-rule bg-panel">
-      <div className="border-b border-rule">
-        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5 p-4">
-          <div className="min-w-[13rem]">
-            <div className="eyebrow">Participant</div>
-            <div className="readout text-[30px] font-semibold leading-none">
-              {cycle.patient_id}
-            </div>
-            <div className="mt-2 font-sans text-[12px] leading-relaxed text-ink-mid">
-              {cycle.trial_id}
-              {treatment && ` · ${treatment.drug_name}`}
-              {latestDose &&
-                ` · dose ${latestDose.dose_number} of ${latestDose.amount} ${latestDose.unit}`}
-              {` · ${state.observation_count} observations`}
-            </div>
+    <section className={`animate-rise border ${tone.shell}`}>
+      <div className={`h-1 ${tone.edge}`} />
+
+      <div className="grid gap-x-8 gap-y-6 p-5 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="min-w-0">
+          <div className="eyebrow">Participant under monitoring</div>
+          <div className="readout mt-1 text-[34px] font-semibold leading-none">
+            {cycle.patient_id}
+          </div>
+          <div className="mt-2 font-sans text-[12.5px] leading-relaxed text-ink-mid">
+            {cycle.trial_id}
+            {treatment && ` · ${treatment.drug_name}`}
+            {latestDose &&
+              ` · dose ${latestDose.dose_number}, ${latestDose.amount} ${latestDose.unit}`}
+            {` · ${state.observation_count} observations`}
           </div>
 
-          <div>
-            <div className="eyebrow mb-1.5">Current state</div>
-            {/* Keyed on the level so a change replays the arrival, and only then. */}
-            <div key={effective_risk.level} className="animate-state">
-              <RiskDisplay level={effective_risk.level} />
-            </div>
-            <div className="mt-2 text-[11px]">
-              {transition ? (
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="readout text-ink-mid">
-                    {transition.from_level ?? "first assessment"}
-                  </span>
-                  <span aria-hidden className="text-signal-deep">→</span>
-                  <span className="readout font-semibold">{transition.to_level}</span>
-                  <span className="text-ink-faint">this cycle</span>
+          <p className="mt-3 max-w-xl font-sans text-[13px] leading-relaxed text-ink">
+            {cycle.summary}
+          </p>
+        </div>
+
+        {/* The state itself, at the scale of the thing it is. */}
+        <div className="lg:border-l lg:border-rule lg:pl-8">
+          <div className="eyebrow">Current risk</div>
+          <div
+            key={effective_risk.level}
+            className="animate-state mt-1 flex items-center gap-3"
+          >
+            <span className={`h-9 w-2.5 shrink-0 ${tone.edge}`} aria-hidden />
+            <span className={`readout text-[46px] font-semibold leading-none ${tone.text}`}>
+              {effective_risk.level}
+            </span>
+          </div>
+
+          <div className="mt-3">
+            {transition ? (
+              <span className="inline-flex items-center gap-2 text-[12px]">
+                <span className="readout text-ink-mid">
+                  {transition.from_level ?? "first read"}
                 </span>
-              ) : (
-                <span className="text-ink-faint">unchanged this cycle</span>
-              )}
-            </div>
-          </div>
-
-          <div className="min-w-[9rem]">
-            <div className="eyebrow mb-1.5">Next dose</div>
-            {next_dose ? (
-              <>
-                <DoseToken decision={next_dose.decision} />
-                <div className="mt-2 text-[11px] text-ink-faint">
-                  {next_dose.proposed_dose_number !== null
-                    ? `proposed dose ${next_dose.proposed_dose_number}`
-                    : "no dose proposed"}
-                </div>
-              </>
+                <span aria-hidden className="text-signal-deep">→</span>
+                <span className="readout font-semibold">{transition.to_level}</span>
+                <span className="text-ink-faint">this cycle</span>
+              </span>
             ) : (
-              <div className="text-[12px] text-ink-faint">not assessed</div>
+              <span className="text-[12px] text-ink-faint">unchanged this cycle</span>
             )}
           </div>
+
+          <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-rule pt-3">
+            <Readout label="Score" value={risk.score.toFixed(2)} />
+            <Readout label="Confidence" value={risk.confidence.toFixed(2)} />
+            <Readout label="Horizon" value={`${risk.prediction_horizon_hours}h`} />
+            {next_dose && (
+              <div>
+                <dt className="text-[10px] tracking-[0.08em] text-ink-faint">NEXT DOSE</dt>
+                <dd className="mt-1">
+                  <DoseToken decision={next_dose.decision} />
+                </dd>
+              </div>
+            )}
+          </dl>
         </div>
       </div>
 
       {treatment?.override && (
-        <div className="flex gap-3 border-b border-rule bg-caution-wash px-4 py-2.5">
+        <div className="flex gap-3 border-t border-rule/70 px-5 py-2.5">
           <span className="mt-0.5 h-3 w-3 shrink-0 stripe-caution" aria-hidden />
           <p className="font-sans text-[12px] leading-relaxed text-ink">
-            <span className="font-semibold text-caution">Enrolled on override.</span>{" "}
+            <span className="font-semibold">Enrolled on override.</span>{" "}
             {treatment.override.approved_by} approved despite{" "}
             <span className="readout">{treatment.override.screening_status}</span>:{" "}
             {treatment.override.reason}
           </p>
         </div>
       )}
-
-      <p className="px-4 py-2.5 font-sans text-[12px] leading-relaxed text-ink-mid">
-        {cycle.summary}
-      </p>
     </section>
   );
 }
 
-/**
- * Section heading carrying the authority of what follows. The three tiers are
- * the real architecture of this product — a model that advises, a protocol
- * that decides, a person who acts — so the heading states which one is
- * speaking rather than leaving three identical panels to be told apart.
- */
-function Tier({
-  step,
-  title,
-  authority,
-  tone = "ink",
-  meta,
-}: {
-  step: string;
-  title: string;
-  authority: string;
-  tone?: "ink" | "signal";
-  meta?: React.ReactNode;
-}) {
+function Readout({ label, value }: { label: string; value: string }) {
   return (
-    <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-rule pb-2">
-      <div className="flex items-baseline gap-3">
-        <span className="readout text-[11px] text-ink-faint">{step}</span>
-        <h2 className="title text-[17px]">{title}</h2>
-        <span
-          className={`text-[10px] font-semibold tracking-[0.12em] ${
-            tone === "signal" ? "text-signal-deep" : "text-ink-faint"
-          }`}
-        >
-          {authority}
-        </span>
-      </div>
-      {meta && <span className="text-[11px] text-ink-faint">{meta}</span>}
+    <div>
+      <dt className="text-[10px] tracking-[0.08em] text-ink-faint">
+        {label.toUpperCase()}
+      </dt>
+      <dd className="readout mt-0.5 text-[18px] font-medium leading-none">{value}</dd>
     </div>
   );
 }
 
-function GateNotice({ cycle }: { cycle: MonitoringCycleResult }) {
-  const { effective_risk } = cycle;
+function Trajectory({ cycle }: { cycle: MonitoringCycleResult }) {
   return (
-    <section className="border border-rule-strong bg-panel">
-      <div className="hatch h-1.5" />
-      <div className="p-4">
-        <div className="text-[10px] font-semibold tracking-[0.12em] text-ink">
-          DATA-QUALITY GATE APPLIED
-        </div>
-        <p className="mt-1 font-sans text-[13px] leading-relaxed text-ink">
-          The risk model reported{" "}
-          <strong className="font-mono">{effective_risk.provider_level}</strong>, but
-          the record could not support it. The applied level is{" "}
-          <strong className="font-mono">{effective_risk.level}</strong>.
-        </p>
-        <p className="mt-1.5 font-sans text-[12px] leading-relaxed text-ink-mid">
-          {effective_risk.reason}
-        </p>
+    <section>
+      <SectionHead
+        title="Trajectory"
+        note="every vital on one clock, with the events that happened to them"
+      />
+      <div className="border border-rule bg-panel p-4">
+        <TrajectoryChart
+          observations={cycle.state.recent_observations}
+          doses={cycle.state.treatment?.doses ?? []}
+          interventions={cycle.interventions}
+          transition={cycle.transition}
+          riskLevel={cycle.effective_risk.level}
+        />
       </div>
     </section>
   );
 }
 
-function Vitals({ state }: { state: MonitoringCycleResult["state"] }) {
-  const byType = new Map<string, Observation[]>();
-  for (const observation of state.recent_observations) {
-    const list = byType.get(observation.measurement_type) ?? [];
-    list.push(observation);
-    byType.set(observation.measurement_type, list);
-  }
+/** Left column: what the model saw. Advisory, and typed as such. */
+function Signals({ cycle }: { cycle: MonitoringCycleResult }) {
+  const { risk } = cycle;
 
   return (
+    <section className="flex flex-col">
+      <SectionHead
+        title="Signals"
+        authority="MODEL · ADVISORY"
+        tone="signal"
+        note={`${risk.provider} @ ${risk.model_version}`}
+      />
+
+      <div className="flex-1 border border-rule bg-panel p-4">
+        {risk.contributing_factors.length > 0 ? (
+          <ul className="stagger space-y-3">
+            {risk.contributing_factors.map((factor, index) => (
+              <li key={index} className="text-[12px] leading-relaxed">
+                <div className="flex items-center gap-3">
+                  <span className="min-w-[8rem] text-[11px] tracking-[0.06em]">
+                    {factor.factor.replace(/_/g, " ").toLowerCase()}
+                  </span>
+                  <span
+                    className="h-1.5 flex-1 bg-band"
+                    role="img"
+                    aria-label={`weight ${factor.weight.toFixed(2)} of 1`}
+                  >
+                    <span
+                      className="block h-full bg-signal"
+                      style={{
+                        width: `${Math.max(0, Math.min(1, factor.weight)) * 100}%`,
+                      }}
+                    />
+                  </span>
+                  <span className="readout w-9 text-right text-[11px] text-ink-mid">
+                    {factor.weight.toFixed(2)}
+                  </span>
+                </div>
+                <p className="mt-1 font-sans text-ink-mid">{factor.detail}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="font-sans text-[12px] text-ink-mid">
+            The model reported no contributing factors for this window.
+          </p>
+        )}
+
+        {risk.likely_patterns.length > 0 && (
+          <div className="mt-4 border-l-2 border-signal/40 py-2 pl-3">
+            {risk.likely_patterns.map((pattern, index) => (
+              <p
+                key={index}
+                className="font-sans text-[11.5px] leading-relaxed text-ink-mid"
+              >
+                {pattern}
+              </p>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/** Right column: what the protocol did about it. Authoritative. */
+function Response({ cycle }: { cycle: MonitoringCycleResult }) {
+  const cadence = cycle.interventions.find(
+    (i) => i.monitoring_interval_minutes !== null,
+  );
+
+  return (
+    <section className="flex flex-col">
+      <SectionHead
+        title="Protocol response"
+        authority="DETERMINISTIC · AUTHORITATIVE"
+        note={
+          cadence
+            ? `monitoring every ${cadence.monitoring_interval_minutes} min`
+            : undefined
+        }
+      />
+
+      <div className="flex-1 border border-rule bg-panel">
+        {cycle.interventions.length === 0 ? (
+          <p className="p-4 font-sans text-[12px] text-ink-mid">
+            The protocol required no action at this level.
+          </p>
+        ) : (
+          <ul className="stagger">
+            {cycle.interventions.map((intervention, index) => (
+              <li
+                key={intervention.intervention_id}
+                className={index === 0 ? "" : "border-t border-rule"}
+              >
+                <div className="flex gap-3 p-3">
+                  <RiskRail level={intervention.risk_level} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <span className="font-sans text-[14px] font-semibold tracking-[-0.01em]">
+                        {intervention.action.replace(/_/g, " ").toLowerCase()}
+                      </span>
+                      <span className="readout text-[10px] text-ink-faint">
+                        {intervention.protocol_rule_id}
+                      </span>
+                    </div>
+                    <p className="mt-1 font-sans text-[12px] leading-relaxed text-ink-mid">
+                      {intervention.rationale}
+                    </p>
+
+                    <details className="group mt-1.5">
+                      <summary className="inline-flex items-center gap-1.5 text-[11px] text-ink-mid hover:text-ink">
+                        <span className="transition-transform duration-200 group-open:rotate-90">
+                          ▸
+                        </span>
+                        Evidence ({intervention.evidence.length})
+                      </summary>
+                      <ol className="mt-2 space-y-2 border-l border-rule pl-3">
+                        {intervention.evidence.map((item, i) => (
+                          <li key={i} className="text-[12px] leading-relaxed">
+                            <div className="flex flex-wrap items-baseline gap-x-2">
+                              <span className="text-[10px] tracking-[0.08em] text-ink-faint">
+                                {item.source_type}
+                              </span>
+                              {item.locator && (
+                                <span className="readout text-[11px] text-ink-mid">
+                                  {item.locator}
+                                </span>
+                              )}
+                            </div>
+                            {item.snippet && (
+                              <div className="mt-0.5 text-ink">{item.snippet}</div>
+                            )}
+                            {item.note && (
+                              <div className="mt-0.5 font-sans text-ink-mid">{item.note}</div>
+                            )}
+                          </li>
+                        ))}
+                      </ol>
+                    </details>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {cycle.notifications.length > 0 && (
+          <div className="animate-rise border-t border-rule bg-band/40 p-3">
+            <div className="eyebrow mb-1.5">Sent ({cycle.notifications.length})</div>
+            <ul className="space-y-1.5">
+              {cycle.notifications.map((notification) => (
+                <li key={notification.notification_id} className="text-[12px]">
+                  <span className="text-[10px] tracking-[0.08em] text-ink-faint">
+                    {notification.audience} · {notification.channel}
+                    {notification.delivered_at ? " · delivered" : " · queued"}
+                  </span>
+                  <div className="text-ink">{notification.subject}</div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {cycle.next_dose && <NextDose next={cycle.next_dose} />}
+      </div>
+    </section>
+  );
+}
+
+function NextDose({ next }: { next: NonNullable<MonitoringCycleResult["next_dose"]> }) {
+  return (
+    <div className="border-t-2 border-ink/15 p-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="eyebrow">Next dose</span>
+        <DoseToken decision={next.decision} />
+        {next.proposed_dose_number !== null && (
+          <span className="text-[12px] text-ink-mid">
+            proposed dose {next.proposed_dose_number}
+          </span>
+        )}
+        <span className="ml-auto text-[10px] text-ink-faint">decision support only</span>
+      </div>
+
+      {next.reasons.length > 0 && (
+        <ul className="mt-2 space-y-1 font-sans text-[12px] leading-relaxed text-ink-mid">
+          {next.reasons.map((reason, index) => (
+            <li key={index}>{reason}</li>
+          ))}
+        </ul>
+      )}
+
+      <details className="group mt-2">
+        <summary className="inline-flex items-center gap-1.5 text-[11px] text-ink-mid hover:text-ink">
+          <span className="transition-transform duration-200 group-open:rotate-90">▸</span>
+          Protocol criteria ({next.criteria.length})
+        </summary>
+        <ul className="mt-2 space-y-2">
+          {next.criteria.map((criterion) => (
+            <li key={criterion.criterion_id} className="flex gap-3 text-[12px]">
+              <span
+                className={`mt-0.5 inline-block h-2.5 w-2.5 shrink-0 border ${
+                  criterion.satisfied === true
+                    ? "border-safe bg-safe"
+                    : criterion.satisfied === false
+                      ? "border-alert bg-alert"
+                      : "hatch border-rule-strong"
+                }`}
+                aria-hidden
+              />
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span className="readout text-[10px] text-ink-faint">
+                    {criterion.criterion_id}
+                  </span>
+                  <span className="text-ink">{criterion.description}</span>
+                </div>
+                <div className="font-sans text-[11.5px] text-ink-mid">
+                  {criterion.detail}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </div>
+  );
+}
+
+function Vitals({ state }: { state: MonitoringCycleResult["state"] }) {
+  return (
     <section>
-      <Tier
-        step="01"
-        title="What the record shows"
-        authority="OBSERVED"
-        meta="baseline = this patient's own first readings"
+      <SectionHead
+        title="Latest readings"
+        note="baseline = this patient's own first readings"
       />
 
       {state.measurements.length === 0 ? (
@@ -225,26 +431,20 @@ function Vitals({ state }: { state: MonitoringCycleResult["state"] }) {
           No measurements recorded.
         </div>
       ) : (
-        <div className="stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-px border border-rule bg-rule sm:grid-cols-2 lg:grid-cols-3">
           {state.measurements.map((measurement) => (
-            <VitalCard
-              key={measurement.measurement_type}
-              measurement={measurement}
-              series={byType.get(measurement.measurement_type) ?? []}
-            />
+            <VitalCell key={measurement.measurement_type} measurement={measurement} />
           ))}
         </div>
       )}
 
       {state.data_quality.flags.length > 0 && (
         <div className="mt-3 border border-rule bg-panel p-3">
-          <div className="eyebrow mb-1.5">
-            Data quality · {state.data_quality.status}
-          </div>
+          <div className="eyebrow mb-1.5">Data quality · {state.data_quality.status}</div>
           <ul className="space-y-1 font-sans text-[12px] leading-relaxed text-ink-mid">
             {state.data_quality.flags.map((flag) => (
               <li key={flag.code}>
-                <span className="font-mono text-[10px] tracking-[0.08em] text-ink-faint">
+                <span className="readout text-[10px] tracking-[0.08em] text-ink-faint">
                   {flag.severity}
                 </span>{" "}
                 {flag.message}
@@ -257,300 +457,82 @@ function Vitals({ state }: { state: MonitoringCycleResult["state"] }) {
   );
 }
 
-function VitalCard({
-  measurement,
-  series,
-}: {
-  measurement: MeasurementSummary;
-  series: Observation[];
-}) {
+function VitalCell({ measurement }: { measurement: MeasurementSummary }) {
   const delta = measurement.delta_from_baseline;
   const moved = delta !== null && delta !== 0;
 
   return (
-    <div className="border border-rule bg-panel p-3">
+    <div className="bg-panel px-4 py-3">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="font-sans text-[12px] font-medium">
+        <span className="font-sans text-[12px] text-ink-mid">
           {LABELS[measurement.measurement_type]}
         </span>
         <TrendMark trend={measurement.trend} />
       </div>
-
-      <div className="mt-2 flex items-baseline gap-1.5">
-        <span className="readout text-[26px] font-semibold leading-none">
+      <div className="mt-1.5 flex items-baseline gap-1.5">
+        <span className="readout text-[24px] font-semibold leading-none">
           {measurement.current ?? "—"}
         </span>
         <span className="text-[11px] text-ink-mid">{measurement.unit}</span>
       </div>
-
-      <div className="mt-3 flex items-end justify-between gap-3">
-        <div>
-          <div className="text-[10px] tracking-[0.08em] text-ink-faint">
-            FROM BASELINE
-          </div>
-          <div className="readout mt-0.5 text-[12px]">
-            {moved ? `${delta > 0 ? "+" : ""}${delta}` : "no change"}
-          </div>
-        </div>
-        <Sparkline observations={series} width={110} height={30} />
-      </div>
-
-      <div className="mt-2 text-[10px] text-ink-faint">
-        {measurement.sample_count} readings
+      <div className="mt-1.5 text-[10.5px] text-ink-faint">
+        {moved ? `${delta > 0 ? "+" : ""}${delta} from baseline` : "no change"}
         {measurement.is_stale && " · stale"}
       </div>
     </div>
   );
 }
 
-function RiskPanel({ cycle }: { cycle: MonitoringCycleResult }) {
-  const { risk, effective_risk, transition } = cycle;
-
+function GateNotice({ cycle }: { cycle: MonitoringCycleResult }) {
+  const { effective_risk } = cycle;
   return (
-    <section>
-      <Tier
-        step="02"
-        title="What the model reports"
-        authority="ADVISORY"
-        tone="signal"
-        meta={`${risk.provider} @ ${risk.model_version}`}
-      />
-
-      <div className="flex border border-rule bg-panel">
-        <RiskRail level={effective_risk.level} />
-        <div className="min-w-0 flex-1 p-4">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <RiskToken level={effective_risk.level} />
-            <Metric label="score" value={risk.score.toFixed(2)} />
-            <Metric label="confidence" value={risk.confidence.toFixed(2)} />
-            <Metric label="horizon" value={`${risk.prediction_horizon_hours}h`} />
-          </div>
-
-          {transition && (
-            <p className="mt-2.5 font-sans text-[13px] leading-relaxed text-ink">
-              {transition.trigger}
-            </p>
-          )}
-
-          {risk.contributing_factors.length > 0 && (
-            <div className="mt-3">
-              <div className="eyebrow mb-1.5">Contributing factors</div>
-              <ul className="stagger space-y-2.5">
-                {risk.contributing_factors.map((factor, index) => (
-                  <li key={index} className="text-[12px] leading-relaxed">
-                    <div className="flex items-center gap-3">
-                      <span className="min-w-[8.5rem] text-[11px] tracking-[0.06em]">
-                        {factor.factor.replace(/_/g, " ").toLowerCase()}
-                      </span>
-                      {/* The weight the model actually returned, drawn to
-                          scale so the factors can be compared at a glance.
-                          Teal: this is the model speaking, not a clinical
-                          state. */}
-                      <span
-                        className="h-1.5 w-24 shrink-0 bg-band"
-                        role="img"
-                        aria-label={`weight ${factor.weight.toFixed(2)} of 1`}
-                      >
-                        <span
-                          className="block h-full bg-signal"
-                          style={{
-                            width: `${Math.max(0, Math.min(1, factor.weight)) * 100}%`,
-                          }}
-                        />
-                      </span>
-                      <span className="readout text-[11px] text-ink-mid">
-                        {factor.weight.toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="mt-0.5 font-sans text-ink-mid">{factor.detail}</div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {risk.likely_patterns.length > 0 && (
-            <div className="mt-3 border-l-2 border-rule-strong pl-3">
-              {risk.likely_patterns.map((pattern, index) => (
-                <p
-                  key={index}
-                  className="font-sans text-[12px] leading-relaxed text-ink-faint"
-                >
-                  {pattern}
-                </p>
-              ))}
-            </div>
-          )}
+    <section className="animate-rise border border-rule-strong bg-panel">
+      <div className="hatch h-1.5" />
+      <div className="p-4">
+        <div className="text-[10px] font-semibold tracking-[0.12em] text-ink">
+          DATA-QUALITY GATE APPLIED
         </div>
+        <p className="mt-1 font-sans text-[13px] leading-relaxed text-ink">
+          The risk model reported{" "}
+          <strong className="readout">{effective_risk.provider_level}</strong>, but the
+          record could not support it. The applied level is{" "}
+          <strong className="readout">{effective_risk.level}</strong>.
+        </p>
+        <p className="mt-1.5 font-sans text-[12px] leading-relaxed text-ink-mid">
+          {effective_risk.reason}
+        </p>
       </div>
     </section>
   );
 }
 
-/** A single labelled number, so the three read as one instrument row. */
-function Metric({ label, value }: { label: string; value: string }) {
+/** One heading rule for the whole console, so the sections read as one system. */
+function SectionHead({
+  title,
+  authority,
+  tone = "ink",
+  note,
+}: {
+  title: string;
+  authority?: string;
+  tone?: "ink" | "signal";
+  note?: string;
+}) {
   return (
-    <span className="inline-flex items-baseline gap-1.5">
-      <span className="text-[10px] tracking-[0.08em] text-ink-faint">
-        {label.toUpperCase()}
-      </span>
-      <span className="readout text-[14px] font-medium">{value}</span>
-    </span>
-  );
-}
-
-function Protocol({ cycle }: { cycle: MonitoringCycleResult }) {
-  const cadence = cycle.interventions.find(
-    (i) => i.monitoring_interval_minutes !== null,
-  );
-
-  return (
-    <section>
-      <Tier
-        step="03"
-        title="What the protocol requires"
-        authority="AUTHORITATIVE"
-        meta={
-          cadence
-            ? `monitoring every ${cadence.monitoring_interval_minutes} min`
-            : undefined
-        }
-      />
-
-      <div className="stagger border border-rule bg-panel">
-        {cycle.interventions.map((intervention, index) => (
-          <div
-            key={intervention.intervention_id}
-            className={index === cycle.interventions.length - 1 ? "" : "border-b border-rule"}
+    <div className="mb-2.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+      <div className="flex items-baseline gap-3">
+        <h2 className="title text-[16px]">{title}</h2>
+        {authority && (
+          <span
+            className={`text-[9.5px] font-semibold tracking-[0.12em] ${
+              tone === "signal" ? "text-signal-deep" : "text-ink-faint"
+            }`}
           >
-            <div className="p-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-sans text-[14px] font-semibold tracking-[-0.01em]">
-                  {intervention.action.replace(/_/g, " ").toLowerCase()}
-                </span>
-                <span className="text-[10px] tracking-[0.08em] text-ink-faint">
-                  {intervention.protocol_rule_id}
-                </span>
-              </div>
-              <p className="mt-1 font-sans text-[12px] leading-relaxed text-ink-mid">
-                {intervention.rationale}
-              </p>
-
-              <details className="mt-2 group">
-                <summary className="inline-flex items-center gap-1.5 text-[11px] text-ink-mid hover:text-ink">
-                  <span className="transition-transform group-open:rotate-90">▸</span>
-                  Evidence ({intervention.evidence.length})
-                </summary>
-                <ol className="mt-2 space-y-2 border-l border-rule pl-3">
-                  {intervention.evidence.map((item, i) => (
-                    <li key={i} className="text-[12px] leading-relaxed">
-                      <div className="flex flex-wrap items-baseline gap-x-2">
-                        <span className="text-[10px] tracking-[0.08em] text-ink-faint">
-                          {item.source_type}
-                        </span>
-                        {item.locator && (
-                          <span className="text-[11px] text-ink-mid">{item.locator}</span>
-                        )}
-                      </div>
-                      {item.snippet && <div className="mt-0.5 text-ink">{item.snippet}</div>}
-                      {item.note && (
-                        <div className="mt-0.5 font-sans text-ink-mid">{item.note}</div>
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              </details>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {cycle.notifications.length > 0 && (
-        <div className="animate-rise mt-3 border border-rule bg-panel p-3">
-          <div className="eyebrow mb-1.5">
-            Notifications sent ({cycle.notifications.length})
-          </div>
-          <ul className="space-y-1.5">
-            {cycle.notifications.map((notification) => (
-              <li key={notification.notification_id} className="text-[12px]">
-                <span className="text-[10px] tracking-[0.08em] text-ink-faint">
-                  {notification.audience} · {notification.channel}
-                  {notification.delivered_at ? " · delivered" : " · queued"}
-                </span>
-                <div className="text-ink">{notification.subject}</div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </section>
-  );
-}
-
-function NextDose({ next }: { next: MonitoringCycleResult["next_dose"] }) {
-  if (!next) return null;
-
-  return (
-    <section>
-      <Tier
-        step="04"
-        title="Whether the next dose can go ahead"
-        authority="DECISION SUPPORT"
-        meta="a clinician administers, never this system"
-      />
-
-      <div className="border border-rule bg-panel p-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <DoseToken decision={next.decision} />
-          {next.proposed_dose_number !== null && (
-            <span className="text-[12px] text-ink-mid">
-              proposed dose {next.proposed_dose_number}
-            </span>
-          )}
-        </div>
-
-        {next.reasons.length > 0 && (
-          <ul className="mt-3 space-y-1 font-sans text-[12px] leading-relaxed text-ink-mid">
-            {next.reasons.map((reason, index) => (
-              <li key={index}>{reason}</li>
-            ))}
-          </ul>
+            {authority}
+          </span>
         )}
-
-        <div className="mt-3 border-t border-rule pt-3">
-          <div className="eyebrow mb-2">Protocol criteria</div>
-          <ul className="space-y-2">
-            {next.criteria.map((criterion) => (
-              <li key={criterion.criterion_id} className="flex gap-3 text-[12px]">
-                <span
-                  className={`mt-0.5 inline-block h-2.5 w-2.5 shrink-0 border ${
-                    criterion.satisfied === true
-                      ? "border-safe bg-safe"
-                      : criterion.satisfied === false
-                        ? "border-alert bg-alert"
-                        : "hatch border-rule-strong"
-                  }`}
-                  aria-hidden
-                />
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-baseline gap-2">
-                    <span className="text-[10px] tracking-[0.08em] text-ink-faint">
-                      {criterion.criterion_id}
-                    </span>
-                    <span className="text-ink">{criterion.description}</span>
-                    {criterion.satisfied === null && (
-                      <span className="text-[10px] tracking-[0.08em] text-ink-mid">
-                        NOT EVALUABLE
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-0.5 font-sans text-ink-mid">{criterion.detail}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
-    </section>
+      {note && <span className="text-[11px] text-ink-faint">{note}</span>}
+    </div>
   );
 }

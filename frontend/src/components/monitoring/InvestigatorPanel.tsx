@@ -200,7 +200,7 @@ function ReviewLog({ reviews }: { reviews: InvestigatorReview[] }) {
         {[...reviews].reverse().map((review, index) => (
           <li
             key={review.review_id}
-            className={`p-3 ${index > 0 ? "border-t border-rule" : ""}`}
+            className={`animate-rise p-3 ${index > 0 ? "border-t border-rule" : ""}`}
           >
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <span className="text-[13px] font-medium">
