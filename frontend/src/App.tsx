@@ -10,6 +10,7 @@ import { SAMPLE_PATIENT, SAMPLE_TRIAL } from "./api/sample";
 import { AIPanel } from "./components/AIPanel";
 import { AdministrationPanel } from "./components/AdministrationPanel";
 import { CriterionLedger } from "./components/CriterionLedger";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ReviewPanel, ReviewRecord } from "./components/ReviewPanel";
 import { ScreeningHeader } from "./components/ScreeningHeader";
 import { UploadPanel } from "./components/UploadPanel";
@@ -156,52 +157,54 @@ export default function App() {
       />
 
       <main className="mx-auto max-w-4xl px-5 py-8">
-        {mode === "monitoring" ? (
-          <MonitoringApp focus={focus} />
-        ) : view.kind === "report" ? (
-          <div className="space-y-8">
-            <ScreeningHeader result={view.result} />
-            <CriterionLedger result={view.result} />
-            <AIPanel
-              analysis={view.result.ai_analysis}
-              disagreements={view.result.disagreements}
+        <ErrorBoundary key={mode}>
+          {mode === "monitoring" ? (
+            <MonitoringApp focus={focus} />
+          ) : view.kind === "report" ? (
+            <div className="space-y-8">
+              <ScreeningHeader result={view.result} />
+              <CriterionLedger result={view.result} />
+              <AIPanel
+                analysis={view.result.ai_analysis}
+                disagreements={view.result.disagreements}
+              />
+
+              {view.result.review ? (
+                <ReviewRecord review={view.result.review} />
+              ) : (
+                <ReviewPanel
+                  result={view.result}
+                  busy={busy}
+                  error={stepError}
+                  onSubmit={onReview}
+                />
+              )}
+
+              {treatment && (
+                <AdministrationPanel
+                  treatment={treatment}
+                  busy={busy}
+                  error={stepError}
+                  onAdminister={onAdminister}
+                  onOpenMonitoring={onOpenMonitoring}
+                />
+              )}
+
+              {view.result.review && !treatment && stepError && (
+                <EnrolmentBlocked error={stepError} />
+              )}
+
+              <Footer result={view.result} />
+            </div>
+          ) : (
+            <UploadPanel
+              busy={view.kind === "processing"}
+              error={error}
+              onFile={(file) => run(() => screenPdf(file))}
+              onUseSample={() => run(() => screenCanonical(SAMPLE_PATIENT, SAMPLE_TRIAL))}
             />
-
-            {view.result.review ? (
-              <ReviewRecord review={view.result.review} />
-            ) : (
-              <ReviewPanel
-                result={view.result}
-                busy={busy}
-                error={stepError}
-                onSubmit={onReview}
-              />
-            )}
-
-            {treatment && (
-              <AdministrationPanel
-                treatment={treatment}
-                busy={busy}
-                error={stepError}
-                onAdminister={onAdminister}
-                onOpenMonitoring={onOpenMonitoring}
-              />
-            )}
-
-            {view.result.review && !treatment && stepError && (
-              <EnrolmentBlocked error={stepError} />
-            )}
-
-            <Footer result={view.result} />
-          </div>
-        ) : (
-          <UploadPanel
-            busy={view.kind === "processing"}
-            error={error}
-            onFile={(file) => run(() => screenPdf(file))}
-            onUseSample={() => run(() => screenCanonical(SAMPLE_PATIENT, SAMPLE_TRIAL))}
-          />
-        )}
+          )}
+        </ErrorBoundary>
       </main>
     </div>
   );

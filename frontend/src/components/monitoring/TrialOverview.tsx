@@ -66,7 +66,7 @@ export function TrialOverviewView({
           <div className="border border-rule bg-panel">
             {overview.requiring_attention.map((patient, index) => (
               <PatientRow
-                key={patient.patient_id}
+                key={patient.treatment_id}
                 patient={patient}
                 onSelect={onSelect}
                 isLast={index === overview.requiring_attention.length - 1}
@@ -89,7 +89,7 @@ export function TrialOverviewView({
           <div className="border border-rule bg-panel">
             {overview.patients.map((patient, index) => (
               <PatientRow
-                key={patient.patient_id}
+                key={patient.treatment_id}
                 patient={patient}
                 onSelect={onSelect}
                 isLast={index === overview.patients.length - 1}

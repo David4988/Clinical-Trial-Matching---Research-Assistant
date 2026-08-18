@@ -140,8 +140,10 @@ export function MonitoringApp({ focus }: { focus?: MonitoringFocus | null }) {
 
   async function onAdvance() {
     if (view.kind !== "patient") return;
-    const trialId = cycle?.trial_id ?? focus?.trialId;
-    if (!trialId) return;
+    // A participant selected from the board has neither a handoff nor a cycle
+    // to name their trial, and the board itself is this trial's — so falling
+    // back to it is what keeps Advance alive for a freshly enrolled patient.
+    const trialId = cycle?.trial_id ?? focus?.trialId ?? TRIAL_ID;
 
     setBusy(true);
     setError(null);
