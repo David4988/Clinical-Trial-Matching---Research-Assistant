@@ -1,0 +1,34 @@
+# Render blueprint for the TrialGuard AI backend.
+#
+# The frontend is not deployed here — it is a static Vite build on Vercel that
+# calls this service over HTTPS. See docs/DEPLOYMENT.md.
+#
+# The disk is the reason this service is not serverless: screening results,
+# treatments, doses and monitoring cycles are written to JSON files, and the
+# demo walks several requests that must see each other's writes.
+services:
+  - type: web
+    name: trialguard-api
+    runtime: python
+    plan: starter          # a persistent disk requires a paid instance type
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /monitoring/model
+    disk:
+      name: trialguard-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      # Live Isolation Forest inference rather than the deterministic mock.
+      - key: RISK_PROVIDER
+        value: synthetic_ml
+      # Points the JSON stores at the persistent disk above.
+      - key: DATA_DIR
+        value: /var/data
+      # The deployed frontend origin, e.g. https://<project>.vercel.app
+      # Set in the Render dashboard once Vercel has assigned the URL.
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.11.9"

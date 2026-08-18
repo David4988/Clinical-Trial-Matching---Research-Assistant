@@ -7,6 +7,7 @@ Docs: http://localhost:8000/docs
 from __future__ import annotations
 
 import logging
+import os
 
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
@@ -21,10 +22,26 @@ from .service import ScreeningService
 
 logger = logging.getLogger("clinical-screening")
 
-ALLOWED_ORIGINS = [
+#: Development origins are always allowed; the deployed frontend is named by
+#: FRONTEND_ORIGIN, because its URL is not known when this repository is
+#: written. Comma-separate the value to allow more than one (a preview
+#: deployment alongside production, say). The list is never widened to "*":
+#: that would let any page on the internet call this API from a browser.
+LOCAL_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+
+FRONTEND_ORIGIN_ENV = "FRONTEND_ORIGIN"
+
+
+def allowed_origins() -> list[str]:
+    configured = [
+        origin.strip().rstrip("/")
+        for origin in os.environ.get(FRONTEND_ORIGIN_ENV, "").split(",")
+        if origin.strip()
+    ]
+    return [*LOCAL_ORIGINS, *configured]
 
 
 def create_app(
@@ -44,7 +61,7 @@ def create_app(
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=ALLOWED_ORIGINS,
+        allow_origins=allowed_origins(),
         allow_credentials=False,
         allow_methods=["GET", "POST"],
         allow_headers=["*"],

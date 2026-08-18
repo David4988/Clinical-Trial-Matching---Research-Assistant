@@ -14,12 +14,13 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from .paths import data_dir
 from .base import Repository, RepositoryError
 from ..schema.clinical import Patient
 from ..schema.result import ScreeningResult
 from ..schema.trial import Trial
 
-DEFAULT_STORE = Path(__file__).resolve().parents[2] / "data" / "store.json"
+DEFAULT_STORE = data_dir() / "store.json"
 
 _EMPTY: dict[str, dict[str, Any]] = {"patients": {}, "trials": {}, "results": {}}
 

@@ -5,6 +5,7 @@
  * `{code, message, details}` body, surfaced as a `ScreeningApiError`.
  */
 
+import { API_BASE } from "./base";
 import { ScreeningApiError } from "./client";
 import type { ApiError } from "../types/canonical";
 import type {
@@ -17,7 +18,7 @@ import type {
   TrialOverview,
 } from "../types/monitoring";
 
-const BASE = "/api/monitoring";
+const BASE = `${API_BASE}/monitoring`;
 
 async function unwrap<T>(response: Response): Promise<T> {
   if (response.ok) return response.json() as Promise<T>;
