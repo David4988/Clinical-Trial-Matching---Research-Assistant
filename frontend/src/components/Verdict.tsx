@@ -14,13 +14,13 @@ export function VerdictRail({ status }: { status: CriterionStatus }) {
       ? "bg-alert"
       : status === "UNKNOWN"
         ? "hatch"
-        : "bg-ink";
+        : "bg-safe";
   return <div className={`w-[3px] shrink-0 self-stretch ${className}`} />;
 }
 
 export function VerdictToken({ status }: { status: CriterionStatus }) {
   const styles: Record<CriterionStatus, string> = {
-    PASS: "text-ink border-ink/30",
+    PASS: "text-safe border-safe/40 bg-safe-wash",
     FAIL: "text-alert border-alert/40 bg-alert-wash",
     UNKNOWN: "text-ink-mid border-rule-strong border-dashed",
   };
@@ -61,24 +61,29 @@ export function OverallBanner({
 
   return (
     <div
-      className={`flex gap-4 border p-4 ${
-        isAlert ? "border-alert/35 bg-alert-wash" : "border-rule bg-panel"
+      className={`animate-rise flex gap-4 border p-5 ${
+        isAlert
+          ? "border-alert/35 bg-alert-wash"
+          : isReview
+            ? "border-caution/35 bg-caution-wash"
+            : "border-safe/35 bg-safe-wash"
       }`}
     >
       <div
         className={`w-1 shrink-0 ${
-          isAlert ? "bg-alert" : isReview ? "hatch" : "bg-ink"
+          isAlert ? "bg-alert" : isReview ? "stripe-caution" : "bg-safe"
         }`}
       />
       <div className="min-w-0">
+        <div className="eyebrow">Deterministic verdict</div>
         <div
-          className={`text-xl font-semibold tracking-[0.06em] ${
-            isAlert ? "text-alert" : "text-ink"
+          className={`mt-1 text-[27px] font-semibold leading-none tracking-[0.04em] ${
+            isAlert ? "text-alert" : isReview ? "text-caution" : "text-safe"
           }`}
         >
           {copy.label}
         </div>
-        <p className="mt-1 max-w-2xl font-sans text-sm text-ink-mid">
+        <p className="mt-2 max-w-2xl font-sans text-[13px] leading-relaxed text-ink">
           {reason || copy.note}
         </p>
       </div>

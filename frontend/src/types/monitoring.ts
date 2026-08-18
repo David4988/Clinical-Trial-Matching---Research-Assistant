@@ -40,8 +40,63 @@ export interface DoseAdministration {
   administered_at: string;
   amount: number;
   unit: string;
+  route: string | null;
   administered_by: string | null;
   note: string | null;
+}
+
+export type InvestigatorAction =
+  | "ACKNOWLEDGE"
+  | "CONTINUE_MONITORING"
+  | "HOLD_TREATMENT";
+
+/**
+ * A named investigator's decision about one monitoring cycle.
+ *
+ * Deliberately a separate vocabulary from `Intervention.action`: an
+ * intervention is what the protocol requires, this is what a person decided
+ * after reading it. Recording one changes no risk level.
+ */
+export interface InvestigatorReview {
+  review_id: string;
+  patient_id: string;
+  trial_id: string;
+  cycle_id: string;
+  action: InvestigatorAction;
+  reviewer: string;
+  note: string;
+  reviewed_at: string;
+  risk_level: RiskLevel;
+  treatment_status_after: TreatmentStatus | null;
+}
+
+/** Provenance for whatever produced the risk verdicts on screen. */
+export interface ModelProvenance {
+  provider: string;
+  model_version: string;
+  live_inference: boolean;
+  /**
+   * Copied through from the artifact's own metadata, so several fields arrive
+   * as nested objects rather than strings. Typing them as strings is what
+   * previously let an object reach React as a child and blank the page.
+   */
+  artifact?: {
+    model_version: string | null;
+    feature_version: string | null;
+    features: string[] | null;
+    estimator: { class?: string; n_estimators?: number } | null;
+    training_cohort: {
+      source?: string;
+      total_patients?: number;
+      cohort_windows?: number;
+      fitted_rows?: number;
+    } | null;
+    scoring: { anomaly_score?: string; decimals?: number } | null;
+    created_at: string | null;
+    model_sha256: string | null;
+    trained_with?: Record<string, string> | null;
+  };
+  artifact_error?: string;
 }
 
 export interface EligibilityOverride {

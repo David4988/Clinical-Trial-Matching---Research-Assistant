@@ -17,9 +17,11 @@ from pydantic import BaseModel, Field
 
 from ..schema.monitoring_enums import (
     AdverseEventSeverity,
+    InvestigatorAction,
     MeasurementType,
     ObservationSource,
 )
+from ..synthetic.generator import Trajectory
 
 
 class RegisterTreatmentRequest(BaseModel):
@@ -40,9 +42,49 @@ class RegisterTreatmentRequest(BaseModel):
 class RecordDoseRequest(BaseModel):
     amount: float = Field(gt=0)
     unit: str
+    route: str | None = None
     administered_by: str | None = None
     note: str | None = None
     now: datetime | None = None
+
+
+class RecordInvestigatorReviewRequest(BaseModel):
+    """An investigator's decision about a monitoring cycle.
+
+    `cycle_id` is optional and defaults to the patient's latest cycle. Send it
+    explicitly when the reviewer was looking at a specific cycle, so a decision
+    cannot be attributed to a newer one that arrived while they were reading.
+    """
+
+    action: InvestigatorAction
+    reviewer: str
+    note: str
+    cycle_id: str | None = None
+    now: datetime | None = None
+
+
+class AdvanceMonitoringRequest(BaseModel):
+    """Play one window of synthetic observations for one enrolled participant.
+
+    The single-participant counterpart to `/demo/seed`, which populates the whole
+    cohort. Both run the same real pipeline — ingest, then a monitoring cycle —
+    so a participant advanced this way is not on a special code path.
+
+    The window set is generated deterministically from `seed`, and `window_index`
+    selects which one to play, so a demo advances one step per click and replays
+    identically every time.
+    """
+
+    trial_id: str
+    trajectory: Trajectory = Trajectory.GRADUAL_DETERIORATION
+    window_index: int = Field(default=0, ge=0)
+    windows: int = Field(default=5, ge=1, le=20)
+    hours: float = 8.0
+    interval_minutes: int = 15
+    seed: int = 42
+    #: Defaults to the treatment's registration time, so the generated timeline
+    #: starts when the participant actually entered Phase 2.
+    start: datetime | None = None
 
 
 class ObservationInput(BaseModel):

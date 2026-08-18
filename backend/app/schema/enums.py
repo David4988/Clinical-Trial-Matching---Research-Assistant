@@ -38,6 +38,19 @@ class OverallStatus(str, Enum):
     REVIEW_REQUIRED = "REVIEW_REQUIRED"
 
 
+class ReviewDecision(str, Enum):
+    """What a human reviewer concluded about a completed screening.
+
+    Additive to the Phase 1 contract: a review is recorded *beside* the
+    deterministic verdict, never in place of it. There is deliberately no
+    "REJECTED" member — refusing a patient is what INELIGIBLE already means,
+    and that verdict belongs to the rule engine, not to a reviewer.
+    """
+
+    APPROVED_FOR_PHASE_2 = "APPROVED_FOR_PHASE_2"
+    FURTHER_REVIEW_REQUESTED = "FURTHER_REVIEW_REQUESTED"
+
+
 class EvidenceSource(str, Enum):
     PDF_FIELD = "PDF_FIELD"
     LAB = "LAB"

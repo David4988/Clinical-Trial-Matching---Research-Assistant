@@ -1,16 +1,26 @@
 import type { HeuristicFlag, ScreeningResult } from "../types/canonical";
 import { OverallBanner } from "./Verdict";
 
+/**
+ * The left rail of the review workspace: who was screened, what the engine
+ * concluded, and how much of the protocol it could actually verify.
+ *
+ * This is the column a reader returns to while reading the ledger, so it is
+ * built to stay put and to be read top to bottom: identity, verdict, the
+ * count behind the verdict, then anything the record itself made difficult.
+ */
 export function ScreeningHeader({ result }: { result: ScreeningResult }) {
   const { patient, trial } = result;
 
   return (
-    <section className="space-y-4">
-      <div className="grid gap-4 border border-rule bg-panel p-4 sm:grid-cols-2">
-        <div>
-          <div className="eyebrow mb-1">Patient</div>
-          <div className="text-lg font-medium">{patient.patient_id}</div>
-          <div className="mt-0.5 text-[13px] text-ink-mid">
+    <div className="space-y-4">
+      <div className="border border-rule bg-panel">
+        <div className="border-b border-rule p-4">
+          <div className="eyebrow">Candidate</div>
+          <div className="readout mt-1 text-[26px] font-semibold leading-none">
+            {patient.patient_id}
+          </div>
+          <div className="mt-1.5 font-sans text-[12.5px] text-ink-mid">
             {[
               patient.age !== null ? `${patient.age} years` : "age not recorded",
               patient.sex !== "UNKNOWN" ? patient.sex.toLowerCase() : null,
@@ -19,10 +29,12 @@ export function ScreeningHeader({ result }: { result: ScreeningResult }) {
               .join(" · ")}
           </div>
         </div>
-        <div className="sm:border-l sm:border-rule sm:pl-4">
-          <div className="eyebrow mb-1">Trial</div>
-          <div className="text-lg font-medium">{trial.trial_id}</div>
-          <div className="mt-0.5 font-sans text-[13px] leading-snug text-ink-mid">
+        <div className="p-4">
+          <div className="eyebrow">Screened against</div>
+          <div className="readout mt-1 text-[17px] font-semibold leading-tight">
+            {trial.trial_id}
+          </div>
+          <div className="mt-1 font-sans text-[12.5px] leading-snug text-ink-mid">
             {trial.title}
           </div>
         </div>
@@ -35,79 +47,116 @@ export function ScreeningHeader({ result }: { result: ScreeningResult }) {
       {result.heuristic_flags.length > 0 && (
         <HeuristicList flags={result.heuristic_flags} />
       )}
-    </section>
-  );
-}
-
-function Tallies({ result }: { result: ScreeningResult }) {
-  const items = [
-    { label: "Pass", value: result.passed_count },
-    { label: "Fail", value: result.failed_count, alert: result.failed_count > 0 },
-    { label: "Unknown", value: result.unknown_count, hatched: result.unknown_count > 0 },
-    {
-      label: "Rule coverage",
-      value: `${Math.round(result.rule_coverage * 100)}%`,
-      hint: "criteria the deterministic engine could verify",
-    },
-  ];
-
-  return (
-    // gap-px over a rule-coloured ground draws the hairlines, so they stay
-    // correct however the grid wraps.
-    <div className="grid grid-cols-2 gap-px border border-rule bg-rule sm:grid-cols-4">
-      {items.map((item) => (
-        <div key={item.label} className="bg-panel p-3">
-          <div className="flex items-center gap-1.5">
-            {item.hatched && <span className="hatch inline-block h-2.5 w-2.5" />}
-            {item.alert && <span className="inline-block h-2.5 w-2.5 bg-alert" />}
-            <div className="eyebrow">{item.label}</div>
-          </div>
-          <div
-            className={`mt-1 text-2xl font-medium ${
-              item.alert ? "text-alert" : "text-ink"
-            }`}
-          >
-            {item.value}
-          </div>
-          {item.hint && (
-            <div className="mt-0.5 font-sans text-[11px] leading-tight text-ink-faint">
-              {item.hint}
-            </div>
-          )}
-        </div>
-      ))}
     </div>
   );
 }
 
+function Tallies({ result }: { result: ScreeningResult }) {
+  const coverage = Math.round(result.rule_coverage * 100);
+
+  return (
+    <div className="border border-rule bg-panel">
+      <div className="stagger grid grid-cols-3 gap-px bg-rule">
+        <Tally label="Pass" value={result.passed_count} tone="safe" />
+        <Tally label="Fail" value={result.failed_count} tone="alert" />
+        <Tally label="Unknown" value={result.unknown_count} tone="unknown" />
+      </div>
+
+      <div className="p-3">
+        <div className="flex items-baseline justify-between">
+          <span className="eyebrow">Rule coverage</span>
+          <span className="readout text-[15px] font-semibold">{coverage}%</span>
+        </div>
+        {/* How much of the protocol the deterministic engine could verify at
+            all — the honest denominator behind the verdict. */}
+        <div className="mt-1.5 h-1.5 w-full bg-band" role="img" aria-label={`${coverage}% of criteria machine-verifiable`}>
+          <div className="h-full bg-ink" style={{ width: `${coverage}%` }} />
+        </div>
+        <p className="mt-1.5 font-sans text-[11px] leading-relaxed text-ink-faint">
+          criteria the deterministic engine could verify. The rest were referred,
+          not guessed.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function Tally({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "safe" | "alert" | "unknown";
+}) {
+  const empty = value === 0;
+  const mark =
+    tone === "safe"
+      ? "bg-safe"
+      : tone === "alert"
+        ? "bg-alert"
+        : "hatch border border-rule-strong";
+  const text =
+    empty || tone === "unknown"
+      ? "text-ink"
+      : tone === "safe"
+        ? "text-safe"
+        : "text-alert";
+
+  return (
+    <div className="bg-panel p-3">
+      <div className="flex items-center gap-1.5">
+        <span className={`inline-block h-2.5 w-2.5 ${empty ? "bg-band" : mark}`} aria-hidden />
+        <span className="eyebrow">{label}</span>
+      </div>
+      <div className={`readout mt-1 text-[24px] font-semibold leading-none ${empty ? "text-ink-faint" : text}`}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * What the record itself made hard. These are not verdicts — they are the
+ * reasons a verdict needed a human, so each kind is marked as its own class of
+ * problem rather than as a generic list item.
+ */
+const FLAG_KIND: Record<string, { label: string; mark: string }> = {
+  CONTRADICTORY_DATA: { label: "Contradiction", mark: "bg-alert" },
+  BORDERLINE_VALUE: { label: "At the boundary", mark: "stripe-caution" },
+  UNSUPPORTED_CRITERION: { label: "Not machine-verifiable", mark: "hatch border border-rule-strong" },
+};
+
 function HeuristicList({ flags }: { flags: HeuristicFlag[] }) {
   return (
-    <section>
-      <h2 className="eyebrow mb-2">Data quality notes</h2>
-      <ul className="border border-rule bg-panel">
-        {flags.map((flag, index) => (
-          <li
-            key={`${flag.code}-${index}`}
-            className={`flex gap-3 p-3 ${index > 0 ? "border-t border-rule" : ""}`}
-          >
-            <span
-              className={`mt-1 h-2 w-2 shrink-0 ${
-                flag.severity === "WARN" ? "bg-ink" : "border border-ink-faint"
-              }`}
-            />
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-baseline gap-x-2">
-                <span className="text-[11px] font-medium">{flag.code}</span>
-                <span className="text-[10px] tracking-[0.1em] text-ink-faint">
-                  {flag.severity}
-                </span>
+    <section className="border border-rule bg-panel">
+      <h2 className="eyebrow border-b border-rule px-3 py-2">
+        Why this needed reading
+      </h2>
+      <ul>
+        {flags.map((flag, index) => {
+          const kind = FLAG_KIND[flag.code];
+          return (
+            <li
+              key={`${flag.code}-${index}`}
+              className={`flex gap-2.5 p-3 ${index > 0 ? "border-t border-rule" : ""}`}
+            >
+              <span
+                className={`mt-1 h-2.5 w-2.5 shrink-0 ${kind?.mark ?? "bg-ink"}`}
+                aria-hidden
+              />
+              <div className="min-w-0">
+                <div className="font-sans text-[12px] font-semibold">
+                  {kind?.label ?? flag.code}
+                </div>
+                <p className="mt-0.5 font-sans text-[12px] leading-relaxed text-ink-mid">
+                  {flag.message}
+                </p>
               </div>
-              <p className="mt-0.5 font-sans text-[13px] leading-relaxed text-ink-mid">
-                {flag.message}
-              </p>
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

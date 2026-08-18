@@ -102,19 +102,25 @@ function Processing() {
   ];
   return (
     <div>
-      <div className="relative mx-auto mb-4 h-0.5 w-40 overflow-hidden bg-band">
-        <div className="animate-sweep absolute inset-y-0 w-1/4 bg-ink" />
+      <div className="relative mx-auto mb-5 h-0.5 w-48 overflow-hidden bg-band">
+        <div className="animate-sweep absolute inset-y-0 w-1/4 bg-signal" />
       </div>
-      <div className="eyebrow mb-2">Processing</div>
-      <ul className="font-sans text-[13px] text-ink-mid">
+      <div className="eyebrow mb-3">Screening in progress</div>
+      {/* The pipeline, arriving in the order it actually runs. */}
+      <ol className="stagger mx-auto inline-flex flex-col gap-1.5 text-left">
         {steps.map((step) => (
-          <li key={step}>{step}</li>
+          <li
+            key={step}
+            className="flex items-center gap-2.5 font-sans text-[13px] text-ink-mid"
+          >
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-signal" aria-hidden />
+            {step}
+          </li>
         ))}
-      </ul>
+      </ol>
     </div>
   );
 }
-
 function ErrorNotice({
   error,
   localMessage,

@@ -17,6 +17,7 @@ NOTIFICATION = "NT"
 NEXT_DOSE = "ND"
 CYCLE = "CY"
 EVENT = "EV"
+INVESTIGATOR_REVIEW = "IR"
 
 
 def new_id(prefix: str) -> str:

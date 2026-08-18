@@ -13,6 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .ingestion import ObservationIngestionService
+from .investigator import InvestigatorReviewService
 from .notifications import NotificationDeliveryProvider
 from .service import MonitoringService
 from .treatment import TreatmentService
@@ -28,6 +29,7 @@ class MonitoringContext:
     treatment: TreatmentService
     ingestion: ObservationIngestionService
     monitoring: MonitoringService
+    investigator: InvestigatorReviewService
 
     @classmethod
     def build(
@@ -38,13 +40,15 @@ class MonitoringContext:
         notification_provider: NotificationDeliveryProvider | None = None,
     ) -> MonitoringContext:
         repository = monitoring_repository or JsonMonitoringRepository()
+        treatment = TreatmentService(screening_repository, repository)
         return cls(
             repository=repository,
-            treatment=TreatmentService(screening_repository, repository),
+            treatment=treatment,
             ingestion=ObservationIngestionService(repository),
             monitoring=MonitoringService(
                 repository,
                 risk_provider=risk_provider,
                 notification_provider=notification_provider,
             ),
+            investigator=InvestigatorReviewService(repository, treatment),
         )

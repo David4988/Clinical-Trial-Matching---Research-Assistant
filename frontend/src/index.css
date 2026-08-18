@@ -5,41 +5,63 @@
 @import "@fontsource/ibm-plex-mono/600.css";
 @import "@fontsource/ibm-plex-sans/400.css";
 @import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-sans/700.css";
 
 /*
-  Design direction: a clinical instrument readout, not a dashboard.
+  TrialGuard AI — clinical operations console.
 
-  Verdicts are carried by MARK and POSITION first — a solid, hatched, or
-  crimson rail on each row, plus a typographic token. Colour only reinforces.
-  There is deliberately no red/amber/green scale: it is hostile to colour-blind
-  readers, and "green = good patient" implies a clinical judgement this system
-  does not make. Crimson is the only saturated hue in the whole interface, and
-  it means exactly one thing: this criterion blocks enrolment.
+  Two voices, one superfamily. Plex Mono is the instrument: identifiers,
+  measurements, levels, anything the machine produced. Plex Sans is the human
+  register: prose, explanations, decisions. Keeping them in one family means the
+  two voices sit together without the page looking like two designs.
+
+  Colour is layered by authority, which is the product's actual architecture:
+
+    ink / rule / paper   structure — carries almost everything
+    signal (teal)        the system is doing something: live inference,
+                         processing, the current position in a sequence
+    safe / caution /     clinical state, and ONLY clinical state. A red on this
+    alert                page always means the participant, never a UI accent.
+
+  Risk is never colour alone. Every level keeps the mark it had before — solid,
+  striped, hatched — and the written level always sits beside it, so the screen
+  survives greyscale and colour-blind readers. Colour reinforces a distinction
+  the pattern has already made.
 */
 @theme {
-  --color-paper: #f6f7f5;
+  /* Structure */
+  --color-paper: #f4f4f1;
   --color-panel: #ffffff;
-  --color-ink: #14201c;
-  --color-ink-mid: #55625e;
-  --color-ink-faint: #8a9591;
-  --color-rule: #d8ddda;
-  --color-rule-strong: #b8c0bc;
-  --color-band: #e8ece9;
-  --color-alert: #9f1239;
-  --color-alert-wash: #fdf2f5;
+  --color-surface: #e9edee;
+  --color-ink: #0b1a24;
+  --color-ink-mid: #47606e;
+  --color-ink-faint: #647e8b;
+  --color-rule: #dbe2e4;
+  --color-rule-strong: #aebbc1;
+  --color-band: #e6ebec;
 
-  /*
-    Phase 2 needs a fourth state between "fine" and "blocking". The rule above
-    still holds: risk level is carried by PATTERN first — solid / striped /
-    crimson / hatched — and always repeated in words. Ochre only reinforces a
-    distinction the pattern has already made, so nothing is lost in greyscale
-    or to a colour-blind reader.
-  */
+  /* System accent — technology, never clinical state */
+  --color-signal: #0e9a94;
+  --color-signal-deep: #05615d;
+  --color-signal-wash: #e6f4f2;
+
+  /* Secondary — provenance, evidence, references */
+  --color-blue: #27578a;
+  --color-blue-wash: #ebf1f7;
+
+  /* Clinical state */
+  --color-safe: #17724a;
+  --color-safe-wash: #e8f2ec;
   --color-caution: #8a5a08;
   --color-caution-wash: #fbf6ec;
+  --color-alert: #a8192b;
+  --color-alert-wash: #fceef0;
 
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
   --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+
+  --ease-emphasis: cubic-bezier(0.2, 0, 0, 1);
 }
 
 :root {
@@ -54,6 +76,33 @@ body {
   font-feature-settings: "tnum" 1;
   -webkit-font-smoothing: antialiased;
 }
+
+/* -- type ----------------------------------------------------------------- */
+
+/* Section titles: the human voice, set tight so it reads as editorial rather
+   than as another data label. */
+.title {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.eyebrow {
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  font-weight: 500;
+}
+
+/* A measurement, an identifier, a level. Tabular so columns line up. */
+.readout {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* -- marks ---------------------------------------------------------------- */
 
 /* Absence rendered as absence: UNKNOWN is hatched, never a grey pill. */
 .hatch {
@@ -82,17 +131,15 @@ body {
   );
 }
 
-.eyebrow {
-  font-size: 0.6875rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-ink-faint);
-  font-weight: 500;
-}
+/* -- interaction ---------------------------------------------------------- */
 
 :focus-visible {
-  outline: 2px solid var(--color-ink);
+  outline: 2px solid var(--color-signal-deep);
   outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-signal-wash);
 }
 
 details > summary {
@@ -103,13 +150,89 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+/* -- motion ---------------------------------------------------------------
+   Motion here reports events, it does not decorate. Entrances say "this
+   arrived", the live dot says "inference is running", the trace draw says
+   "this is being plotted". Everything is 150–500ms and everything stops
+   under prefers-reduced-motion.
+*/
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-rise {
+  animation: rise 320ms var(--ease-emphasis) both;
+}
+
+/* Sequential arrival for a list whose order carries meaning. */
+.stagger > * {
+  animation: rise 320ms var(--ease-emphasis) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 45ms; }
+.stagger > *:nth-child(3) { animation-delay: 90ms; }
+.stagger > *:nth-child(4) { animation-delay: 135ms; }
+.stagger > *:nth-child(5) { animation-delay: 180ms; }
+.stagger > *:nth-child(6) { animation-delay: 225ms; }
+.stagger > *:nth-child(7) { animation-delay: 270ms; }
+.stagger > *:nth-child(n + 8) { animation-delay: 300ms; }
+
+/* A state the system just changed — one decisive wash, then still. */
+@keyframes state-arrive {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.99);
+  }
+  60% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-state {
+  animation: state-arrive 420ms var(--ease-emphasis) both;
+}
+
+/* Live inference. Tied to the model actually reporting live_inference — never
+   ambient decoration. */
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+.animate-live {
+  animation: live-pulse 2s ease-in-out infinite;
+}
+
+/* A trace being plotted. */
+@keyframes draw {
+  from {
+    stroke-dashoffset: var(--draw-length, 200);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.animate-draw {
+  stroke-dasharray: var(--draw-length, 200);
+  animation: draw 700ms var(--ease-emphasis) both;
 }
 
 @keyframes sweep {
@@ -118,4 +241,14 @@ details > summary::-webkit-details-marker {
 }
 .animate-sweep {
   animation: sweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

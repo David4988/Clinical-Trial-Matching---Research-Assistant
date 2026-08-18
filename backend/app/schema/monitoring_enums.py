@@ -138,6 +138,21 @@ class AdverseEventSeverity(str, Enum):
     SEVERE = "SEVERE"
 
 
+class InvestigatorAction(str, Enum):
+    """What a human investigator did about a monitoring cycle.
+
+    Distinct from `InterventionAction` on purpose. An intervention is what the
+    deterministic protocol *requires*; this is what a named person *decided*
+    once they had read it. Keeping them in separate vocabularies is what stops
+    a UI from rendering a human decision as though the protocol produced it, or
+    the reverse.
+    """
+
+    ACKNOWLEDGE = "ACKNOWLEDGE"
+    CONTINUE_MONITORING = "CONTINUE_MONITORING"
+    HOLD_TREATMENT = "HOLD_TREATMENT"
+
+
 class MonitoringEventType(str, Enum):
     """Timeline entry kinds, append-only.
 
@@ -156,3 +171,4 @@ class MonitoringEventType(str, Enum):
     NOTIFICATION_CREATED = "NOTIFICATION_CREATED"
     NEXT_DOSE_ASSESSED = "NEXT_DOSE_ASSESSED"
     ADVERSE_EVENT_RECORDED = "ADVERSE_EVENT_RECORDED"
+    INVESTIGATOR_REVIEW_RECORDED = "INVESTIGATOR_REVIEW_RECORDED"

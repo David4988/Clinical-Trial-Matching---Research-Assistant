@@ -118,6 +118,21 @@ export interface Disagreement {
   description: string;
 }
 
+export type ReviewDecision = "APPROVED_FOR_PHASE_2" | "FURTHER_REVIEW_REQUESTED";
+
+/**
+ * A named human's decision about a screening. A sibling of the verdict, never
+ * a replacement for it: every deterministic field on `ScreeningResult` reads
+ * the same before and after a review is recorded.
+ */
+export interface ScreeningReview {
+  decision: ReviewDecision;
+  reviewer: string;
+  note: string;
+  reviewed_status: OverallStatus;
+  decided_at: string;
+}
+
 export interface ScreeningResult {
   result_id: string;
   patient: Patient;
@@ -132,6 +147,8 @@ export interface ScreeningResult {
   ai_analysis: AIAnalysis | null;
   disagreements: Disagreement[];
   status_reason: string;
+  /** Null until a human has acted on the screening. */
+  review: ScreeningReview | null;
   generated_at: string;
 }
 

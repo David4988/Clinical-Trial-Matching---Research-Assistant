@@ -19,6 +19,7 @@ from .enums import (
     CriterionStatus,
     HeuristicCode,
     OverallStatus,
+    ReviewDecision,
     Severity,
 )
 from .trial import Trial
@@ -71,6 +72,29 @@ class Disagreement(BaseModel):
     description: str
 
 
+class ScreeningReview(BaseModel):
+    """A named human's decision about a completed screening.
+
+    Frozen, and a sibling of the criteria results rather than a parent of them —
+    the same asymmetry that keeps the AI layer out of the verdict. A reviewer
+    records what they concluded and why; they do not edit `overall_status`,
+    `criteria_results`, or any evidence. The deterministic record of what the
+    rules found stays exactly as the engine produced it.
+
+    `reviewed_status` captures the verdict that was actually in front of the
+    reviewer, so the decision stays self-describing even if the same patient is
+    re-screened later against different data.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    decision: ReviewDecision
+    reviewer: str
+    note: str
+    reviewed_status: OverallStatus
+    decided_at: datetime
+
+
 class ScreeningResult(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
@@ -90,6 +114,10 @@ class ScreeningResult(BaseModel):
     disagreements: list[Disagreement] = Field(default_factory=list)
     # Why the overall status came out the way it did, in order of precedence.
     status_reason: str = ""
+    # Null until a human acts on the screening. Recorded after the fact and
+    # never read by the engine, so a screening's deterministic fields are
+    # identical whether or not anyone has reviewed it.
+    review: ScreeningReview | None = None
     generated_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )

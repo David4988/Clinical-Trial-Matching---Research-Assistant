@@ -10,12 +10,17 @@ from __future__ import annotations
 
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 
-from .models import ErrorResponse, HealthResponse, ScreenRequest
+from .models import (
+    ErrorResponse,
+    HealthResponse,
+    RecordReviewRequest,
+    ScreenRequest,
+)
 from ..extraction.errors import ExtractionError
 from ..extraction.parser import parse_document
 from ..repository.base import RepositoryError
 from ..schema.result import ScreeningResult
-from ..service import ScreeningService
+from ..service import ReviewError, ScreeningService
 
 router = APIRouter()
 
@@ -100,3 +105,36 @@ def get_result(request: Request, result_id: str) -> ScreeningResult:
     if result is None:
         _fail(404, "RESULT_NOT_FOUND", f"No screening result with id '{result_id}'.")
     return result
+
+
+@router.post(
+    "/results/{result_id}/review",
+    response_model=ScreeningResult,
+    responses={404: {"model": ErrorResponse}, **_ERRORS},
+)
+def record_review(
+    request: Request, result_id: str, payload: RecordReviewRequest
+) -> ScreeningResult:
+    """Record a human decision about a screening.
+
+    Returns the same `ScreeningResult` with `review` populated. Every
+    deterministic field is unchanged — the review is stored beside the verdict,
+    never over it.
+    """
+    try:
+        return _service(request).record_review(
+            result_id=result_id,
+            decision=payload.decision,
+            reviewer=payload.reviewer,
+            note=payload.note,
+            now=payload.now,
+        )
+    except ReviewError as exc:
+        _fail(
+            404 if exc.code == "RESULT_NOT_FOUND" else 422,
+            exc.code,
+            exc.message,
+            exc.details,
+        )
+    except RepositoryError as exc:
+        _fail(503, "PERSISTENCE_FAILED", "The review could not be saved.", [str(exc)])
