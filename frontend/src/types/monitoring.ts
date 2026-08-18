@@ -75,15 +75,26 @@ export interface ModelProvenance {
   provider: string;
   model_version: string;
   live_inference: boolean;
+  /**
+   * Copied through from the artifact's own metadata, so several fields arrive
+   * as nested objects rather than strings. Typing them as strings is what
+   * previously let an object reach React as a child and blank the page.
+   */
   artifact?: {
     model_version: string | null;
     feature_version: string | null;
     features: string[] | null;
-    estimator: string | null;
-    training_cohort: string | null;
-    scoring: string | null;
+    estimator: { class?: string; n_estimators?: number } | null;
+    training_cohort: {
+      source?: string;
+      total_patients?: number;
+      cohort_windows?: number;
+      fitted_rows?: number;
+    } | null;
+    scoring: { anomaly_score?: string; decimals?: number } | null;
     created_at: string | null;
     model_sha256: string | null;
+    trained_with?: Record<string, string> | null;
   };
   artifact_error?: string;
 }

@@ -54,7 +54,7 @@ export function ModelBadge({ model }: { model: ModelProvenance }) {
 
         <p className="min-w-[12rem] flex-1 font-sans text-[11px] leading-relaxed text-ink-faint">
           {DESCRIPTIONS[model.provider] ?? "Risk provider loaded at startup."}
-          {artifact?.estimator && ` · ${artifact.estimator}`}
+          {artifact?.estimator?.class && ` · ${artifact.estimator.class}`}
         </p>
       </div>
 
@@ -66,8 +66,8 @@ export function ModelBadge({ model }: { model: ModelProvenance }) {
           </summary>
           <dl className="mt-2 grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
             <Row label="Feature version" value={artifact.feature_version} />
-            <Row label="Training cohort" value={artifact.training_cohort} />
-            <Row label="Scoring" value={artifact.scoring} />
+            <Row label="Training cohort" value={cohortSummary(artifact.training_cohort)} />
+            <Row label="Scoring" value={artifact.scoring?.anomaly_score} />
             <Row
               label="Features"
               value={artifact.features ? `${artifact.features.length}` : null}
@@ -99,8 +99,27 @@ export function ModelBadge({ model }: { model: ModelProvenance }) {
   );
 }
 
-function Row({ label, value }: { label: string; value: string | null }) {
-  if (!value) return null;
+/** The cohort the artifact was fitted on, as one readable line. */
+function cohortSummary(
+  cohort: NonNullable<ModelProvenance["artifact"]>["training_cohort"],
+): string | null {
+  if (!cohort) return null;
+  const parts = [
+    cohort.total_patients != null && `${cohort.total_patients} patients`,
+    cohort.fitted_rows != null && `${cohort.fitted_rows} rows fitted`,
+    cohort.source,
+  ].filter((part): part is string => typeof part === "string");
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
+
+/**
+ * Renders scalars only. Artifact metadata is free-form JSON the model owns, so
+ * a field that becomes an object must degrade to a hidden row rather than
+ * throwing "Objects are not valid as a React child" and blanking the page.
+ */
+function Row({ label, value }: { label: string; value: unknown }) {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  if (value === "") return null;
   return (
     <div className="flex items-baseline gap-2">
       <dt className="text-[10px] tracking-[0.08em] text-ink-faint">{label}</dt>

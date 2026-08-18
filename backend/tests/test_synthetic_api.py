@@ -131,3 +131,22 @@ def test_model_endpoint_exposes_the_artifact_when_live(tmp_path):
     assert artifact["estimator"]["random_state"] == 42
     assert sorted(artifact["training_cohort"]["scenarios"]) == ["IMPROVING", "STABLE"]
     assert len(artifact["model_sha256"]) == 64
+
+
+def test_artifact_provenance_offers_a_scalar_for_every_nested_field(tmp_path):
+    """The badge renders leaves, never the nested objects themselves.
+
+    `estimator`, `training_cohort` and `scoring` are objects copied straight
+    out of the artifact's metadata. The monitoring badge reads one scalar from
+    each; pinning those here means a metadata rename shows up as a failing test
+    rather than as a silently empty row on the provenance panel.
+    """
+    artifact = (
+        TestClient(_isolated_app(tmp_path)).get("/monitoring/model").json()["artifact"]
+    )
+
+    assert isinstance(artifact["estimator"]["class"], str)
+    assert isinstance(artifact["training_cohort"]["source"], str)
+    assert isinstance(artifact["training_cohort"]["total_patients"], int)
+    assert isinstance(artifact["training_cohort"]["fitted_rows"], int)
+    assert isinstance(artifact["scoring"]["anomaly_score"], str)
