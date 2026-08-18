@@ -1,3 +1,4 @@
+import { API_BASE } from "./base";
 import type {
   ApiError,
   Patient,
@@ -6,7 +7,7 @@ import type {
   Trial,
 } from "../types/canonical";
 
-const BASE = "/api";
+const BASE = API_BASE;
 
 /** Thrown for every non-2xx response, always carrying the structured body. */
 export class ScreeningApiError extends Error {
