@@ -21,6 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from .paths import data_dir
 from .base import RepositoryError
 from .monitoring_base import MonitoringRepository
 from ..schema.monitoring import AdverseEvent, Observation, TreatmentAssignment
@@ -30,7 +31,7 @@ from ..schema.monitoring_result import (
     Notification,
 )
 
-DEFAULT_STORE = Path(__file__).resolve().parents[2] / "data" / "monitoring.json"
+DEFAULT_STORE = data_dir() / "monitoring.json"
 
 _EMPTY: dict[str, dict[str, Any]] = {
     "treatments": {},
