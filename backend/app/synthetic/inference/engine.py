@@ -298,16 +298,18 @@ class EarlywarningInferenceEngine:
             self._model = model
 
     def _validate(self, metadata: dict[str, Any], model_path: Path) -> None:
-        expected_sha = metadata.get("model_sha256")
-        if not expected_sha:
-            raise ModelUnavailable("No SHA256 in metadata")
-
+        expected_sha = "c334171f87b3be7414d66b691c635bbf1b11ec1f12c8c375562b342125f629e3"
         digest = hashlib.sha256()
         with open(model_path, "rb") as handle:
             for chunk in iter(lambda: handle.read(1 << 20), b""):
                 digest.update(chunk)
-        if digest.hexdigest() != expected_sha:
-            raise ModelUnavailable("Model SHA256 mismatch")
+        
+        actual_sha = digest.hexdigest()
+        if actual_sha != expected_sha:
+            raise ModelUnavailable(f"Model SHA256 mismatch: {actual_sha} != {expected_sha}")
+        
+        if metadata.get("model_sha256") != expected_sha:
+            raise ModelUnavailable("Metadata SHA256 does not match locked artifact")
             
         if metadata.get("model_version") != "v2":
             raise ModelUnavailable("Wrong model version")
@@ -339,13 +341,33 @@ class EarlywarningInferenceEngine:
         if state.current is None:
             return empty_assessment("INSUFFICIENT_DATA")
 
-        # Explicit 180 minute boundary
+        if not observations:
+            return empty_assessment("INSUFFICIENT_DATA")
+
+        # History length (time since very first observation)
+        first_obs_time = min(o.recorded_at for o in observations)
+        history_length_min = (now - first_obs_time).total_seconds() / 60.0
+
+        # Latest observation staleness (time since most recent observation overall)
+        latest_obs_time = max(o.recorded_at for o in observations)
+        latest_staleness_min = (now - latest_obs_time).total_seconds() / 60.0
+
+        if history_length_min < 180.0:
+            return empty_assessment("INSUFFICIENT_DATA")
+        
+        if latest_staleness_min > 60.0:
+            return empty_assessment("INSUFFICIENT_DATA")
+
+        # Explicit 180 minute boundary for extracting recent obs
         import datetime as dt
         cutoff = now - dt.timedelta(minutes=180)
         recent_obs = [o for o in observations if cutoff <= o.recorded_at <= now]
 
+        if len(recent_obs) < 3:
+            return empty_assessment("INSUFFICIENT_DATA")
+
         obs_dicts = []
-        for o in recent_obs:
+        for o in observations:
             obs_dicts.append({
                 "patient_id": o.patient_id,
                 "recorded_at": o.recorded_at.replace(microsecond=0),
@@ -360,25 +382,6 @@ class EarlywarningInferenceEngine:
         
         if "time__minutes_since_first_obs" in matrix.columns:
             matrix = matrix.drop(columns=["time__minutes_since_first_obs"])
-            
-        is_sufficient = True
-        if len(obs_df) < 3:
-            is_sufficient = False
-        
-        if is_sufficient:
-            stale_60m_count = 0
-            for v in ["HEART_RATE", "SPO2", "RESPIRATORY_RATE", "SYSTOLIC_BP", "DIASTOLIC_BP"]:
-                stale = matrix[f"{v}__staleness_min"].iloc[0]
-                if np.isnan(stale) or stale > 180.0:
-                    is_sufficient = False
-                    break
-                if stale > 60.0:
-                    stale_60m_count += 1
-            if stale_60m_count > 2:
-                is_sufficient = False
-                
-        if not is_sufficient:
-            return empty_assessment("INSUFFICIENT_DATA")
             
         # Verify columns match
         if list(matrix.columns) != self.metadata["feature_columns"]:
@@ -399,9 +402,10 @@ class EarlywarningInferenceEngine:
         evidence = []
         for i, c in enumerate(contribs):
             direction = "POSITIVE" if c > 0 else "NEGATIVE"
+            raw_val = float(matrix.iloc[0, i])
             evidence.append(FeatureEvidence(
                 feature_name=matrix.columns[i],
-                raw_value=float(matrix.iloc[0, i]),
+                raw_value=raw_val if not np.isnan(raw_val) else None,
                 transformed_value=float(X_scaled[0, i]),
                 model_weight=float(clf.coef_[0, i]),
                 contribution=float(c),

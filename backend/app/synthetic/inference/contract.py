@@ -65,7 +65,7 @@ from pydantic import BaseModel
 
 class FeatureEvidence(BaseModel):
     feature_name: str
-    raw_value: float
+    raw_value: float | None
     transformed_value: float
     model_weight: float
     contribution: float

@@ -110,6 +110,12 @@ def _verbose(w: ReplayWindow, change_point: int) -> None:
     else:
         print("Score=—        (no previous window; no delta was invented)")
         print("Prediction=—")
+    if hasattr(w, 'early_warning') and w.early_warning:
+        ew = w.early_warning
+        ew_pred = "ELEVATED" if ew.get("predicted_deterioration") else "LOW"
+        score_val = ew.get('score')
+        score_str = f"{score_val:.4f}" if score_val is not None else "—"
+        print(f"EarlyWarning={ew_pred} (score: {score_str})")
     print(f"Risk={w.risk_level}" + (f"   (model said {w.provider_level}, gated)" if w.gated else ""))
     if w.transition:
         print(f"  transition: {w.transition}")

@@ -102,6 +102,7 @@ class ReplayWindow:
     next_dose: str | None = None
     contributing_factors: list[dict[str, Any]] = field(default_factory=list)
     likely_patterns: list[str] = field(default_factory=list)
+    early_warning: dict[str, Any] | None = None
 
     @property
     def scored(self) -> bool:
@@ -256,6 +257,7 @@ def replay(
             ),
             contributing_factors=risk["contributing_factors"],
             likely_patterns=risk["likely_patterns"],
+            early_warning=cycle.get("early_warning"),
         )
 
         if verify_consistency and risk["provider"] == "synthetic_ml":

@@ -189,7 +189,7 @@ export interface RiskAssessment {
 
 export interface FeatureEvidence {
   feature_name: string;
-  raw_value: number;
+  raw_value: number | null;
   transformed_value: number;
   model_weight: number;
   contribution: number;
