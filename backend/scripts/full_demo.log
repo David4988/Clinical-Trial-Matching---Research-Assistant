@@ -1,0 +1,1339 @@
+
+==================================================================
+LIVE SYNTHETIC PATIENT REPLAY
+Patient:   PT-DEMO-001  (research trajectory P0014, SUDDEN_DETERIORATION)
+Model:     synthetic_if_v1  sha256 8114caf6302beebe…
+Provider:  synthetic_ml   live_inference=True
+Cadence:   5 minutes
+Windows:   0–143   ground-truth change point: 103
+==================================================================
+
+Window 00   06:00
+HR=82.9   SpO2=94.9   RR=14.7  
+ΔHR=—       ΔSpO2=—       ΔRR=—      
+Score=—        (no previous window; no delta was invented)
+Prediction=—
+EarlyWarning=LOW (score: —)
+Risk=UNKNOWN
+  transition: First assessment: UNKNOWN.
+  protocol:   REQUEST_REPEAT_OBSERVATION, CLINICAL_REVIEW, NOTIFY_CLINICIAN
+
+Window 01   06:05
+HR=78.2   SpO2=94.5   RR=14.0  
+ΔHR=-4.7    ΔSpO2=-0.4    ΔRR=-0.7   
+Score=-0.101410
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  transition: De-escalated from UNKNOWN to GREEN.
+  protocol:   ROUTINE_MONITORING
+
+Window 02   06:10
+HR=82.0   SpO2=95.2   RR=12.6  
+ΔHR=+3.8    ΔSpO2=+0.7    ΔRR=-1.4   
+Score=-0.069534
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 03   06:15
+HR=81.0   SpO2=95.7   RR=12.9  
+ΔHR=-1.0    ΔSpO2=+0.5    ΔRR=+0.3   
+Score=-0.091948
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 04   06:20
+HR=75.5   SpO2=95.1   RR=14.8  
+ΔHR=-5.5    ΔSpO2=-0.6    ΔRR=+1.9   
+Score=-0.079816
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 05   06:25
+HR=83.8   SpO2=94.8   RR=14.0  
+ΔHR=+8.3    ΔSpO2=-0.3    ΔRR=-0.8   
+Score=-0.049057
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 06   06:30
+HR=79.2   SpO2=95.9   RR=16.5  
+ΔHR=-4.6    ΔSpO2=+1.1    ΔRR=+2.5   
+Score=-0.034945
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 07   06:35
+HR=82.9   SpO2=94.5   RR=16.9  
+ΔHR=+3.7    ΔSpO2=-1.4    ΔRR=+0.4   
+Score=-0.054011
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 08   06:40
+HR=79.4   SpO2=95.0   RR=14.5  
+ΔHR=-3.5    ΔSpO2=+0.5    ΔRR=-2.4   
+Score=-0.099262
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 09   06:45
+HR=73.9   SpO2=94.7   RR=15.1  
+ΔHR=-5.5    ΔSpO2=-0.3    ΔRR=+0.6   
+Score=-0.102729
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 10   06:50
+HR=82.5   SpO2=95.9   RR=18.0  
+ΔHR=+8.6    ΔSpO2=+1.2    ΔRR=+2.9   
+Score=+0.022011
+Prediction=ANOMALY
+EarlyWarning=LOW (score: —)
+Risk=RED
+  transition: Escalated from GREEN to RED.
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 11   06:55
+HR=81.0   SpO2=94.8   RR=15.3  
+ΔHR=-1.5    ΔSpO2=-1.1    ΔRR=-2.7   
+Score=-0.057092
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  transition: De-escalated from RED to GREEN.
+  protocol:   ROUTINE_MONITORING
+
+Window 12   07:00
+HR=79.4   SpO2=95.1   RR=13.6  
+ΔHR=-1.6    ΔSpO2=+0.3    ΔRR=-1.7   
+Score=-0.102944
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 13   07:05
+HR=82.0   SpO2=94.7   RR=16.5  
+ΔHR=+2.6    ΔSpO2=-0.4    ΔRR=+2.9   
+Score=-0.092992
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 14   07:10
+HR=74.6   SpO2=95.1   RR=12.9  
+ΔHR=-7.4    ΔSpO2=+0.4    ΔRR=-3.6   
+Score=-0.011153
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=AMBER
+  transition: Escalated from GREEN to AMBER.
+  protocol:   INCREASE_MONITORING, CLINICAL_REVIEW, NOTIFY_CLINICIAN
+
+Window 15   07:15
+HR=76.7   SpO2=94.6   RR=12.4  
+ΔHR=+2.1    ΔSpO2=-0.5    ΔRR=-0.5   
+Score=-0.088389
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  transition: De-escalated from AMBER to GREEN.
+  protocol:   ROUTINE_MONITORING
+
+Window 16   07:20
+HR=77.0   SpO2=95.7   RR=14.4  
+ΔHR=+0.3    ΔSpO2=+1.1    ΔRR=+2.0   
+Score=-0.075590
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 17   07:25
+HR=77.4   SpO2=95.0   RR=14.0  
+ΔHR=+0.4    ΔSpO2=-0.7    ΔRR=-0.4   
+Score=-0.106779
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 18   07:30
+HR=79.4   SpO2=95.4   RR=14.8  
+ΔHR=+2.0    ΔSpO2=+0.4    ΔRR=+0.8   
+Score=-0.120727
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 19   07:35
+HR=76.6   SpO2=95.0   RR=14.0  
+ΔHR=-2.8    ΔSpO2=-0.4    ΔRR=-0.8   
+Score=-0.115631
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 20   07:40
+HR=78.2   SpO2=95.6   RR=13.8  
+ΔHR=+1.6    ΔSpO2=+0.6    ΔRR=-0.2   
+Score=-0.110755
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 21   07:45
+HR=79.9   SpO2=94.7   RR=13.5  
+ΔHR=+1.7    ΔSpO2=-0.9    ΔRR=-0.3   
+Score=-0.082218
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 22   07:50
+HR=78.7   SpO2=95.2   RR=13.3  
+ΔHR=-1.2    ΔSpO2=+0.5    ΔRR=-0.2   
+Score=-0.108874
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 23   07:55
+HR=78.3   SpO2=95.1   RR=15.4  
+ΔHR=-0.4    ΔSpO2=-0.1    ΔRR=+2.1   
+Score=-0.120196
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 24   08:00
+HR=79.8   SpO2=95.3   RR=15.1  
+ΔHR=+1.5    ΔSpO2=+0.2    ΔRR=-0.3   
+Score=-0.125756
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 25   08:05
+HR=80.5   SpO2=95.1   RR=14.3  
+ΔHR=+0.7    ΔSpO2=-0.2    ΔRR=-0.8   
+Score=-0.120200
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 26   08:10
+HR=75.8   SpO2=94.9   RR=12.6  
+ΔHR=-4.7    ΔSpO2=-0.2    ΔRR=-1.7   
+Score=-0.074802
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 27   08:15
+HR=74.1   SpO2=94.8   RR=14.6  
+ΔHR=-1.7    ΔSpO2=-0.1    ΔRR=+2.0   
+Score=-0.116357
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 28   08:20
+HR=75.6   SpO2=94.3   RR=14.9  
+ΔHR=+1.5    ΔSpO2=-0.5    ΔRR=+0.3   
+Score=-0.113762
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 29   08:25
+HR=77.6   SpO2=94.5   RR=14.6  
+ΔHR=+2.0    ΔSpO2=+0.2    ΔRR=-0.3   
+Score=-0.121191
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 30   08:30
+HR=75.4   SpO2=94.8   RR=12.6  
+ΔHR=-2.2    ΔSpO2=+0.3    ΔRR=-2.0   
+Score=-0.078729
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 31   08:35
+HR=80.2   SpO2=94.9   RR=16.3  
+ΔHR=+4.8    ΔSpO2=+0.1    ΔRR=+3.7   
+Score=-0.063578
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 32   08:40
+HR=78.4   SpO2=95.6   RR=13.7  
+ΔHR=-1.8    ΔSpO2=+0.7    ΔRR=-2.6   
+Score=-0.079295
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 33   08:45
+HR=74.8   SpO2=95.5   RR=13.7  
+ΔHR=-3.6    ΔSpO2=-0.1    ΔRR=+0.0   
+Score=-0.096989
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 34   08:50
+HR=75.1   SpO2=94.2   RR=14.3  
+ΔHR=+0.3    ΔSpO2=-1.3    ΔRR=+0.6   
+Score=-0.065352
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 35   08:55
+HR=73.2   SpO2=95.4   RR=18.3  
+ΔHR=-1.9    ΔSpO2=+1.2    ΔRR=+4.0   
+Score=-0.034801
+Prediction=NORMAL
+EarlyWarning=LOW (score: —)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 36   09:00
+HR=81.6   SpO2=95.1   RR=14.8  
+ΔHR=+8.4    ΔSpO2=-0.3    ΔRR=-3.5   
+Score=-0.009135
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=AMBER
+  transition: Escalated from GREEN to AMBER.
+  protocol:   INCREASE_MONITORING, CLINICAL_REVIEW, NOTIFY_CLINICIAN
+
+Window 37   09:05
+HR=76.3   SpO2=95.0   RR=13.8  
+ΔHR=-5.3    ΔSpO2=-0.1    ΔRR=-1.0   
+Score=-0.097637
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  transition: De-escalated from AMBER to GREEN.
+  protocol:   ROUTINE_MONITORING
+
+Window 38   09:10
+HR=78.0   SpO2=95.6   RR=14.3  
+ΔHR=+1.7    ΔSpO2=+0.6    ΔRR=+0.5   
+Score=-0.113750
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 39   09:15
+HR=77.8   SpO2=94.9   RR=16.5  
+ΔHR=-0.2    ΔSpO2=-0.7    ΔRR=+2.2   
+Score=-0.107324
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 40   09:20
+HR=79.1   SpO2=95.3   RR=13.1  
+ΔHR=+1.3    ΔSpO2=+0.4    ΔRR=-3.4   
+Score=-0.064445
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 41   09:25
+HR=82.3   SpO2=95.4   RR=15.0  
+ΔHR=+3.2    ΔSpO2=+0.1    ΔRR=+1.9   
+Score=-0.098965
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 42   09:30
+HR=83.4   SpO2=95.3   RR=16.3  
+ΔHR=+1.1    ΔSpO2=-0.1    ΔRR=+1.3   
+Score=-0.119419
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 43   09:35
+HR=82.1   SpO2=95.7   RR=14.2  
+ΔHR=-1.3    ΔSpO2=+0.4    ΔRR=-2.1   
+Score=-0.092008
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 44   09:40
+HR=78.2   SpO2=94.7   RR=12.7  
+ΔHR=-3.9    ΔSpO2=-1.0    ΔRR=-1.5   
+Score=-0.051073
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 45   09:45
+HR=86.1   SpO2=94.9   RR=12.4  
+ΔHR=+7.9    ΔSpO2=+0.2    ΔRR=-0.3   
+Score=-0.033521
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 46   09:50
+HR=75.5   SpO2=95.1   RR=13.6  
+ΔHR=-10.6   ΔSpO2=+0.2    ΔRR=+1.2   
+Score=-0.007966
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=AMBER
+  transition: Escalated from GREEN to AMBER.
+  protocol:   INCREASE_MONITORING, CLINICAL_REVIEW, NOTIFY_CLINICIAN
+
+Window 47   09:55
+HR=76.7   SpO2=94.7   RR=13.5  
+ΔHR=+1.2    ΔSpO2=-0.4    ΔRR=-0.1   
+Score=-0.114754
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  transition: De-escalated from AMBER to GREEN.
+  protocol:   ROUTINE_MONITORING
+
+Window 48   10:00
+HR=80.1   SpO2=94.7   RR=14.9  
+ΔHR=+3.4    ΔSpO2=+0.0    ΔRR=+1.4   
+Score=-0.116135
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 49   10:05
+HR=78.9   SpO2=95.6   RR=16.2  
+ΔHR=-1.2    ΔSpO2=+0.9    ΔRR=+1.3   
+Score=-0.094783
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 50   10:10
+HR=77.3   SpO2=95.6   RR=14.3  
+ΔHR=-1.6    ΔSpO2=+0.0    ΔRR=-1.9   
+Score=-0.101982
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 51   10:15
+HR=79.6   SpO2=93.7   RR=15.2  
+ΔHR=+2.3    ΔSpO2=-1.9    ΔRR=+0.9   
+Score=-0.009238
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=AMBER
+  transition: Escalated from GREEN to AMBER.
+  protocol:   INCREASE_MONITORING, CLINICAL_REVIEW, NOTIFY_CLINICIAN
+
+Window 52   10:20
+HR=80.0   SpO2=93.9   RR=14.7  
+ΔHR=+0.4    ΔSpO2=+0.2    ΔRR=-0.5   
+Score=-0.096017
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  transition: De-escalated from AMBER to GREEN.
+  protocol:   ROUTINE_MONITORING
+
+Window 53   10:25
+HR=83.9   SpO2=94.5   RR=13.0  
+ΔHR=+3.9    ΔSpO2=+0.6    ΔRR=-1.7   
+Score=-0.063317
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 54   10:30
+HR=76.1   SpO2=94.9   RR=14.1  
+ΔHR=-7.8    ΔSpO2=+0.4    ΔRR=+1.1   
+Score=-0.059148
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 55   10:35
+HR=70.4   SpO2=95.1   RR=16.5  
+ΔHR=-5.7    ΔSpO2=+0.2    ΔRR=+2.4   
+Score=-0.086506
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 56   10:40
+HR=81.2   SpO2=94.7   RR=15.3  
+ΔHR=+10.8   ΔSpO2=-0.4    ΔRR=-1.2   
+Score=-0.032128
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 57   10:45
+HR=81.3   SpO2=95.9   RR=14.3  
+ΔHR=+0.1    ΔSpO2=+1.2    ΔRR=-1.0   
+Score=-0.058679
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 58   10:50
+HR=77.0   SpO2=94.7   RR=15.4  
+ΔHR=-4.3    ΔSpO2=-1.2    ΔRR=+1.1   
+Score=-0.080043
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 59   10:55
+HR=75.8   SpO2=95.5   RR=14.6  
+ΔHR=-1.2    ΔSpO2=+0.8    ΔRR=-0.8   
+Score=-0.110893
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 60   11:00
+HR=79.1   SpO2=94.8   RR=15.3  
+ΔHR=+3.3    ΔSpO2=-0.7    ΔRR=+0.7   
+Score=-0.108077
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 61   11:05
+HR=74.3   SpO2=94.5   RR=13.4  
+ΔHR=-4.8    ΔSpO2=-0.3    ΔRR=-1.9   
+Score=-0.084019
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 62   11:10
+HR=74.0   SpO2=94.9   RR=16.4  
+ΔHR=-0.3    ΔSpO2=+0.4    ΔRR=+3.0   
+Score=-0.095465
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 63   11:15
+HR=77.0   SpO2=95.2   RR=13.4  
+ΔHR=+3.0    ΔSpO2=+0.3    ΔRR=-3.0   
+Score=-0.089502
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 64   11:20
+HR=80.5   SpO2=95.4   RR=14.3  
+ΔHR=+3.5    ΔSpO2=+0.2    ΔRR=+0.9   
+Score=-0.111797
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 65   11:25
+HR=78.9   SpO2=94.9   RR=15.6  
+ΔHR=-1.6    ΔSpO2=-0.5    ΔRR=+1.3   
+Score=-0.118636
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 66   11:30
+HR=77.3   SpO2=95.0   RR=11.9  
+ΔHR=-1.6    ΔSpO2=+0.1    ΔRR=-3.7   
+Score=-0.046150
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 67   11:35
+HR=76.4   SpO2=94.9   RR=14.1  
+ΔHR=-0.9    ΔSpO2=-0.1    ΔRR=+2.2   
+Score=-0.106267
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 68   11:40
+HR=78.5   SpO2=95.4   RR=14.8  
+ΔHR=+2.1    ΔSpO2=+0.5    ΔRR=+0.7   
+Score=-0.121783
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 69   11:45
+HR=77.9   SpO2=94.0   RR=17.4  
+ΔHR=-0.6    ΔSpO2=-1.4    ΔRR=+2.6   
+Score=-0.043105
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 70   11:50
+HR=77.9   SpO2=95.0   RR=14.8  
+ΔHR=+0.0    ΔSpO2=+1.0    ΔRR=-2.6   
+Score=-0.077518
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 71   11:55
+HR=77.4   SpO2=94.9   RR=15.0  
+ΔHR=-0.5    ΔSpO2=-0.1    ΔRR=+0.2   
+Score=-0.135612
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 72   12:00
+HR=79.3   SpO2=95.1   RR=14.5  
+ΔHR=+1.9    ΔSpO2=+0.2    ΔRR=-0.5   
+Score=-0.124088
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 73   12:05
+HR=79.6   SpO2=94.2   RR=14.1  
+ΔHR=+0.3    ΔSpO2=-0.9    ΔRR=-0.4   
+Score=-0.089489
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 74   12:10
+HR=77.6   SpO2=94.6   RR=16.9  
+ΔHR=-2.0    ΔSpO2=+0.4    ΔRR=+2.8   
+Score=-0.098400
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 75   12:15
+HR=79.4   SpO2=95.3   RR=15.7  
+ΔHR=+1.8    ΔSpO2=+0.7    ΔRR=-1.2   
+Score=-0.114137
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 76   12:20
+HR=76.2   SpO2=94.4   RR=14.6  
+ΔHR=-3.2    ΔSpO2=-0.9    ΔRR=-1.1   
+Score=-0.085929
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 77   12:25
+HR=75.7   SpO2=94.6   RR=16.1  
+ΔHR=-0.5    ΔSpO2=+0.2    ΔRR=+1.5   
+Score=-0.122675
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 78   12:30
+HR=82.6   SpO2=95.6   RR=13.7  
+ΔHR=+6.9    ΔSpO2=+1.0    ΔRR=-2.4   
+Score=-0.019415
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=AMBER
+  transition: Escalated from GREEN to AMBER.
+  protocol:   INCREASE_MONITORING, CLINICAL_REVIEW, NOTIFY_CLINICIAN
+
+Window 79   12:35
+HR=75.1   SpO2=94.5   RR=14.2  
+ΔHR=-7.5    ΔSpO2=-1.1    ΔRR=+0.5   
+Score=-0.049063
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  transition: De-escalated from AMBER to GREEN.
+  protocol:   ROUTINE_MONITORING
+
+Window 80   12:40
+HR=75.5   SpO2=94.8   RR=13.5  
+ΔHR=+0.4    ΔSpO2=+0.3    ΔRR=-0.7   
+Score=-0.112813
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 81   12:45
+HR=77.5   SpO2=95.8   RR=14.1  
+ΔHR=+2.0    ΔSpO2=+1.0    ΔRR=+0.6   
+Score=-0.082829
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 82   12:50
+HR=78.2   SpO2=95.2   RR=16.6  
+ΔHR=+0.7    ΔSpO2=-0.6    ΔRR=+2.5   
+Score=-0.097464
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 83   12:55
+HR=77.3   SpO2=96.2   RR=15.3  
+ΔHR=-0.9    ΔSpO2=+1.0    ΔRR=-1.3   
+Score=-0.063718
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 84   13:00
+HR=77.4   SpO2=95.1   RR=14.8  
+ΔHR=+0.1    ΔSpO2=-1.1    ΔRR=-0.5   
+Score=-0.085476
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 85   13:05
+HR=81.1   SpO2=95.7   RR=13.0  
+ΔHR=+3.7    ΔSpO2=+0.6    ΔRR=-1.8   
+Score=-0.080175
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 86   13:10
+HR=79.4   SpO2=95.4   RR=15.7  
+ΔHR=-1.7    ΔSpO2=-0.3    ΔRR=+2.7   
+Score=-0.092124
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 87   13:15
+HR=78.7   SpO2=94.8   RR=15.0  
+ΔHR=-0.7    ΔSpO2=-0.6    ΔRR=-0.7   
+Score=-0.115464
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 88   13:20
+HR=83.8   SpO2=95.3   RR=12.7  
+ΔHR=+5.1    ΔSpO2=+0.5    ΔRR=-2.3   
+Score=-0.046606
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 89   13:25
+HR=75.6   SpO2=95.5   RR=16.2  
+ΔHR=-8.2    ΔSpO2=+0.2    ΔRR=+3.5   
+Score=-0.021357
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 90   13:30
+HR=78.0   SpO2=95.5   RR=13.5  
+ΔHR=+2.4    ΔSpO2=+0.0    ΔRR=-2.7   
+Score=-0.080689
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 91   13:35
+HR=85.3   SpO2=95.8   RR=14.8  
+ΔHR=+7.3    ΔSpO2=+0.3    ΔRR=+1.3   
+Score=-0.039819
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 92   13:40
+HR=77.6   SpO2=94.5   RR=13.7  
+ΔHR=-7.7    ΔSpO2=-1.3    ΔRR=-1.1   
+Score=-0.001349
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=AMBER
+  transition: Escalated from GREEN to AMBER.
+  protocol:   INCREASE_MONITORING, CLINICAL_REVIEW, NOTIFY_CLINICIAN
+
+Window 93   13:45
+HR=83.0   SpO2=95.3   RR=15.8  
+ΔHR=+5.4    ΔSpO2=+0.8    ΔRR=+2.1   
+Score=-0.055968
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  transition: De-escalated from AMBER to GREEN.
+  protocol:   ROUTINE_MONITORING
+
+Window 94   13:50
+HR=78.7   SpO2=95.1   RR=16.8  
+ΔHR=-4.3    ΔSpO2=-0.2    ΔRR=+1.0   
+Score=-0.124338
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 95   13:55
+HR=73.7   SpO2=96.2   RR=15.3  
+ΔHR=-5.0    ΔSpO2=+1.1    ΔRR=-1.5   
+Score=-0.035351
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 96   14:00
+HR=83.7   SpO2=95.6   RR=14.2  
+ΔHR=+10.0   ΔSpO2=-0.6    ΔRR=-1.1   
+Score=-0.005292
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=AMBER
+  transition: Escalated from GREEN to AMBER.
+  protocol:   INCREASE_MONITORING, CLINICAL_REVIEW, NOTIFY_CLINICIAN
+
+Window 97   14:05
+HR=77.7   SpO2=94.3   RR=14.9  
+ΔHR=-6.0    ΔSpO2=-1.3    ΔRR=+0.7   
+Score=-0.040291
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  transition: De-escalated from AMBER to GREEN.
+  protocol:   ROUTINE_MONITORING
+
+Window 98   14:10
+HR=76.7   SpO2=94.7   RR=14.3  
+ΔHR=-1.0    ΔSpO2=+0.4    ΔRR=-0.6   
+Score=-0.118625
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 99   14:15
+HR=78.8   SpO2=95.0   RR=16.6  
+ΔHR=+2.1    ΔSpO2=+0.3    ΔRR=+2.3   
+Score=-0.110788
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 100   14:20
+HR=78.0   SpO2=94.7   RR=12.8  
+ΔHR=-0.8    ΔSpO2=-0.3    ΔRR=-3.8   
+Score=-0.055344
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 101   14:25
+HR=80.7   SpO2=94.4   RR=14.1  
+ΔHR=+2.7    ΔSpO2=-0.3    ΔRR=+1.3   
+Score=-0.110966
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 102   14:30
+HR=82.6   SpO2=94.6   RR=17.4  
+ΔHR=+1.9    ΔSpO2=+0.2    ΔRR=+3.3   
+Score=-0.075542
+Prediction=NORMAL
+EarlyWarning=LOW (score: 0.0000)
+Risk=GREEN
+  protocol:   ROUTINE_MONITORING
+
+Window 103   14:35  <-- ground-truth deterioration begins
+HR=99.3   SpO2=90.4   RR=22.5  
+ΔHR=+16.7   ΔSpO2=-4.2    ΔRR=+5.1   
+Score=+0.212998
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  transition: Escalated from GREEN to RED.
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 104   14:40
+HR=101.5  SpO2=89.8   RR=22.3  
+ΔHR=+2.2    ΔSpO2=-0.6    ΔRR=-0.2   
+Score=+0.071445
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 105   14:45
+HR=101.7  SpO2=90.3   RR=24.0  
+ΔHR=+0.2    ΔSpO2=+0.5    ΔRR=+1.7   
+Score=+0.103907
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 106   14:50
+HR=99.0   SpO2=90.5   RR=22.6  
+ΔHR=-2.7    ΔSpO2=+0.2    ΔRR=-1.4   
+Score=+0.084753
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 107   14:55
+HR=97.9   SpO2=89.8   RR=22.9  
+ΔHR=-1.1    ΔSpO2=-0.7    ΔRR=+0.3   
+Score=+0.087554
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 108   15:00
+HR=95.5   SpO2=89.8   RR=23.6  
+ΔHR=-2.4    ΔSpO2=+0.0    ΔRR=+0.7   
+Score=+0.091543
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 109   15:05
+HR=99.3   SpO2=89.5   RR=24.2  
+ΔHR=+3.8    ΔSpO2=-0.3    ΔRR=+0.6   
+Score=+0.096108
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 110   15:10
+HR=99.3   SpO2=90.9   RR=23.7  
+ΔHR=+0.0    ΔSpO2=+1.4    ΔRR=-0.5   
+Score=+0.133999
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 111   15:15
+HR=100.5  SpO2=91.1   RR=22.9  
+ΔHR=+1.2    ΔSpO2=+0.2    ΔRR=-0.8   
+Score=+0.089753
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 112   15:20
+HR=102.6  SpO2=90.5   RR=23.9  
+ΔHR=+2.1    ΔSpO2=-0.6    ΔRR=+1.0   
+Score=+0.093800
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 113   15:25
+HR=101.3  SpO2=89.2   RR=21.8  
+ΔHR=-1.3    ΔSpO2=-1.3    ΔRR=-2.1   
+Score=+0.111122
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 114   15:30
+HR=95.8   SpO2=91.0   RR=21.5  
+ΔHR=-5.5    ΔSpO2=+1.8    ΔRR=-0.3   
+Score=+0.141982
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 115   15:35
+HR=99.3   SpO2=91.1   RR=22.1  
+ΔHR=+3.5    ΔSpO2=+0.1    ΔRR=+0.6   
+Score=+0.077177
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 116   15:40
+HR=99.6   SpO2=89.8   RR=21.3  
+ΔHR=+0.3    ΔSpO2=-1.3    ΔRR=-0.8   
+Score=+0.096431
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 117   15:45
+HR=97.6   SpO2=90.6   RR=25.7  
+ΔHR=-2.0    ΔSpO2=+0.8    ΔRR=+4.4   
+Score=+0.152880
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 118   15:50
+HR=99.7   SpO2=89.4   RR=23.4  
+ΔHR=+2.1    ΔSpO2=-1.2    ΔRR=-2.3   
+Score=+0.117857
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 119   15:55
+HR=98.1   SpO2=90.5   RR=23.4  
+ΔHR=-1.6    ΔSpO2=+1.1    ΔRR=+0.0   
+Score=+0.119620
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 120   16:00
+HR=99.9   SpO2=90.2   RR=24.7  
+ΔHR=+1.8    ΔSpO2=-0.3    ΔRR=+1.3   
+Score=+0.099901
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 121   16:05
+HR=97.3   SpO2=89.5   RR=20.8  
+ΔHR=-2.6    ΔSpO2=-0.7    ΔRR=-3.9   
+Score=+0.093412
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 122   16:10
+HR=100.9  SpO2=89.6   RR=25.9  
+ΔHR=+3.6    ΔSpO2=+0.1    ΔRR=+5.1   
+Score=+0.161248
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 123   16:15
+HR=103.8  SpO2=90.0   RR=24.0  
+ΔHR=+2.9    ΔSpO2=+0.4    ΔRR=-1.9   
+Score=+0.098474
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 124   16:20
+HR=95.6   SpO2=90.3   RR=23.6  
+ΔHR=-8.2    ΔSpO2=+0.3    ΔRR=-0.4   
+Score=+0.133501
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 125   16:25
+HR=103.8  SpO2=90.2   RR=20.8  
+ΔHR=+8.2    ΔSpO2=-0.1    ΔRR=-2.8   
+Score=+0.113744
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 126   16:30
+HR=98.3   SpO2=89.7   RR=21.7  
+ΔHR=-5.5    ΔSpO2=-0.5    ΔRR=+0.9   
+Score=+0.072007
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 127   16:35
+HR=94.7   SpO2=91.1   RR=24.7  
+ΔHR=-3.6    ΔSpO2=+1.4    ΔRR=+3.0   
+Score=+0.156406
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 128   16:40
+HR=95.9   SpO2=89.9   RR=22.5  
+ΔHR=+1.2    ΔSpO2=-1.2    ΔRR=-2.2   
+Score=+0.105478
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 129   16:45
+HR=96.2   SpO2=90.2   RR=22.1  
+ΔHR=+0.3    ΔSpO2=+0.3    ΔRR=-0.4   
+Score=+0.075958
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 130   16:50
+HR=98.6   SpO2=90.1   RR=22.7  
+ΔHR=+2.4    ΔSpO2=-0.1    ΔRR=+0.6   
+Score=+0.085479
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 131   16:55
+HR=102.0  SpO2=90.0   RR=24.1  
+ΔHR=+3.4    ΔSpO2=-0.1    ΔRR=+1.4   
+Score=+0.097427
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 132   17:00
+HR=100.2  SpO2=89.6   RR=23.4  
+ΔHR=-1.8    ΔSpO2=-0.4    ΔRR=-0.7   
+Score=+0.088684
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 133   17:05
+HR=98.7   SpO2=90.3   RR=26.5  
+ΔHR=-1.5    ΔSpO2=+0.7    ΔRR=+3.1   
+Score=+0.131978
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 134   17:10
+HR=98.4   SpO2=90.2   RR=25.0  
+ΔHR=-0.3    ΔSpO2=-0.1    ΔRR=-1.5   
+Score=+0.098116
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 135   17:15
+HR=95.9   SpO2=90.4   RR=23.7  
+ΔHR=-2.5    ΔSpO2=+0.2    ΔRR=-1.3   
+Score=+0.080030
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 136   17:20
+HR=103.8  SpO2=89.4   RR=22.6  
+ΔHR=+7.9    ΔSpO2=-1.0    ΔRR=-1.1   
+Score=+0.119209
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 137   17:25
+HR=96.5   SpO2=89.4   RR=22.2  
+ΔHR=-7.3    ΔSpO2=+0.0    ΔRR=-0.4   
+Score=+0.106904
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 138   17:30
+HR=98.8   SpO2=89.5   RR=24.9  
+ΔHR=+2.3    ΔSpO2=+0.1    ΔRR=+2.7   
+Score=+0.111006
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 139   17:35
+HR=97.3   SpO2=89.1   RR=22.2  
+ΔHR=-1.5    ΔSpO2=-0.4    ΔRR=-2.7   
+Score=+0.080222
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 140   17:40
+HR=103.3  SpO2=89.6   RR=22.3  
+ΔHR=+6.0    ΔSpO2=+0.5    ΔRR=+0.1   
+Score=+0.085159
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 141   17:45
+HR=100.2  SpO2=90.1   RR=23.2  
+ΔHR=-3.1    ΔSpO2=+0.5    ΔRR=+0.9   
+Score=+0.093902
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 142   17:50
+HR=97.6   SpO2=90.5   RR=23.4  
+ΔHR=-2.6    ΔSpO2=+0.4    ΔRR=+0.2   
+Score=+0.087668
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+Window 143   17:55
+HR=91.5   SpO2=89.4   RR=23.6  
+ΔHR=-6.1    ΔSpO2=-1.1    ΔRR=+0.2   
+Score=+0.112249
+Prediction=ANOMALY
+EarlyWarning=LOW (score: 0.0000)
+Risk=RED
+  protocol:   URGENT_ESCALATION, NOTIFY_CLINICIAN, INCREASE_MONITORING
+
+==================================================================
+SUMMARY
+==================================================================
+windows replayed        144  (143 scoreable, 1 without a predecessor)
+before change point     102 windows, 1% flagged by the model
+after change point       41 windows, 100% flagged by the model
+effective risk path     UNKNOWN×1 -> GREEN×9 -> RED×1 -> GREEN×3 -> AMBER×1 -> GREEN×21 -> AMBER×1 -> GREEN×9 -> AMBER×1 -> GREEN×4 -> AMBER×1 -> GREEN×26 -> AMBER×1 -> GREEN×13 -> AMBER×1 -> GREEN×3 -> AMBER×1 -> GREEN×6 -> RED×41
+risk provider           synthetic_ml
+model version           synthetic_if_v1
+data quality            DEGRADED, OK
+gated windows           0
+timeline events         INTERVENTION_RAISED×244, NEXT_DOSE_ASSESSED×144, NOTIFICATION_CREATED×50, OBSERVATIONS_INGESTED×144, RISK_ASSESSED×144, RISK_TRANSITION×19
+==================================================================
+

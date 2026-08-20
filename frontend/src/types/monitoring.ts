@@ -211,6 +211,27 @@ export interface PredictiveRiskAssessment {
   artifact_checksum: string;
 }
 
+export interface XAIExplanationRequest {
+  model_name: string;
+  model_version: string;
+  signal_type: string;
+  risk_state: string;
+  score: number | null;
+  score_semantics: string;
+  horizon_hours: number | null;
+  evidence: Array<Record<string, unknown>>;
+  deterministic_explanation: string | null;
+}
+
+export interface XAIExplanation {
+  explanation_text: string;
+  evidence_references: string[];
+  generated_at: string;
+  model_name: string;
+  prompt_version: string;
+  status: "OK" | "UNAVAILABLE" | "INVALID_RESPONSE";
+}
+
 /** The trust gate's output: what was applied, what the model said, and why. */
 export interface EffectiveRisk {
   level: RiskLevel;

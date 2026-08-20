@@ -43,6 +43,8 @@ from ..schema.monitoring_result import (
     Notification,
     PatientState,
 )
+from ..schema.xai import XAIExplanation, XAIExplanationRequest
+from ..risk.xai_client import generate_explanation
 from ..synthetic.generator import COHORT, generate_windowed
 
 router = APIRouter(prefix="/monitoring", tags=["monitoring"])
@@ -394,6 +396,15 @@ def timeline(request: Request, patient_id: str) -> list[MonitoringEvent]:
 @router.get("/patients/{patient_id}/notifications", response_model=list[Notification])
 def patient_notifications(request: Request, patient_id: str) -> list[Notification]:
     return _context(request).repository.list_notifications(patient_id)
+
+
+# -- explainability --------------------------------------------------------
+
+
+@router.post("/explain", response_model=XAIExplanation)
+async def explain_risk(payload: XAIExplanationRequest) -> XAIExplanation:
+    """Asynchronous narration of evidence via Gemini."""
+    return await generate_explanation(payload)
 
 
 # -- dashboard -------------------------------------------------------------

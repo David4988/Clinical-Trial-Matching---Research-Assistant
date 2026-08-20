@@ -2,7 +2,10 @@ import type {
   MeasurementSummary,
   MonitoringCycleResult,
   RiskLevel,
+  XAIExplanationRequest,
+  XAIExplanation,
 } from "../../types/monitoring";
+import { useEffect, useState } from "react";
 import { TrajectoryChart } from "./TrajectoryChart";
 import { DoseToken, RiskRail, TrendMark } from "./RiskMark";
 
@@ -150,15 +153,7 @@ function RiskHero({ cycle }: { cycle: MonitoringCycleResult }) {
                   Insufficient observations
                 </div>
               ) : (
-                <div className="mt-2 flex items-center gap-3">
-                  <span className={`readout text-[28px] font-semibold leading-none ${cycle.early_warning.predicted_deterioration ? 'text-alert' : 'text-safe'}`}>
-                    {cycle.early_warning.predicted_deterioration ? "ELEVATED" : "LOW"}
-                  </span>
-                  <dl className="flex gap-4 ml-4">
-                    <Readout label="Risk Score" value={cycle.early_warning.score?.toFixed(2) ?? "—"} />
-                    <Readout label="Horizon" value={`${cycle.early_warning.horizon_hours}h`} />
-                  </dl>
-                </div>
+                <EarlyWarningExplainable cycle={cycle} />
               )}
             </div>
           )}
@@ -187,6 +182,112 @@ function Readout({ label, value }: { label: string; value: string }) {
         {label.toUpperCase()}
       </dt>
       <dd className="readout mt-0.5 text-[18px] font-medium leading-none">{value}</dd>
+    </div>
+  );
+}
+
+function EarlyWarningExplainable({ cycle }: { cycle: MonitoringCycleResult }) {
+  const [explanation, setExplanation] = useState<XAIExplanation | null>(null);
+  const [loading, setLoading] = useState(true);
+  const ew = cycle.early_warning!;
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setExplanation(null);
+    
+    // Only fetch explanation if it's elevated, or based on product rules. 
+    // Usually XAI adds most value when there's an anomaly.
+    // For demonstration, we'll fetch it anytime ew is available and score is not null.
+
+    if (ew.score === null) {
+      setLoading(false);
+      return;
+    }
+
+    const req: XAIExplanationRequest = {
+      model_name: ew.provider,
+      model_version: ew.model_version,
+      signal_type: "EARLY_WARNING",
+      risk_state: ew.predicted_deterioration ? "ELEVATED" : "LOW",
+      score: ew.score,
+      score_semantics: "RISK_SCORE",
+      horizon_hours: ew.horizon_hours,
+      // Map evidence features to generic dictionaries
+      evidence: ew.evidence.map((e) => ({
+        feature_name: e.feature_name,
+        contribution: e.contribution,
+        direction: e.direction,
+        raw_value: e.raw_value,
+        transformed_value: e.transformed_value,
+        objective_description: e.objective_description
+      })),
+      // Fallback deterministic explanation
+      deterministic_explanation: "Early warning score evaluated based on recent observation deltas."
+    };
+
+    fetch("/api/monitoring/explain", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req)
+    })
+      .then((r) => r.json())
+      .then((res: XAIExplanation) => {
+        if (active) {
+          setExplanation(res);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.error("XAI request failed", err);
+        if (active) setLoading(false);
+      });
+
+    return () => { active = false; };
+  }, [ew.artifact_checksum, ew.evaluated_at]);
+
+  return (
+    <div className="mt-2 space-y-4">
+      <div className="flex items-center gap-3">
+        <span className={`readout text-[28px] font-semibold leading-none ${ew.predicted_deterioration ? 'text-alert' : 'text-safe'}`}>
+          {ew.predicted_deterioration ? "ELEVATED" : "LOW"}
+        </span>
+        <dl className="flex gap-4 ml-4">
+          <Readout label="Risk Score" value={ew.score?.toFixed(2) ?? "—"} />
+          <Readout label="Horizon" value={`${ew.horizon_hours}h`} />
+        </dl>
+      </div>
+
+      <div className="bg-panel border border-rule mt-4 p-4 text-sm font-sans space-y-3">
+        <div>
+          <div className="eyebrow mb-1">AI INTERPRETATION (ADVISORY)</div>
+          {loading ? (
+             <div className="animate-pulse flex space-x-4">
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="h-2 bg-rule rounded"></div>
+                  <div className="h-2 bg-rule rounded w-5/6"></div>
+                </div>
+             </div>
+          ) : explanation ? (
+             <div className="text-ink-mid leading-relaxed">
+               {explanation.explanation_text}
+             </div>
+          ) : (
+             <div className="text-ink-faint">Explanation unavailable.</div>
+          )}
+        </div>
+
+        <div className="pt-2 border-t border-rule-strong">
+          <div className="eyebrow mb-1">MODEL EVIDENCE</div>
+          <div className="space-y-1">
+            {ew.evidence.map((ev, i) => (
+              <div key={i} className="text-[11.5px] text-ink-mid">
+                • {ev.objective_description}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
