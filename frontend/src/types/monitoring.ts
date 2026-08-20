@@ -187,6 +187,30 @@ export interface RiskAssessment {
   degraded: boolean;
 }
 
+export interface FeatureEvidence {
+  feature_name: string;
+  raw_value: number;
+  transformed_value: number;
+  model_weight: number;
+  contribution: number;
+  direction: "POSITIVE" | "NEGATIVE";
+  objective_description: string;
+}
+
+export interface PredictiveRiskAssessment {
+  provider: string;
+  model_version: string;
+  feature_version: string;
+  horizon_hours: number;
+  score: number | null;
+  threshold: number;
+  predicted_deterioration: boolean | null;
+  data_quality_state: string;
+  evidence: FeatureEvidence[];
+  evaluated_at: string;
+  artifact_checksum: string;
+}
+
 /** The trust gate's output: what was applied, what the model said, and why. */
 export interface EffectiveRisk {
   level: RiskLevel;
@@ -259,6 +283,7 @@ export interface MonitoringCycleResult {
   notifications: Notification[];
   next_dose: NextDoseAssessment | null;
   summary: string;
+  early_warning: PredictiveRiskAssessment | null;
 }
 
 export interface MonitoringEvent {

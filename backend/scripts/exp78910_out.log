@@ -1,0 +1,46 @@
+Building original cohort (train)...
+Building feature matrix (v2) for train...
+Training Champion Model...
+
+================ Exp 8: Explainability ================
+Top 10 Positive Coefficients (Risk Increasing):
+HEART_RATE__current               3.417914
+HEART_RATE__baseline_dev          3.231382
+SPO2__mean_180m                   2.712803
+SYSTOLIC_BP__mean_60m             2.687315
+SPO2__mean_60m                    2.095711
+ctx__completeness_60m             1.975412
+DIASTOLIC_BP__mean_60m            1.966683
+RESPIRATORY_RATE__baseline_dev    1.853224
+SYSTOLIC_BP__delta_last           1.592764
+RESPIRATORY_RATE__std_60m         1.563646
+dtype: float64
+
+Top 10 Negative Coefficients (Risk Decreasing):
+HEART_RATE__std_180m             -8.149196
+SPO2__std_180m                   -5.478149
+SYSTOLIC_BP__std_180m            -4.645137
+SYSTOLIC_BP__baseline_pct_dev    -4.231924
+RESPIRATORY_RATE__std_180m       -4.029595
+cross__hr_x_rr                   -3.944710
+SPO2__baseline_pct_dev           -3.862565
+TEMPERATURE__std_180m            -3.184331
+DIASTOLIC_BP__baseline_pct_dev   -2.758609
+HEART_RATE__baseline_pct_dev     -2.584582
+dtype: float64
+
+================ Exp 9: Robustness Re-test (D_hard) ================
+Building harder cohort...
+Building feature matrix (v2) for hard...
+AUROC: 0.7565, AUPRC: 0.2129, Prevalence: 0.0664
+Eval @ Thr=0.733:
+Recall: 0.785, Precision: 0.408
+Median Lead: 55.0m, Actionable: 0.564
+False Alerts/Patient/Day: 2.64
+
+================ Exp 10: Isolation Forest Comparison ================
+IF AUROC: 0.5173, IF AUPRC: 0.0949
+IF Eval @ Patient Recall ~0.800 (Thr=0.860):
+Precision: 0.282
+Median Lead: 115.0m, Actionable: 0.596
+False Alerts/Patient/Day: 12.33

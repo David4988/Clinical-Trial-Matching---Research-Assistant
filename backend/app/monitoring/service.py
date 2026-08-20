@@ -84,6 +84,17 @@ class MonitoringService:
         # 2. Advisory risk. Reads state, returns an opinion, writes nothing.
         risk = self.risk_provider.assess(state, now)
 
+        # 2b. Earlywarning Sidecar
+        from ..synthetic.inference.engine import EarlywarningInferenceEngine, PatientWindowState
+        try:
+            ew_engine = EarlywarningInferenceEngine()
+            ew_state = PatientWindowState.from_observations(patient_id, list(state.recent_observations))
+            early_warning = ew_engine.score_earlywarning(ew_state, observations, now)
+        except Exception as exc:
+            import logging
+            logging.getLogger("app.monitoring").exception("Earlywarning inference failed", exc_info=exc)
+            early_warning = None
+
         # 3. The trust gate. Deterministic, and the provider cannot reach it.
         effective = apply_trust_gate(state, risk)
 
@@ -124,6 +135,7 @@ class MonitoringService:
             notifications=notifications,
             next_dose=next_dose,
             summary=_summarise(effective, next_dose, state),
+            early_warning=early_warning,
         )
 
         if persist:

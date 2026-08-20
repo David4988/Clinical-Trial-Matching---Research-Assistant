@@ -23,13 +23,15 @@ the trust gate.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .contract import MODEL_SIGNALS
 from .engine import InferenceResult
 from .windows import PatientWindowState
 from ...schema.monitoring_enums import DataQualityStatus
-from ...schema.monitoring_result import PatientState
+
+if TYPE_CHECKING:
+    from ...schema.monitoring_result import PatientState
 
 #: Research's relative weighting when naming the single strongest signal: a 2%
 #: SpO2 move is treated as comparable to a ~10 bpm heart-rate move. Copied so

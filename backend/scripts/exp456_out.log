@@ -1,0 +1,34 @@
+Building cohort...
+Building feature matrix (v2)...
+
+================ Exp 4: Horizons ================
+
+--- Horizon 1.0h ---
+AUROC: 0.8413, AUPRC: 0.2758
+Threshold: 0.750
+Recall: 0.815, Actionable: 0.523, Median Lead: 40.0, FA: 2.39/d
+
+--- Horizon 3.0h ---
+AUROC: 0.7331, AUPRC: 0.2048
+Threshold: 0.750
+Recall: 0.785, Actionable: 0.508, Median Lead: 45.0, FA: 2.32/d
+
+--- Horizon 6.0h ---
+AUROC: 0.6974, AUPRC: 0.2084
+Threshold: 0.750
+Recall: 0.769, Actionable: 0.508, Median Lead: 42.5, FA: 2.45/d
+
+================ Exp 6: Coverage vs Burden ================
+FA Constraint <= 3.0: Thr=0.733 | Recall=0.800, Actionable=0.569, Lead=50.0m, Actual FA=2.98
+FA Constraint <= 4.0: Thr=0.713 | Recall=0.831, Actionable=0.600, Lead=60.0m, Actual FA=3.72
+FA Constraint <= 5.0: Thr=0.693 | Recall=0.862, Actionable=0.646, Lead=82.5m, Actual FA=4.90
+
+================ Exp 5: Scenario Performance ================
+Using threshold 0.733 (FA <= 3.0) to score TEST set.
+Global Test Set: Recall=0.787, Prec=0.436, Lead=60.0m, FA=2.43/d
+[GRADUAL_DETERIORATION] (n=37) Recall: 1.000, Median Lead: 60.0m
+[IMPROVING] (n=25) False Alert Rate (pts alerted): 0.000 (0/25)
+[NOISY_SENSOR] (n=21) False Alert Rate (pts alerted): 0.333 (7/21)
+[STABLE] (n=78) False Alert Rate (pts alerted): 0.244 (19/78)
+[SUDDEN_DETERIORATION] (n=23) Recall: 0.435, Median Lead: 35.0m
+[TRANSIENT_EXCURSION] (n=37) Recall: 1.000, Median Lead: nanm

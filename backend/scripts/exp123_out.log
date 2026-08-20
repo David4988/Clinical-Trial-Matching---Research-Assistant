@@ -1,0 +1,47 @@
+Building cohort...
+Building target grid...
+Splitting...
+Building feature matrix (v2)...
+Training LR (baseline)...
+[LR (baseline)] AUROC: 0.7331, AUPRC: 0.2048
+  Best Operating Point (FA <= 3.0) -> Thr: 0.750
+  Recall: 0.785, Actionable: 0.508, Lead: 45.0m, FA: 2.32/d
+
+Training Random Forest...
+[Random Forest] AUROC: 0.7413, AUPRC: 0.2027
+  Best Operating Point (FA <= 3.0) -> Thr: 0.690
+  Recall: 0.738, Actionable: 0.431, Lead: 35.0m, FA: 1.77/d
+
+Training XGBoost...
+[XGBoost] AUROC: 0.7389, AUPRC: 0.2079
+  Best Operating Point (FA <= 3.0) -> Thr: 0.710
+  Recall: 0.631, Actionable: 0.369, Lead: 35.0m, FA: 2.65/d
+
+
+--- Exp 2: Feature Group Ablation (RF) ---
+Top 15 Features:
+ctx__obs_count_60m                0.040013
+HEART_RATE__mean_180m             0.034497
+TEMPERATURE__baseline_pct_dev     0.033682
+HEART_RATE__baseline_pct_dev      0.031000
+HEART_RATE__delta_30m             0.029691
+RESPIRATORY_RATE__baseline_dev    0.026260
+TEMPERATURE__mean_180m            0.026056
+HEART_RATE__baseline_dev          0.023843
+HEART_RATE__std_180m              0.023314
+TEMPERATURE__std_180m             0.021686
+HEART_RATE__baseline              0.021672
+TEMPERATURE__baseline             0.021177
+DIASTOLIC_BP__mean_180m           0.021083
+HEART_RATE__delta_60m             0.020439
+TEMPERATURE__baseline_dev         0.020154
+dtype: float64
+
+Feature Group Importances:
+  rolling: 0.4530
+  baseline: 0.3133
+  delta: 0.1141
+  context: 0.0413
+  cross: 0.0311
+  current: 0.0294
+  trend: 0.0178

@@ -57,3 +57,30 @@ class ModelUnavailable(RuntimeError):
     Raised only inside the engine. The risk provider catches it and degrades —
     a monitoring cycle must never abort because a model failed to load.
     """
+
+
+from datetime import datetime
+from typing import Literal
+from pydantic import BaseModel
+
+class FeatureEvidence(BaseModel):
+    feature_name: str
+    raw_value: float
+    transformed_value: float
+    model_weight: float
+    contribution: float
+    direction: Literal["POSITIVE", "NEGATIVE"]
+    objective_description: str
+
+class PredictiveRiskAssessment(BaseModel):
+    provider: str
+    model_version: str
+    feature_version: str
+    horizon_hours: int
+    score: float | None
+    threshold: float
+    predicted_deterioration: bool | None
+    data_quality_state: str
+    evidence: list[FeatureEvidence]
+    evaluated_at: datetime
+    artifact_checksum: str

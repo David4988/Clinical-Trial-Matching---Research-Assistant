@@ -130,7 +130,6 @@ function RiskHero({ cycle }: { cycle: MonitoringCycleResult }) {
           <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-rule pt-3">
             <Readout label="Score" value={risk.score.toFixed(2)} />
             <Readout label="Confidence" value={risk.confidence.toFixed(2)} />
-            <Readout label="Horizon" value={`${risk.prediction_horizon_hours}h`} />
             {next_dose && (
               <div>
                 <dt className="text-[10px] tracking-[0.08em] text-ink-faint">NEXT DOSE</dt>
@@ -140,6 +139,29 @@ function RiskHero({ cycle }: { cycle: MonitoringCycleResult }) {
               </div>
             )}
           </dl>
+
+          {cycle.early_warning && (
+            <div className="mt-5 border-t border-rule pt-4">
+              <div className="eyebrow text-signal-deep">3h Early Warning</div>
+              {cycle.early_warning.data_quality_state !== "OK" ? (
+                <div className="mt-2 text-[12px] text-ink-mid">
+                  Early warning unavailable
+                  <br />
+                  Insufficient observations
+                </div>
+              ) : (
+                <div className="mt-2 flex items-center gap-3">
+                  <span className={`readout text-[28px] font-semibold leading-none ${cycle.early_warning.predicted_deterioration ? 'text-alert' : 'text-safe'}`}>
+                    {cycle.early_warning.predicted_deterioration ? "ELEVATED" : "LOW"}
+                  </span>
+                  <dl className="flex gap-4 ml-4">
+                    <Readout label="Risk Score" value={cycle.early_warning.score?.toFixed(2) ?? "—"} />
+                    <Readout label="Horizon" value={`${cycle.early_warning.horizon_hours}h`} />
+                  </dl>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

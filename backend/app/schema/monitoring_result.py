@@ -34,6 +34,7 @@ from .monitoring_enums import (
     RiskLevel,
     TrendDirection,
 )
+from ..synthetic.inference.contract import PredictiveRiskAssessment
 
 
 # -- patient state ---------------------------------------------------------
@@ -349,3 +350,4 @@ class MonitoringCycleResult(BaseModel):
     next_dose: NextDoseAssessment | None = None
     # Why the cycle came out the way it did, in the protocol's own words.
     summary: str = ""
+    early_warning: PredictiveRiskAssessment | None = None
