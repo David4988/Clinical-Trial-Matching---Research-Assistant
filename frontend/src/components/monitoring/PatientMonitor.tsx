@@ -83,28 +83,44 @@ function RiskHero({ cycle }: { cycle: MonitoringCycleResult }) {
     <section className={`animate-rise border ${tone.shell}`}>
       <div className={`h-1 ${tone.edge}`} />
 
-      <div className="grid gap-x-8 gap-y-6 p-5 lg:grid-cols-[minmax(0,1fr)_auto]">
-        <div className="min-w-0">
-          <div className="eyebrow">Participant under monitoring</div>
-          <div className="readout mt-1 text-[34px] font-semibold leading-none">
+      <div className="flex flex-col lg:flex-row gap-8 p-6">
+        {/* LEFT COLUMN: Participant Metadata */}
+        <div className="w-full lg:w-60 shrink-0 flex flex-col">
+          <div className="eyebrow uppercase whitespace-nowrap">Participant<br/>under monitoring</div>
+          <div className="readout mt-2 text-[34px] font-semibold leading-none whitespace-nowrap">
             {cycle.patient_id}
           </div>
-          <div className="mt-2 font-sans text-[12.5px] leading-relaxed text-ink-mid">
-            {cycle.trial_id}
-            {treatment && ` · ${treatment.drug_name}`}
-            {latestDose &&
-              ` · dose ${latestDose.dose_number}, ${latestDose.amount} ${latestDose.unit}`}
-            {` · ${state.observation_count} observations`}
+          
+          <div className="mt-5 space-y-1.5 font-sans text-[12.5px] leading-snug text-ink-mid">
+            <div>{cycle.trial_id}</div>
+            {treatment && <div>{treatment.drug_name}</div>}
+            {latestDose && (
+              <div>Dose {latestDose.dose_number}, {latestDose.amount} {latestDose.unit}</div>
+            )}
+            <div>{state.observation_count} observations</div>
           </div>
 
-          <p className="mt-3 max-w-xl font-sans text-[13px] leading-relaxed text-ink">
-            {cycle.summary}
-          </p>
+          <div className="mt-8 space-y-4 font-sans text-[12px] leading-snug text-ink">
+            <div>
+              <div className="text-[10px] tracking-[0.08em] text-ink-faint uppercase mb-1">Risk</div>
+              <div className={`font-semibold ${tone.text}`}>{effective_risk.level}</div>
+            </div>
+            {next_dose && (
+              <div>
+                <div className="text-[10px] tracking-[0.08em] text-ink-faint uppercase mb-1">Next dose</div>
+                <div className="font-semibold">{next_dose.decision.replace(/_/g, " ")}</div>
+              </div>
+            )}
+            <div>
+              <div className="text-[10px] tracking-[0.08em] text-ink-faint uppercase mb-1">Data quality</div>
+              <div className="font-semibold">{state.data_quality.status}</div>
+            </div>
+          </div>
         </div>
 
-        {/* The state itself, at the scale of the thing it is. */}
-        <div className="lg:border-l lg:border-rule lg:pl-8">
-          <div className="eyebrow">Current risk</div>
+        {/* RIGHT COLUMN: Main Risk & Explanation */}
+        <div className="flex-1 min-w-0 lg:border-l lg:border-rule lg:pl-8">
+          <div className="eyebrow">Participant risk</div>
           <div
             key={effective_risk.level}
             className="animate-state mt-1 flex items-center gap-3"
@@ -130,12 +146,12 @@ function RiskHero({ cycle }: { cycle: MonitoringCycleResult }) {
             )}
           </div>
 
-          <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-rule pt-3">
+          <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-3 border-t border-rule pt-4">
             <Readout label="Score" value={risk.score.toFixed(2)} />
             <Readout label="Confidence" value={risk.confidence.toFixed(2)} />
             {next_dose && (
               <div>
-                <dt className="text-[10px] tracking-[0.08em] text-ink-faint">NEXT DOSE</dt>
+                <dt className="text-[10px] tracking-[0.08em] text-ink-faint uppercase">Next dose</dt>
                 <dd className="mt-1">
                   <DoseToken decision={next_dose.decision} />
                 </dd>
@@ -144,10 +160,10 @@ function RiskHero({ cycle }: { cycle: MonitoringCycleResult }) {
           </dl>
 
           {cycle.early_warning && (
-            <div className="mt-5 border-t border-rule pt-4">
-              <div className="eyebrow text-signal-deep">3h Early Warning</div>
+            <div className="mt-6 border-t border-rule pt-5">
+              <div className="eyebrow text-signal-deep mb-3">3h Early Warning</div>
               {cycle.early_warning.data_quality_state !== "OK" ? (
-                <div className="mt-2 text-[12px] text-ink-mid">
+                <div className="text-[12px] text-ink-mid">
                   Early warning unavailable
                   <br />
                   Insufficient observations
@@ -161,7 +177,7 @@ function RiskHero({ cycle }: { cycle: MonitoringCycleResult }) {
       </div>
 
       {treatment?.override && (
-        <div className="flex gap-3 border-t border-rule/70 px-5 py-2.5">
+        <div className="flex gap-3 border-t border-rule/70 px-6 py-3">
           <span className="mt-0.5 h-3 w-3 shrink-0 stripe-caution" aria-hidden />
           <p className="font-sans text-[12px] leading-relaxed text-ink">
             <span className="font-semibold">Enrolled on override.</span>{" "}
@@ -178,8 +194,8 @@ function RiskHero({ cycle }: { cycle: MonitoringCycleResult }) {
 function Readout({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-[10px] tracking-[0.08em] text-ink-faint">
-        {label.toUpperCase()}
+      <dt className="text-[10px] tracking-[0.08em] text-ink-faint uppercase">
+        {label}
       </dt>
       <dd className="readout mt-0.5 text-[18px] font-medium leading-none">{value}</dd>
     </div>
@@ -195,7 +211,7 @@ function EarlyWarningExplainable({ cycle }: { cycle: MonitoringCycleResult }) {
     let active = true;
     setLoading(true);
     setExplanation(null);
-    
+
     // Only fetch explanation if it's elevated, or based on product rules. 
     // Usually XAI adds most value when there's an anomaly.
     // For demonstration, we'll fetch it anytime ew is available and score is not null.
@@ -247,42 +263,44 @@ function EarlyWarningExplainable({ cycle }: { cycle: MonitoringCycleResult }) {
   }, [ew.artifact_checksum, ew.evaluated_at]);
 
   return (
-    <div className="mt-2 space-y-4">
+    <div className="space-y-4 max-w-4xl">
       <div className="flex items-center gap-3">
         <span className={`readout text-[28px] font-semibold leading-none ${ew.predicted_deterioration ? 'text-alert' : 'text-safe'}`}>
           {ew.predicted_deterioration ? "ELEVATED" : "LOW"}
         </span>
-        <dl className="flex gap-4 ml-4">
+        <dl className="flex gap-6 ml-4">
           <Readout label="Risk Score" value={ew.score?.toFixed(2) ?? "—"} />
           <Readout label="Horizon" value={`${ew.horizon_hours}h`} />
         </dl>
       </div>
 
-      <div className="bg-panel border border-rule mt-4 p-4 text-sm font-sans space-y-3">
+      <div className="bg-panel border border-rule mt-5 p-5 text-sm font-sans space-y-4">
         <div>
-          <div className="eyebrow mb-1">AI INTERPRETATION (ADVISORY)</div>
+          <div className="eyebrow mb-2">AI INTERPRETATION (ADVISORY)</div>
           {loading ? (
              <div className="animate-pulse flex space-x-4">
                 <div className="flex-1 space-y-2 py-1">
                   <div className="h-2 bg-rule rounded"></div>
                   <div className="h-2 bg-rule rounded w-5/6"></div>
+                  <div className="h-2 bg-rule rounded w-4/6"></div>
                 </div>
              </div>
           ) : explanation ? (
-             <div className="text-ink-mid leading-relaxed">
+             <div className="text-ink-mid text-[13px] leading-relaxed">
                {explanation.explanation_text}
              </div>
           ) : (
-             <div className="text-ink-faint">Explanation unavailable.</div>
+             <div className="text-ink-faint text-[13px]">Explanation unavailable.</div>
           )}
         </div>
 
-        <div className="pt-2 border-t border-rule-strong">
-          <div className="eyebrow mb-1">MODEL EVIDENCE</div>
-          <div className="space-y-1">
+        <div className="pt-4 border-t border-rule-strong">
+          <div className="eyebrow mb-3">MODEL EVIDENCE</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
             {ew.evidence.map((ev, i) => (
-              <div key={i} className="text-[11.5px] text-ink-mid">
-                • {ev.objective_description}
+              <div key={i} className="flex justify-between items-baseline text-[11.5px] font-mono text-ink-mid">
+                <span className="truncate pr-3" title={ev.feature_name}>{ev.feature_name}</span>
+                <span className="shrink-0">{ev.contribution > 0 ? '+' : ''}{ev.contribution.toFixed(3)}</span>
               </div>
             ))}
           </div>
@@ -513,13 +531,12 @@ function NextDose({ next }: { next: NonNullable<MonitoringCycleResult["next_dose
           {next.criteria.map((criterion) => (
             <li key={criterion.criterion_id} className="flex gap-3 text-[12px]">
               <span
-                className={`mt-0.5 inline-block h-2.5 w-2.5 shrink-0 border ${
-                  criterion.satisfied === true
+                className={`mt-0.5 inline-block h-2.5 w-2.5 shrink-0 border ${criterion.satisfied === true
                     ? "border-safe bg-safe"
                     : criterion.satisfied === false
                       ? "border-alert bg-alert"
                       : "hatch border-rule-strong"
-                }`}
+                  }`}
                 aria-hidden
               />
               <div className="min-w-0">
@@ -647,9 +664,8 @@ function SectionHead({
         <h2 className="title text-[16px]">{title}</h2>
         {authority && (
           <span
-            className={`text-[9.5px] font-semibold tracking-[0.12em] ${
-              tone === "signal" ? "text-signal-deep" : "text-ink-faint"
-            }`}
+            className={`text-[9.5px] font-semibold tracking-[0.12em] ${tone === "signal" ? "text-signal-deep" : "text-ink-faint"
+              }`}
           >
             {authority}
           </span>
