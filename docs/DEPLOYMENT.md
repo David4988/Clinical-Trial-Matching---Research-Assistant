@@ -87,6 +87,12 @@ Unset locally: the client falls back to `/api` and Vite's dev proxy forwards to
 | `LOCAL_MODEL_ENDPOINT` | only if `MODEL_PROVIDER=local` | The Ollama (or compatible) HTTP endpoint, e.g. `http://127.0.0.1:11434`. Never reachable from Render directly — `local` is a developer-machine configuration, reached over an SSH tunnel or similar; it is not meant to be set in production. |
 | `LOCAL_MODEL_NAME` | only if `MODEL_PROVIDER=local` | The model name as Ollama knows it, e.g. `qwen3.5:9b`. Never hard-coded in application code. |
 | `AGENT_TIMEOUT_SECONDS` | no | Defaults to `90`. Per-request timeout for a `local`/`hosted` model call; on timeout the proposal still returns as a usable `DRAFT`, drafted by the template provider instead, with `provenance.degraded: true`. |
+| `HOSTED_MODEL_NAME` | no | Defaults to `gemini-3.6-flash`. Only read when `MODEL_PROVIDER=hosted`. |
+| `GEMINI_API_KEY` | only if `MODEL_PROVIDER=hosted` | Verified live against the API at startup (`client.models.get`) — an invalid model id logs the exact API error, never a generic "AI unavailable". |
+| `GMAIL_CLIENT_ID` / `GMAIL_CLIENT_SECRET` / `GMAIL_REFRESH_TOKEN` / `GMAIL_SENDER` | only for real Gmail send | The OAuth client plus a refresh token obtained ONCE, interactively, via `python scripts/gmail_oauth_setup.py` — the application never performs that flow itself. Missing any of the four degrades `EMAIL` delivery to in-app, logged once. |
+| `META_ACCESS_TOKEN` / `WHATSAPP_PHONE_NUMBER_ID` | only for real WhatsApp send | The Cloud API access token and sender phone number id. Missing either degrades `WHATSAPP` delivery to in-app. |
+| `WHATSAPP_APP_SECRET` | only for WhatsApp inbound | Verifies `X-Hub-Signature-256` on the inbound webhook. Missing it means every inbound webhook call is rejected with `403` — a safe failure mode, not an open one. |
+| `WHATSAPP_VERIFY_TOKEN` | only for WhatsApp inbound | Compared against Meta's verification handshake (`GET /comms/whatsapp/webhook`). |
 
 An unreachable `LOCAL_MODEL_ENDPOINT` at startup is probed once and logged
 once; the application always boots and the obligation workflow always works,

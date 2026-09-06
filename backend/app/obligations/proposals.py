@@ -247,6 +247,12 @@ class ObligationProposalService:
         final_subject = edited_subject or proposal.subject
         final_body = edited_body or proposal.body
 
+        recipient = (
+            self.repository.get_party(proposal.recipient_party_id)
+            if proposal.recipient_party_id and proposal.recipient_party_id != "UNROUTED"
+            else None
+        )
+
         approval = ApprovalRecord(
             proposal_id=proposal_id,
             approved_by=reviewer.strip(),
@@ -256,6 +262,8 @@ class ObligationProposalService:
             body=final_body,
             template_name=proposal.template_name,
             template_params=proposal.template_params,
+            recipient_email=recipient.email if recipient else None,
+            recipient_phone=recipient.phone if recipient else None,
         )
 
         provider = build_delivery_provider(final_channel)

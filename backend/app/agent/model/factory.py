@@ -30,6 +30,10 @@ DEFAULT_LOCAL_ENDPOINT = "http://127.0.0.1:11434"
 DEFAULT_LOCAL_MODEL_NAME = "qwen3.5:9b"
 DEFAULT_AGENT_TIMEOUT_SECONDS = 90.0
 
+HOSTED_API_KEY_ENV = "GEMINI_API_KEY"
+HOSTED_MODEL_NAME_ENV = "HOSTED_MODEL_NAME"
+DEFAULT_HOSTED_MODEL_NAME = "gemini-3.6-flash"
+
 
 def agent_timeout_seconds() -> float:
     raw = os.environ.get(AGENT_TIMEOUT_ENV, "").strip()
@@ -69,13 +73,35 @@ def build_model_provider(name: str | None = None) -> AgentModelProvider:
         return TemplateProvider()
 
     if chosen == HOSTED:
-        try:
-            from .hosted_provider import HostedProvider  # not built in this pass
-
-            return HostedProvider()
-        except Exception as exc:  # noqa: BLE001 - startup must not fail here
-            logger.error("Could not start the hosted model provider (%s); falling back to template.", exc)
+        api_key = os.environ.get(HOSTED_API_KEY_ENV, "").strip()
+        if not api_key:
+            logger.error(
+                "%s is not set; cannot start the hosted model provider. "
+                "Falling back to the deterministic template provider.",
+                HOSTED_API_KEY_ENV,
+            )
             return TemplateProvider()
+
+        model_name = os.environ.get(HOSTED_MODEL_NAME_ENV, DEFAULT_HOSTED_MODEL_NAME).strip()
+        try:
+            from .hosted_provider import HostedProvider
+
+            provider = HostedProvider(api_key=api_key, model_name=model_name, timeout_seconds=agent_timeout_seconds())
+        except Exception as exc:  # noqa: BLE001 - startup must not fail here
+            logger.error("Could not construct the hosted model provider (%s); falling back to template.", exc)
+            return TemplateProvider()
+
+        if provider.probe():
+            return provider
+        # probe() already logged the SPECIFIC error (e.g. "model not found:
+        # models/typo'd-name") — never collapse a real, actionable API error
+        # into a generic "AI unavailable" here.
+        logger.error(
+            "Hosted model %r failed its startup probe; falling back to the "
+            "deterministic template provider for this run.",
+            model_name,
+        )
+        return TemplateProvider()
 
     logger.warning(
         "Unknown %s=%r; expected one of %s. Using the deterministic template provider.",

@@ -8,12 +8,24 @@ from __future__ import annotations
 
 import logging
 import os
+from pathlib import Path
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+# Local development secrets (Gemini, Gmail, WhatsApp) live in a single
+# git-ignored `.env.local` at the repo root — loaded once, here, before any
+# factory reads an environment variable. `risk/xai_client.py` previously did
+# this itself as a side effect of being imported; centralising it removes
+# that fragile ordering dependency. `load_dotenv` never overwrites a variable
+# already set in the real environment (e.g. by Render), so production is
+# unaffected.
+load_dotenv(Path(__file__).resolve().parents[2] / ".env.local")
+
+from .api.comms_routes import router as comms_router
 from .api.monitoring_routes import router as monitoring_router
 from .api.obligation_routes import router as obligation_router
 from .api.routes import router
@@ -120,6 +132,7 @@ def create_app(
     app.include_router(router)
     app.include_router(monitoring_router)
     app.include_router(obligation_router)
+    app.include_router(comms_router)
 
     # Every failure leaves through one of these three handlers, so the client
     # always receives {"error": {code, message, details}} and never a traceback.

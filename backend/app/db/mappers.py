@@ -16,7 +16,14 @@ from typing import Any, Mapping
 from ..schema.clinical import Patient
 from ..schema.monitoring import AdverseEvent, Observation, TreatmentAssignment
 from ..schema.monitoring_result import MonitoringCycleResult, MonitoringEvent, Notification
-from ..schema.obligations import ApprovalRecord, Obligation, ObligationAction, ProposedAction, ResponsibleParty
+from ..schema.obligations import (
+    ApprovalRecord,
+    IncomingMessage,
+    Obligation,
+    ObligationAction,
+    ProposedAction,
+    ResponsibleParty,
+)
 from ..schema.result import ScreeningResult
 from ..schema.trial import Trial
 
@@ -494,6 +501,8 @@ def approval_record_to_row(approval: ApprovalRecord) -> dict[str, Any]:
         "body": approval.body,
         "template_name": approval.template_name,
         "template_params": approval.template_params,
+        "recipient_email": approval.recipient_email,
+        "recipient_phone": approval.recipient_phone,
     }
 
 
@@ -508,5 +517,42 @@ def row_to_approval_record(row: Row) -> ApprovalRecord:
             "body": row["body"],
             "template_name": row["template_name"],
             "template_params": row["template_params"],
+            "recipient_email": row["recipient_email"],
+            "recipient_phone": row["recipient_phone"],
+        }
+    )
+
+
+# -- incoming messages (inbound) ---------------------------------------------
+
+
+def incoming_message_to_row(message: IncomingMessage) -> dict[str, Any]:
+    return {
+        "message_id": message.message_id,
+        "channel": message.channel.value,
+        "provider_message_id": message.provider_message_id,
+        "provider_thread_id": message.provider_thread_id,
+        "from_party_id": message.from_party_id,
+        "obligation_id": message.obligation_id,
+        "received_at": message.received_at,
+        "body_text": message.body_text,
+        "classification": message.classification.value if message.classification else None,
+        "confidence": message.confidence,
+    }
+
+
+def row_to_incoming_message(row: Row) -> IncomingMessage:
+    return IncomingMessage.model_validate(
+        {
+            "message_id": row["message_id"],
+            "channel": row["channel"],
+            "provider_message_id": row["provider_message_id"],
+            "provider_thread_id": row["provider_thread_id"],
+            "from_party_id": row["from_party_id"],
+            "obligation_id": row["obligation_id"],
+            "received_at": row["received_at"],
+            "body_text": row["body_text"],
+            "classification": row["classification"],
+            "confidence": row["confidence"],
         }
     )

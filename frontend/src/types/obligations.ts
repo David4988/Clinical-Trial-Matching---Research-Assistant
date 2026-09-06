@@ -55,6 +55,7 @@ export interface ObligationAction {
   recipient_party_id: string | null;
   ref_id: string | null;
   note: string;
+  payload?: Record<string, unknown>;
 }
 
 export interface ProposalProvenance {

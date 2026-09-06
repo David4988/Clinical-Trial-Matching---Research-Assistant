@@ -10,10 +10,11 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from . import ids, parties as parties_module, reconcile as reconcile_module
-from .detectors import missing_lab
+from .detectors import missing_lab, missing_observation
 from ..repository.base import RepositoryError  # noqa: F401
 from ..repository.obligation_base import ObligationRepository
 from ..schema.enums import CriterionKind
+from ..schema.monitoring_result import MonitoringCycleResult
 from ..schema.obligation_enums import ActorKind, ObligationActionKind, ObligationStatus, ResolutionKind
 from ..schema.obligations import DetectionScope, Obligation, ObligationAction, ObligationDelta, ObligationResolution
 from ..schema.result import ScreeningResult
@@ -65,6 +66,44 @@ class ObligationService:
             existing=existing,
             now=now,
             criterion_kind_by_ref=criterion_kind_by_ref,
+            has_active_treatment=has_active_treatment,
+            responsible_party_id_for=resolver,
+        )
+        self._persist(delta)
+        return delta
+
+    def detect_from_monitoring_cycle(
+        self,
+        cycle: MonitoringCycleResult,
+        now: datetime | None = None,
+        has_active_treatment: bool = True,
+    ) -> ObligationDelta:
+        """The second detector source (§26 Phase 5): reconciles missing
+        required observations for one completed monitoring cycle. Same
+        contract as `detect_from_screening` — only ever called with a cycle
+        that ran to completion, `has_active_treatment` defaults True because
+        a monitoring cycle only exists for an enrolled, treated patient."""
+        now = now or datetime.now(timezone.utc)
+        trial_id = cycle.trial_id
+        patient_id = cycle.patient_id
+        source = "MONITORING_OBSERVATION"
+
+        detected = missing_observation.detect(cycle)
+        existing = self.repository.list_active_scope(trial_id, patient_id, source)
+        parties = self.repository.list_parties(trial_id)
+
+        def resolver(req):
+            party = parties_module.resolve(req.trial_id, parties)
+            return party.party_id if party else None
+
+        delta = reconcile_module.reconcile(
+            trial_id=trial_id,
+            patient_id=patient_id,
+            detector_source=source,
+            detected=detected,
+            existing=existing,
+            now=now,
+            criterion_kind_by_ref=None,
             has_active_treatment=has_active_treatment,
             responsible_party_id_for=resolver,
         )

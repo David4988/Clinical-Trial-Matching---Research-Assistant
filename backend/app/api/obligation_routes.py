@@ -4,12 +4,10 @@ Conventions matched to `api/monitoring_routes.py`: `_context`, `_now`,
 `_fail`, `_handle`, a per-router `_STATUS_BY_CODE` dict defaulting to 422.
 `docs/FINAL_IMPLEMENTATION_PLAN.md` §23.
 
-Reduced-scope note: `/investigate` runs the deterministic
-`obligations/templates.py` provider (§12.4's `TemplateProvider`, a normal
-provider implementation, not a placeholder) rather than a local/hosted model
-— Phase 11-13 (the agent + local/hosted providers) are deferred in this pass.
-The response shape and the approval boundary are identical either way; only
-`provenance.provider_kind` differs (`TEMPLATE` here, always).
+`/investigate` runs whichever `AgentModelProvider` `MODEL_PROVIDER` selects
+(template/local/hosted) via `agent/investigate.py`; the response shape and
+the approval boundary are identical regardless of which one answered —
+only `provenance.provider_kind`/`.model_name` differ.
 """
 
 from __future__ import annotations
@@ -18,11 +16,19 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Query, Request
 
-from .obligation_models import ApproveProposalRequest, DismissObligationRequest, RejectProposalRequest
+from .obligation_models import (
+    ApproveProposalRequest,
+    DismissObligationRequest,
+    RecordResponseRequest,
+    RejectProposalRequest,
+)
+from ..agent.classify import classify_response
+from ..obligations import ids as obligation_ids
 from ..obligations.context import ObligationContext
 from ..obligations.service import ObligationError
 from ..repository.base import RepositoryError
-from ..schema.obligations import Obligation, ObligationAction, ProposedAction, QueueItem, ResponsibleParty
+from ..schema.obligation_enums import ActorKind, ObligationActionKind
+from ..schema.obligations import IncomingMessage, Obligation, ObligationAction, ProposedAction, QueueItem, ResponsibleParty
 
 router = APIRouter(prefix="/obligations", tags=["obligations"])
 
@@ -97,6 +103,14 @@ def list_parties(request: Request, trial_id: str | None = None) -> list[Responsi
         return _context(request).repository.list_parties(trial_id)
     except RepositoryError as exc:
         _fail(503, "PERSISTENCE_FAILED", "Parties could not be read.", [str(exc)])
+
+
+@router.get("/incoming", response_model=list[IncomingMessage])
+def list_incoming(request: Request, unmatched: bool = False) -> list[IncomingMessage]:
+    try:
+        return _context(request).repository.list_incoming_messages(unmatched=unmatched)
+    except RepositoryError as exc:
+        _fail(503, "PERSISTENCE_FAILED", "Incoming messages could not be read.", [str(exc)])
 
 
 @router.get("/proposals", response_model=list[ProposedAction])
@@ -190,3 +204,39 @@ def dismiss(request: Request, obligation_id: str, payload: DismissObligationRequ
         _handle(exc)
     except RepositoryError as exc:
         _fail(503, "PERSISTENCE_FAILED", "The dismissal could not be saved.", [str(exc)])
+
+
+@router.post("/{obligation_id}/responses", response_model=ObligationAction, status_code=201)
+def record_response(request: Request, obligation_id: str, payload: RecordResponseRequest) -> ObligationAction:
+    """The manual demo + test path (§23.6): records an inbound reply
+    without a live Gmail/WhatsApp round-trip. Classification only —
+    `Obligation.status`, `.resolution` and every other field are
+    byte-identical before and after."""
+    ctx = _context(request)
+    now = _now(payload.now)
+    try:
+        obligation = ctx.service.get(obligation_id)
+    except RepositoryError as exc:
+        _fail(503, "PERSISTENCE_FAILED", "The obligation could not be read.", [str(exc)])
+    if obligation is None:
+        _fail(404, "OBLIGATION_NOT_FOUND", f"No obligation with id '{obligation_id}'.")
+
+    classification, confidence = classify_response(payload.text)
+    action = ObligationAction(
+        action_id=obligation_ids.new_id(obligation_ids.OBLIGATION_ACTION),
+        obligation_id=obligation_id,
+        seq=obligation.action_count + 1,
+        kind=ObligationActionKind.RESPONSE_RECEIVED,
+        occurred_at=now,
+        actor_kind=ActorKind.SYSTEM,
+        recipient_party_id=payload.from_party_id,
+        note=payload.text,
+        payload={"classification": classification.value, "confidence": confidence},
+    )
+    try:
+        ctx.service.attach_action(obligation, action)
+    except ObligationError as exc:
+        _handle(exc)
+    except RepositoryError as exc:
+        _fail(503, "PERSISTENCE_FAILED", "The response could not be saved.", [str(exc)])
+    return action

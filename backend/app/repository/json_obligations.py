@@ -21,7 +21,14 @@ from .obligation_base import ObligationRepository
 from .paths import data_dir
 from .base import RepositoryError
 from .session_stub import json_transaction
-from ..schema.obligations import ApprovalRecord, Obligation, ObligationAction, ProposedAction, ResponsibleParty
+from ..schema.obligations import (
+    ApprovalRecord,
+    IncomingMessage,
+    Obligation,
+    ObligationAction,
+    ProposedAction,
+    ResponsibleParty,
+)
 
 DEFAULT_STORE = data_dir() / "obligations.json"
 
@@ -31,6 +38,7 @@ _EMPTY: dict[str, dict[str, Any]] = {
     "actions": {},  # obligation_id -> list[dict]
     "proposals": {},
     "approvals": {},
+    "incoming_messages": {},
 }
 
 
@@ -181,3 +189,35 @@ class JsonObligationRepository(ObligationRepository):
     def get_approval(self, proposal_id: str) -> ApprovalRecord | None:
         raw = self._load()["approvals"].get(proposal_id)
         return ApprovalRecord.model_validate(raw) if raw else None
+
+    # -- inbound messages ------------------------------------------------
+
+    def find_incoming_message(self, channel: str, provider_message_id: str) -> IncomingMessage | None:
+        for raw in self._load()["incoming_messages"].values():
+            if raw["channel"] == channel and raw["provider_message_id"] == provider_message_id:
+                return IncomingMessage.model_validate(raw)
+        return None
+
+    def save_incoming_message(self, message: IncomingMessage) -> None:
+        data = self._load()
+        data["incoming_messages"][message.message_id] = message.model_dump(mode="json")
+        self._write(data)
+
+    def list_incoming_messages(self, unmatched: bool = False) -> list[IncomingMessage]:
+        messages = [IncomingMessage.model_validate(raw) for raw in self._load()["incoming_messages"].values()]
+        if unmatched:
+            messages = [m for m in messages if m.obligation_id is None]
+        messages.sort(key=lambda m: m.received_at, reverse=True)
+        return messages
+
+    def find_proposal_by_thread_id(self, provider_thread_id: str) -> ProposedAction | None:
+        for proposal in self.list_proposals():
+            if proposal.execution and proposal.execution.provider_thread_id == provider_thread_id:
+                return proposal
+        return None
+
+    def find_proposal_by_provider_message_id(self, provider_message_id: str) -> ProposedAction | None:
+        for proposal in self.list_proposals():
+            if proposal.execution and proposal.execution.provider_message_id == provider_message_id:
+                return proposal
+        return None

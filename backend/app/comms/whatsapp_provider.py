@@ -1,35 +1,41 @@
-"""WhatsApp Business Cloud API delivery provider.
+"""WhatsApp Business Cloud API delivery provider — real send.
 
-Interface-correct stub: `requires_template = True`, `supports_freeform =
-False`, and `deliver_with_outcome` refuses (never sends) when
-`approval.template_name` is absent — exactly the §16.2 precondition the
-obligation engine's execution boundary relies on. The real Graph API call is
-not implemented in this pass because it requires a Meta Business/WhatsApp
-Cloud API account, a phone number, and **Meta template approval**, none of
-which can be completed from this repository or in this session — an external,
-multi-day approval process (`docs/FINAL_IMPLEMENTATION_PLAN.md` §18.4).
+`requires_template = True`, `supports_freeform = False`: `deliver_with_outcome`
+refuses (never calls the Graph API) when `approval.template_name` is absent
+— the §16.2 precondition the obligation engine's execution boundary relies
+on, checked here a second time as defence in depth. The model never
+invents `template_name`/`template_params`; both always come from
+`obligations/templates.py`, carried on the `ApprovalRecord` untouched.
 
-Setting `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, and
-`WHATSAPP_VERIFY_TOKEN` would make `configured` True; wiring the real
-`POST /messages` call with template components is the only remaining step,
-isolated entirely to this file, per §16.4 ("the ONLY WhatsApp-aware module").
-The model never invents a template name or its parameters — both come from
-`obligations/templates.py`.
+`configured()` requires `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`
+(the project uses `META_ACCESS_TOKEN` as the actual env var name for the
+access token — see `WHATSAPP_ACCESS_TOKEN_ENV` below for the exact name
+this reads).
 """
 
 from __future__ import annotations
 
+import logging
 import os
 from datetime import datetime
 
+from . import whatsapp_client
 from ..monitoring.notifications import NotificationDeliveryProvider
 from ..schema.monitoring_enums import NotificationChannel
 from ..schema.monitoring_result import Notification
 from ..schema.obligations import ApprovalRecord, DeliveryOutcome
 
-WHATSAPP_ACCESS_TOKEN_ENV = "WHATSAPP_ACCESS_TOKEN"
+logger = logging.getLogger("app.comms.whatsapp_provider")
+
+#: The project's actual configured env var for the long-lived access token.
+WHATSAPP_ACCESS_TOKEN_ENV = "META_ACCESS_TOKEN"
 WHATSAPP_PHONE_NUMBER_ID_ENV = "WHATSAPP_PHONE_NUMBER_ID"
+#: Verification token for the inbound webhook handshake (§18) — separate
+#: from the access token; set by whoever configures the Meta App dashboard.
 WHATSAPP_VERIFY_TOKEN_ENV = "WHATSAPP_VERIFY_TOKEN"
+WHATSAPP_APP_SECRET_ENV = "WHATSAPP_APP_SECRET"
+
+_sent_proposal_ids: set[str] = set()
 
 
 def configured() -> bool:
@@ -53,9 +59,9 @@ class WhatsAppProvider(NotificationDeliveryProvider):
     ) -> tuple[Notification, DeliveryOutcome]:
         if approval.template_name is None:
             # Structural refusal — outbound business-initiated WhatsApp
-            # messages must use an approved template. This must be
-            # unreachable in practice: execution.py checks the same
-            # precondition before calling any provider (§16.2).
+            # messages must use an approved template. execution.py already
+            # checks this precondition before any provider is touched
+            # (§16.2); this is the provider's own defence in depth.
             return notification, DeliveryOutcome(
                 delivered=False, provider=self.name, error="TEMPLATE_REQUIRED"
             )
@@ -63,10 +69,45 @@ class WhatsAppProvider(NotificationDeliveryProvider):
             return notification, DeliveryOutcome(
                 delivered=False, provider=self.name, error="WHATSAPP_NOT_CONFIGURED"
             )
-        # Real send (Graph API POST /messages, rendering approval.template_name
-        # + approval.template_params as template components) is not exercised
-        # here — blocked externally on Meta template approval, per the module
-        # docstring.
-        return notification, DeliveryOutcome(
-            delivered=False, provider=self.name, error="WHATSAPP_SEND_NOT_IMPLEMENTED"
+        if not approval.recipient_phone:
+            return notification, DeliveryOutcome(
+                delivered=False, provider=self.name, error="RECIPIENT_PHONE_MISSING"
+            )
+        if approval.proposal_id in _sent_proposal_ids:
+            logger.warning("Duplicate WhatsApp send suppressed for proposal %s.", approval.proposal_id)
+            return notification, DeliveryOutcome(
+                delivered=False, provider=self.name, error="DUPLICATE_SEND_SUPPRESSED"
+            )
+
+        access_token = os.environ[WHATSAPP_ACCESS_TOKEN_ENV]
+        phone_number_id = os.environ[WHATSAPP_PHONE_NUMBER_ID_ENV]
+
+        try:
+            sent = whatsapp_client.send_template_message(
+                access_token=access_token,
+                phone_number_id=phone_number_id,
+                to=approval.recipient_phone,
+                template_name=approval.template_name,
+                template_params=approval.template_params,
+            )
+        except whatsapp_client.WhatsAppClientError as exc:
+            logger.error("WhatsApp send failed for proposal %s: %s", approval.proposal_id, exc)
+            return notification, DeliveryOutcome(
+                delivered=False, provider=self.name, error=f"WHATSAPP_SEND_FAILED: {exc}"
+            )
+        except Exception as exc:  # noqa: BLE001 - a provider must never raise
+            logger.error("Unexpected WhatsApp failure for proposal %s: %s", approval.proposal_id, exc)
+            return notification, DeliveryOutcome(
+                delivered=False, provider=self.name, error=f"WHATSAPP_SEND_FAILED: {exc}"
+            )
+
+        _sent_proposal_ids.add(approval.proposal_id)
+        wamid = None
+        messages = sent.get("messages") or []
+        if messages:
+            wamid = messages[0].get("id")
+
+        delivered_notification = notification.model_copy(update={"delivered_at": now, "delivery_provider": self.name})
+        return delivered_notification, DeliveryOutcome(
+            delivered=True, provider=self.name, provider_message_id=wamid
         )

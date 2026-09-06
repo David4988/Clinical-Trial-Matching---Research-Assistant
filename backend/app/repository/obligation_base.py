@@ -14,6 +14,7 @@ from contextlib import AbstractContextManager
 from .base import RepositoryError  # noqa: F401  (re-exported for obligation callers)
 from ..schema.obligations import (
     ApprovalRecord,
+    IncomingMessage,
     Obligation,
     ObligationAction,
     ProposedAction,
@@ -100,3 +101,26 @@ class ObligationRepository(ABC):
 
     @abstractmethod
     def get_approval(self, proposal_id: str) -> ApprovalRecord | None: ...
+
+    # -- inbound messages ------------------------------------------------
+
+    @abstractmethod
+    def find_incoming_message(self, channel: str, provider_message_id: str) -> IncomingMessage | None:
+        """The idempotency check (§9.4 `inbound_idempotent`): a duplicate
+        webhook delivery or a re-read poll must be discarded, not re-ledgered."""
+
+    @abstractmethod
+    def save_incoming_message(self, message: IncomingMessage) -> None: ...
+
+    @abstractmethod
+    def list_incoming_messages(self, unmatched: bool = False) -> list[IncomingMessage]: ...
+
+    @abstractmethod
+    def find_proposal_by_thread_id(self, provider_thread_id: str) -> ProposedAction | None:
+        """Deterministic matching, priority 1 (§19.3): a stored Gmail
+        `threadId` from a prior execution."""
+
+    @abstractmethod
+    def find_proposal_by_provider_message_id(self, provider_message_id: str) -> ProposedAction | None:
+        """Deterministic matching, priority 1 for WhatsApp: the `wamid` a
+        reply's `context.id` points back to."""

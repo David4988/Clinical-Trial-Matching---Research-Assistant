@@ -46,13 +46,17 @@ def _approval(channel: NotificationChannel, template_name: str | None = None) ->
 
 
 def test_factory_falls_back_to_in_app_when_gmail_not_configured(monkeypatch):
-    monkeypatch.delenv("GMAIL_CLIENT_ID", raising=False)
+    # Hermetic regardless of what a developer's local `.env.local` happens
+    # to have set — every var `configured()` checks is explicitly removed.
+    for var in ("GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET", "GMAIL_REFRESH_TOKEN", "GMAIL_SENDER"):
+        monkeypatch.delenv(var, raising=False)
     provider = build_delivery_provider(NotificationChannel.EMAIL)
     assert isinstance(provider, InAppNotificationProvider)
 
 
 def test_factory_falls_back_to_in_app_when_whatsapp_not_configured(monkeypatch):
-    monkeypatch.delenv("WHATSAPP_ACCESS_TOKEN", raising=False)
+    for var in ("META_ACCESS_TOKEN", "WHATSAPP_PHONE_NUMBER_ID"):
+        monkeypatch.delenv(var, raising=False)
     provider = build_delivery_provider(NotificationChannel.WHATSAPP)
     assert isinstance(provider, InAppNotificationProvider)
 
@@ -63,7 +67,8 @@ def test_factory_returns_in_app_provider_for_in_app_channel():
 
 
 def test_gmail_provider_never_raises_when_unconfigured(monkeypatch):
-    monkeypatch.delenv("GMAIL_CLIENT_ID", raising=False)
+    for var in ("GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET", "GMAIL_REFRESH_TOKEN", "GMAIL_SENDER"):
+        monkeypatch.delenv(var, raising=False)
     provider = GmailProvider()
     notification, outcome = provider.deliver_with_outcome(
         _notification(NotificationChannel.EMAIL), _approval(NotificationChannel.EMAIL), NOW

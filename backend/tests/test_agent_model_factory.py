@@ -5,6 +5,7 @@ endpoint."""
 from __future__ import annotations
 
 from app.agent.model.factory import build_model_provider
+from app.agent.model.hosted_provider import HostedProvider
 from app.agent.model.local_provider import LocalProvider
 from app.agent.model.template_provider import TemplateProvider
 
@@ -45,8 +46,29 @@ def test_local_reads_endpoint_and_model_name_from_env(monkeypatch):
     assert provider.model_name == "some-other-model"
 
 
-def test_hosted_falls_back_to_template_when_not_built(monkeypatch):
-    # hosted_provider.py is not implemented in this pass — the factory must
-    # not raise or crash the app.
+def test_hosted_falls_back_to_template_when_api_key_missing(monkeypatch):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     provider = build_model_provider(name="hosted")
     assert isinstance(provider, TemplateProvider)
+
+
+def test_hosted_falls_back_to_template_when_probe_fails(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-key")
+    monkeypatch.setattr(HostedProvider, "probe", lambda self: False)
+    provider = build_model_provider(name="hosted")
+    assert isinstance(provider, TemplateProvider)
+
+
+def test_hosted_selected_when_api_key_present_and_probe_succeeds(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-key")
+    monkeypatch.setattr(HostedProvider, "probe", lambda self: True)
+    provider = build_model_provider(name="hosted")
+    assert isinstance(provider, HostedProvider)
+
+
+def test_hosted_reads_model_name_from_env(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-key")
+    monkeypatch.setenv("HOSTED_MODEL_NAME", "some-other-gemini-model")
+    monkeypatch.setattr(HostedProvider, "probe", lambda self: True)
+    provider = build_model_provider(name="hosted")
+    assert provider.model_name == "some-other-gemini-model"

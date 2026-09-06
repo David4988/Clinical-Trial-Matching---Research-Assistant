@@ -393,4 +393,35 @@ approval_records = Table(
     Column("body", String, nullable=False),
     Column("template_name", String, nullable=True),
     Column("template_params", JSONB, nullable=False, server_default="[]"),
+    # NEW: the resolved recipient contact address for this channel, set by
+    # `ObligationProposalService.approve()` from `parties.resolve()` — never
+    # invented by a provider or a model (docs/FINAL_IMPLEMENTATION_PLAN.md §16).
+    Column("recipient_email", String, nullable=True),
+    Column("recipient_phone", String, nullable=True),
+)
+
+incoming_messages = Table(
+    "incoming_messages",
+    metadata,
+    Column("message_id", String, primary_key=True),
+    Column("channel", String, nullable=False),
+    Column("provider_message_id", String, nullable=False),
+    Column("provider_thread_id", String, nullable=True),
+    Column("from_party_id", String, ForeignKey("responsible_parties.party_id"), nullable=True),
+    Column("obligation_id", String, ForeignKey("obligations.obligation_id"), nullable=True),
+    Column("received_at", DateTime(timezone=True), nullable=False),
+    Column("body_text", String, nullable=False),
+    Column(
+        "classification",
+        String,
+        CheckConstraint(
+            "classification IN ('WILL_PROVIDE','PROVIDED','DISPUTED','UNCLEAR') OR classification IS NULL",
+            name="ck_incoming_classification",
+        ),
+        nullable=True,
+    ),
+    Column("confidence", Float, nullable=True),
+    UniqueConstraint("channel", "provider_message_id", name="inbound_idempotent"),
+    Index("ix_incoming_messages_obligation", "obligation_id"),
+    Index("ix_incoming_messages_thread", "provider_thread_id"),
 )

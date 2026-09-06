@@ -10,6 +10,7 @@ in `main.py` already produce it, and the frontend already knows how to render it
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -82,6 +83,22 @@ def _fail(status: int, code: str, message: str, details: list[str] | None = None
 
 def _handle(exc: MonitoringError):
     _fail(_STATUS_BY_CODE.get(exc.code, 422), exc.code, exc.message, exc.details)
+
+
+def _detect_monitoring_obligations(request: Request, cycle: MonitoringCycleResult) -> None:
+    """The monitoring-side counterpart to `api/routes.py`'s
+    `_detect_obligations` — same reasoning: best-effort, wired in downstream
+    of a persisted, completed cycle rather than inside `MonitoringService`,
+    so `monitoring/` stays free of any import from `obligations/`."""
+    obligations = getattr(request.app.state, "obligations", None)
+    if obligations is None:
+        return
+    try:
+        obligations.service.detect_from_monitoring_cycle(cycle)
+    except Exception:  # noqa: BLE001 - detection is advisory to the cycle call
+        logging.getLogger("app.obligations").exception(
+            "Monitoring obligation detection failed for cycle %s", cycle.cycle_id
+        )
 
 
 # -- protocol transparency -------------------------------------------------
@@ -270,11 +287,13 @@ def run_cycle(
 ) -> MonitoringCycleResult:
     """Run one monitoring cycle: state -> risk -> gate -> protocol -> next dose."""
     try:
-        return _context(request).monitoring.run_cycle(
+        cycle = _context(request).monitoring.run_cycle(
             patient_id, payload.trial_id, _now(payload.now)
         )
     except RepositoryError as exc:
         _fail(503, "PERSISTENCE_FAILED", "The cycle could not be saved.", [str(exc)])
+    _detect_monitoring_obligations(request, cycle)
+    return cycle
 
 
 @router.get("/patients/{patient_id}/cycle", response_model=MonitoringCycleResult)
@@ -344,9 +363,11 @@ def advance_monitoring(
 
     try:
         context.ingestion.ingest(batch, now=at)
-        return context.monitoring.run_cycle(patient_id, payload.trial_id, at)
+        cycle = context.monitoring.run_cycle(patient_id, payload.trial_id, at)
     except RepositoryError as exc:
         _fail(503, "PERSISTENCE_FAILED", "The cycle could not be saved.", [str(exc)])
+    _detect_monitoring_obligations(request, cycle)
+    return cycle
 
 
 @router.post(
@@ -410,13 +431,78 @@ async def explain_risk(payload: XAIExplanationRequest) -> XAIExplanation:
 # -- dashboard -------------------------------------------------------------
 
 
+def _obligations_overview(request: Request, trial_id: str) -> dict | None:
+    """The population operations view (§20.5): evolves the existing
+    overview rather than a parallel analytics subsystem. Returns `None`
+    when the obligation layer is not wired up for this app instance (every
+    existing test) — the route below omits the key entirely in that case,
+    so `TrialOverview.tsx` keeps working untouched."""
+    obligations = getattr(request.app.state, "obligations", None)
+    if obligations is None:
+        return None
+
+    all_obligations = obligations.service.list(trial_id=trial_id)
+    open_and_awaiting = [o for o in all_obligations if o.status.value in ("OPEN", "AWAITING_RESPONSE")]
+    proposals = obligations.repository.list_proposals(trial_id=trial_id)
+    parties = {p.party_id: p for p in obligations.repository.list_parties(trial_id)}
+
+    by_type: dict[str, int] = {}
+    by_party_open: dict[str, int] = {}
+    by_party_awaiting: dict[str, int] = {}
+    for o in open_and_awaiting:
+        by_type[o.type.value] = by_type.get(o.type.value, 0) + 1
+        if o.responsible_party_id:
+            by_party_open[o.responsible_party_id] = by_party_open.get(o.responsible_party_id, 0) + (
+                1 if o.status.value == "OPEN" else 0
+            )
+            by_party_awaiting[o.responsible_party_id] = by_party_awaiting.get(o.responsible_party_id, 0) + (
+                1 if o.status.value == "AWAITING_RESPONSE" else 0
+            )
+
+    now = datetime.now(timezone.utc)
+    oldest_open_days = (
+        max((now - o.first_detected_at).days for o in open_and_awaiting) if open_and_awaiting else None
+    )
+    overdue = sum(1 for o in open_and_awaiting if o.due_at and o.due_at < now)
+
+    by_party = [
+        {
+            "party_id": party_id,
+            "display_name": parties[party_id].display_name if party_id in parties else party_id,
+            "open": by_party_open.get(party_id, 0),
+            "awaiting_response": by_party_awaiting.get(party_id, 0),
+            # Not yet tracked: needs RESPONSE_RECEIVED ledger timestamps
+            # paired with the triggering MESSAGE_SENT entry, per party.
+            # Absence of data is not a reassuring number — never 0.
+            "median_response_days": None,
+        }
+        for party_id in sorted(set(by_party_open) | set(by_party_awaiting))
+    ]
+
+    return {
+        "open": sum(1 for o in open_and_awaiting if o.status.value == "OPEN"),
+        "awaiting_response": sum(1 for o in open_and_awaiting if o.status.value == "AWAITING_RESPONSE"),
+        "pending_approval": sum(1 for p in proposals if p.status.value == "DRAFT"),
+        "high_priority": sum(1 for o in open_and_awaiting if o.priority.value in ("HIGH", "URGENT")),
+        "overdue": overdue,
+        "by_type": by_type,
+        "by_party": by_party,
+        "oldest_open_days": oldest_open_days,
+    }
+
+
 @router.get("/trials/{trial_id}/overview")
 def trial_overview(request: Request, trial_id: str) -> dict:
     """Aggregate for the Trial Overview screen."""
     try:
-        return _context(request).monitoring.trial_overview(trial_id)
+        overview = _context(request).monitoring.trial_overview(trial_id)
     except RepositoryError as exc:
         _fail(503, "PERSISTENCE_FAILED", "The overview could not be built.", [str(exc)])
+
+    obligations_summary = _obligations_overview(request, trial_id)
+    if obligations_summary is not None:
+        overview["obligations"] = obligations_summary
+    return overview
 
 
 # -- demo seeding ----------------------------------------------------------

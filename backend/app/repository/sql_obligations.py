@@ -18,8 +18,22 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from ..db import mappers
 from ..db.session import SessionScopedRepository
-from ..db.tables import approval_records, obligation_actions, obligations, proposed_actions, responsible_parties
-from ..schema.obligations import ApprovalRecord, Obligation, ObligationAction, ProposedAction, ResponsibleParty
+from ..db.tables import (
+    approval_records,
+    incoming_messages,
+    obligation_actions,
+    obligations,
+    proposed_actions,
+    responsible_parties,
+)
+from ..schema.obligations import (
+    ApprovalRecord,
+    IncomingMessage,
+    Obligation,
+    ObligationAction,
+    ProposedAction,
+    ResponsibleParty,
+)
 from .base import RepositoryError
 from .obligation_base import ObligationRepository
 
@@ -222,3 +236,61 @@ class SqlObligationRepository(SessionScopedRepository, ObligationRepository):
         except SQLAlchemyError as exc:
             raise RepositoryError(f"Could not read approval: {exc}") from exc
         return mappers.row_to_approval_record(row) if row else None
+
+    # -- inbound messages ------------------------------------------------
+
+    def find_incoming_message(self, channel: str, provider_message_id: str) -> IncomingMessage | None:
+        query = (
+            select(incoming_messages)
+            .where(incoming_messages.c.channel == channel)
+            .where(incoming_messages.c.provider_message_id == provider_message_id)
+        )
+        try:
+            with self._session() as session:
+                row = session.execute(query).mappings().first()
+        except SQLAlchemyError as exc:
+            raise RepositoryError(f"Could not read incoming message: {exc}") from exc
+        return mappers.row_to_incoming_message(row) if row else None
+
+    def save_incoming_message(self, message: IncomingMessage) -> None:
+        row = mappers.incoming_message_to_row(message)
+        stmt = pg_insert(incoming_messages).values(**row)
+        # Idempotent on the real constraint: a duplicate (channel,
+        # provider_message_id) is discarded, not an error — exactly the
+        # webhook-retry / re-polled-message case this table exists for.
+        stmt = stmt.on_conflict_do_nothing(index_elements=["channel", "provider_message_id"])
+        try:
+            with self._session() as session:
+                session.execute(stmt)
+        except SQLAlchemyError as exc:
+            raise RepositoryError(f"Could not save incoming message: {exc}") from exc
+
+    def list_incoming_messages(self, unmatched: bool = False) -> list[IncomingMessage]:
+        query = select(incoming_messages)
+        if unmatched:
+            query = query.where(incoming_messages.c.obligation_id.is_(None))
+        query = query.order_by(incoming_messages.c.received_at.desc())
+        try:
+            with self._session() as session:
+                rows = session.execute(query).mappings().all()
+        except SQLAlchemyError as exc:
+            raise RepositoryError(f"Could not list incoming messages: {exc}") from exc
+        return [mappers.row_to_incoming_message(row) for row in rows]
+
+    def find_proposal_by_thread_id(self, provider_thread_id: str) -> ProposedAction | None:
+        query = select(proposed_actions).where(proposed_actions.c.exec_provider_thread_id == provider_thread_id)
+        try:
+            with self._session() as session:
+                row = session.execute(query).mappings().first()
+        except SQLAlchemyError as exc:
+            raise RepositoryError(f"Could not read proposal by thread id: {exc}") from exc
+        return mappers.row_to_proposed_action(row) if row else None
+
+    def find_proposal_by_provider_message_id(self, provider_message_id: str) -> ProposedAction | None:
+        query = select(proposed_actions).where(proposed_actions.c.exec_provider_message_id == provider_message_id)
+        try:
+            with self._session() as session:
+                row = session.execute(query).mappings().first()
+        except SQLAlchemyError as exc:
+            raise RepositoryError(f"Could not read proposal by provider message id: {exc}") from exc
+        return mappers.row_to_proposed_action(row) if row else None

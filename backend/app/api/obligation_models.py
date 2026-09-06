@@ -31,3 +31,12 @@ class RejectProposalRequest(BaseModel):
     reviewer: str
     note: str
     now: datetime | None = None
+
+
+class RecordResponseRequest(BaseModel):
+    """The manual demo + test path (§23.6) — records an inbound reply
+    without needing a live Gmail/WhatsApp round-trip."""
+
+    text: str
+    from_party_id: str | None = None
+    now: datetime | None = None

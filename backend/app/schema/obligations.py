@@ -180,6 +180,13 @@ class ApprovalRecord(BaseModel):
     body: str
     template_name: str | None = None
     template_params: list[str] = Field(default_factory=list)
+    # NEW, additive: the resolved `ResponsibleParty`'s contact address for
+    # this channel — resolved deterministically by `ObligationProposalService
+    # .approve()` from `parties.resolve()`, never invented by a provider or
+    # a model. `None` when the party has no address on that channel; the
+    # provider reports that as its own delivery failure rather than guessing.
+    recipient_email: str | None = None
+    recipient_phone: str | None = None
 
 
 class ResponsibleParty(BaseModel):

@@ -350,6 +350,8 @@ function ObligationDetail({
               {" — "}
               {new Date(a.occurred_at).toLocaleString()}
               {a.actor_name ? ` · ${a.actor_name}` : ` · ${a.actor_kind}`}
+              {a.channel ? ` · ${a.channel}` : ""}
+              {a.payload?.classification ? ` · classified: ${a.payload.classification}` : ""}
               {a.note ? ` · ${a.note}` : ""}
             </li>
           ))}
