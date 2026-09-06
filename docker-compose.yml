@@ -1,0 +1,26 @@
+# Local PostgreSQL for development and the test suite.
+#
+# Deliberately on a non-default port (5433) so this never collides with a
+# system-wide Postgres a developer already has running on 5432. Credentials
+# are committed on purpose — they guard a throwaway loopback-only container,
+# never a real deployment. See docs/FINAL_IMPLEMENTATION_PLAN.md §10.2, §25.4.
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: trialguard
+      POSTGRES_PASSWORD: trialguard
+      POSTGRES_DB: trialguard
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - trialguard_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trialguard -d trialguard"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+volumes:
+  trialguard_pgdata:

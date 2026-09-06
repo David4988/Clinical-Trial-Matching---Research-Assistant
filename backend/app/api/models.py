@@ -52,3 +52,10 @@ class HealthResponse(BaseModel):
     phase: str
     ai_provider: str
     repository: str
+    # Additive (docs/FINAL_IMPLEMENTATION_PLAN.md §23.10): which persistence
+    # backend actually answered, and whether a `postgres` request silently
+    # degraded to the JSON fallback. `None` when the app was built with an
+    # explicit repository (every test in this repository) rather than through
+    # `repository/factory.py`.
+    persistence_backend: str | None = None
+    persistence_degraded: bool = False

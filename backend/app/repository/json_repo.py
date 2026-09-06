@@ -11,11 +11,13 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+from contextlib import AbstractContextManager
 from pathlib import Path
 from typing import Any
 
 from .paths import data_dir
 from .base import Repository, RepositoryError
+from .session_stub import json_transaction
 from ..schema.clinical import Patient
 from ..schema.result import ScreeningResult
 from ..schema.trial import Trial
@@ -61,6 +63,9 @@ class JsonRepository(Repository):
             raise RepositoryError(f"Could not write store at {self.path}: {exc}") from exc
 
     # -- Repository --------------------------------------------------------
+
+    def transaction(self) -> AbstractContextManager[None]:
+        return json_transaction()
 
     def save_patient(self, patient: Patient) -> None:
         data = self._load()

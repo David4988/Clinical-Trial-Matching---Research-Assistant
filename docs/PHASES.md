@@ -1,5 +1,9 @@
 # Upgrade path
 
+> Describes the original input-modality upgrade path and remains accurate. The
+> operational layer's roadmap lives in
+> **[`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md)** §26.
+
 The design requirement: **Phases 2–6 extend the Phase 1 architecture rather
 than rewrite the eligibility engine.**
 

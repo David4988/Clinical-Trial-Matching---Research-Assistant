@@ -16,6 +16,7 @@ reintroduced by accident.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from contextlib import AbstractContextManager
 from datetime import datetime
 
 from .base import RepositoryError  # noqa: F401  (re-exported for monitoring callers)
@@ -29,6 +30,11 @@ from ..schema.monitoring_result import (
 
 class MonitoringRepository(ABC):
     """Storage for treatments, observations, cycles, timeline events and alerts."""
+
+    @abstractmethod
+    def transaction(self) -> AbstractContextManager[None]:
+        """All writes inside the block commit together or not at all. See
+        `Repository.transaction` and `docs/FINAL_IMPLEMENTATION_PLAN.md` §9.6."""
 
     # -- treatments --------------------------------------------------------
 

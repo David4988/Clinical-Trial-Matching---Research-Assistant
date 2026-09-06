@@ -23,9 +23,15 @@ services:
       # Live Isolation Forest inference rather than the deterministic mock.
       - key: RISK_PROVIDER
         value: synthetic_ml
-      # Points the JSON stores at the persistent disk above.
+      # Points the JSON stores at the persistent disk above. Only read when
+      # DATABASE_URL is unset — see docs/FINAL_IMPLEMENTATION_PLAN.md §11.5.
       - key: DATA_DIR
         value: /var/data
+      # PostgreSQL / Supabase connection string. No value is ever committed
+      # here; set it in the Render dashboard. Omitting it keeps the service
+      # on the JSON-file rollback, a real and tested fallback.
+      - key: DATABASE_URL
+        sync: false
       # The deployed frontend origin, e.g. https://<project>.vercel.app
       # Set in the Render dashboard once Vercel has assigned the URL.
       - key: FRONTEND_ORIGIN

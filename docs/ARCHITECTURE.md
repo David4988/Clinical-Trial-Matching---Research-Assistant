@@ -1,5 +1,9 @@
 # Architecture — Phase 1
 
+> Describes Phase 1 and remains accurate. The obligation layer, agent, comms
+> and database packages **extend** this architecture and its dependency table —
+> see **[`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md)** §4.
+
 > Normalize first. Verify deterministically. Use AI to assist. Explain every
 > result. Persist cleanly. Extend later.
 
@@ -168,9 +172,16 @@ locator. PDF-derived facts cite `page 1, line 12`.
 | `heuristics/`  | `schema/`, `engine/`              |
 | `ai/`          | `schema/`                         |
 | `extraction/`  | `schema/`                         |
-| `repository/`  | `schema/`                         |
+| `repository/`  | `schema/` (+ SQLAlchemy in `sql_repo.py`/`sql_monitoring.py` only) |
+| `db/`          | `schema/` — the only package that imports SQLAlchemy itself |
 | `service.py`   | all of the above                  |
 | `api/`         | `service.py`, `schema/`           |
+
+`db/` and the two SQL repository implementations are the PostgreSQL
+persistence layer added in `docs/FINAL_IMPLEMENTATION_PLAN.md` §9. Nothing
+above this line changed: `service.py` still holds a `Repository`, never an
+engine or a session, and the JSON implementations remain a fully supported
+fallback (`repository/factory.py`).
 
 If `engine/` ever needs to import from `extraction/` or `ai/`, the boundary
 has been broken.

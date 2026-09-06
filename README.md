@@ -45,7 +45,7 @@ and press *Load demo cohort* for Phase 2.
 
 ```bash
 cd backend
-.venv/Scripts/python -m pytest tests -q     # 310 tests, no network
+.venv/Scripts/python -m pytest tests -q     # 629 tests, no network by default (add a local Postgres for the DB-backed ones)
 .venv/Scripts/python scripts/smoke_test.py  # end-to-end against a running server
 ```
 
@@ -259,6 +259,14 @@ additional adapters feeding the same schema.
 Full detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 Upgrade path through Phase 6: [`docs/PHASES.md`](docs/PHASES.md).
 
+**Implementation roadmap:** the authoritative plan for the obligation /
+work-queue layer, the PostgreSQL migration, the AI provider abstraction and
+the Gmail / WhatsApp integrations is
+[`docs/FINAL_IMPLEMENTATION_PLAN.md`](docs/FINAL_IMPLEMENTATION_PLAN.md).
+`docs/IMPLEMENTATION_PLAN.md` and `docs/OBLIGATIONS_PLAN.md` are historical;
+`docs/PHASE0_CONTRACT.md` remains authoritative for field-level domain detail
+except its §11 (persistence).
+
 ## API
 
 | Method | Path | Purpose |
@@ -318,7 +326,7 @@ backend/
     service.py     Phase 1 orchestration
   fixtures/        canonical JSON + generated demo PDFs
   scripts/         generate_demo_pdf.py, smoke_test.py
-  tests/           310 tests
+  tests/           629 tests
 frontend/
   src/
     types/         TypeScript mirror of the canonical schema

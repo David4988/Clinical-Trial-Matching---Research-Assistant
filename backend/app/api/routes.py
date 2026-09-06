@@ -51,6 +51,8 @@ def health(request: Request) -> HealthResponse:
         phase="1",
         ai_provider=service.ai_provider.name,
         repository=type(service.repository).__name__,
+        persistence_backend=getattr(request.app.state, "persistence_backend", None),
+        persistence_degraded=getattr(request.app.state, "persistence_degraded", False),
     )
 
 

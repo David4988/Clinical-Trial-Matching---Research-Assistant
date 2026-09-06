@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse
 from .api.monitoring_routes import router as monitoring_router
 from .api.routes import router
 from .monitoring.context import MonitoringContext
+from .repository.factory import build_repositories
 from .risk.factory import build_risk_provider
 from .service import ScreeningService
 
@@ -67,7 +68,23 @@ def create_app(
         allow_headers=["*"],
     )
 
-    app.state.service = service or ScreeningService()
+    # Which persistence backend answers is a deployment choice, read once from
+    # PERSISTENCE (postgres | json) — or inferred from whether DATABASE_URL is
+    # set — and never raising: an unreachable database degrades to the JSON
+    # store rather than refusing to start. See
+    # docs/FINAL_IMPLEMENTATION_PLAN.md §11.5. Built once so the screening and
+    # monitoring repositories agree on which backend is live; a caller
+    # supplying its own `service` and/or `monitoring` (every test in this
+    # repository) bypasses this entirely.
+    repositories = build_repositories() if service is None else None
+    app.state.persistence_backend = (
+        repositories.backend if repositories is not None else None
+    )
+    app.state.persistence_degraded = (
+        repositories.degraded if repositories is not None else False
+    )
+
+    app.state.service = service or ScreeningService(repository=repositories.repository)
     # Phase 2 reads Phase 1's results through the existing Repository, so the
     # screening store is shared rather than duplicated.
     #
@@ -76,6 +93,9 @@ def create_app(
     # deterministic mock so the app still starts with no ML dependencies.
     app.state.monitoring = monitoring or MonitoringContext.build(
         app.state.service.repository,
+        monitoring_repository=(
+            repositories.monitoring_repository if repositories is not None else None
+        ),
         risk_provider=build_risk_provider(),
     )
     app.include_router(router)

@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+from contextlib import AbstractContextManager
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -24,6 +25,7 @@ from typing import Any
 from .paths import data_dir
 from .base import RepositoryError
 from .monitoring_base import MonitoringRepository
+from .session_stub import json_transaction
 from ..schema.monitoring import AdverseEvent, Observation, TreatmentAssignment
 from ..schema.monitoring_result import (
     MonitoringCycleResult,
@@ -110,6 +112,11 @@ class JsonMonitoringRepository(MonitoringRepository):
             ) from exc
 
         self._cache, self._cache_key = data, self._file_key()
+
+    # -- MonitoringRepository ------------------------------------------------
+
+    def transaction(self) -> AbstractContextManager[None]:
+        return json_transaction()
 
     # -- treatments --------------------------------------------------------
 
