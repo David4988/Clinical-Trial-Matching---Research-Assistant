@@ -25,7 +25,9 @@ from dataclasses import dataclass
 from .base import Repository
 from .json_repo import JsonRepository
 from .json_monitoring import JsonMonitoringRepository
+from .json_obligations import JsonObligationRepository
 from .monitoring_base import MonitoringRepository
+from .obligation_base import ObligationRepository
 
 logger = logging.getLogger("app.repository.factory")
 
@@ -41,6 +43,7 @@ ENV_VAR = "PERSISTENCE"
 class RepositoryBundle:
     repository: Repository
     monitoring_repository: MonitoringRepository
+    obligation_repository: ObligationRepository
     backend: str
     #: True when the caller asked for `postgres` but the app is actually
     #: running on the JSON fallback — the fact `/health` surfaces (§23.10).
@@ -75,6 +78,7 @@ def build_repositories(name: str | None = None) -> RepositoryBundle:
         return RepositoryBundle(
             repository=JsonRepository(),
             monitoring_repository=JsonMonitoringRepository(),
+            obligation_repository=JsonObligationRepository(),
             backend=JSON,
         )
 
@@ -83,12 +87,14 @@ def build_repositories(name: str | None = None) -> RepositoryBundle:
         from ..db.engine import build_engine
         from .sql_repo import SqlRepository
         from .sql_monitoring import SqlMonitoringRepository
+        from .sql_obligations import SqlObligationRepository
 
         engine = build_engine()
         _probe(engine)
         return RepositoryBundle(
             repository=SqlRepository(engine),
             monitoring_repository=SqlMonitoringRepository(engine),
+            obligation_repository=SqlObligationRepository(engine),
             backend=POSTGRES,
         )
     except Exception as exc:  # noqa: BLE001 - startup must not fail here
@@ -101,6 +107,7 @@ def build_repositories(name: str | None = None) -> RepositoryBundle:
         return RepositoryBundle(
             repository=JsonRepository(),
             monitoring_repository=JsonMonitoringRepository(),
+            obligation_repository=JsonObligationRepository(),
             backend=JSON,
             degraded=True,
         )

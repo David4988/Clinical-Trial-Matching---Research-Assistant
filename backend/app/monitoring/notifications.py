@@ -32,6 +32,7 @@ from ..schema.monitoring_result import (
     Notification,
     PatientState,
 )
+from ..schema.obligations import ApprovalRecord, DeliveryOutcome
 
 _SUBJECTS: dict[RiskLevel, str] = {
     RiskLevel.GREEN: "Routine monitoring continues",
@@ -123,16 +124,39 @@ def _body(
 class NotificationDeliveryProvider(ABC):
     """Physically delivers a generated notification.
 
-    Phase 2 ships only the in-app provider. Email/SMS/push implement this same
-    interface later with no change to generation.
+    Phase 2 ships only the in-app provider. Email/SMS/push/WhatsApp implement
+    this same interface with no change to generation. The obligation layer
+    (`docs/FINAL_IMPLEMENTATION_PLAN.md` §16) adds the capability
+    declarations and `deliver_with_outcome` — the boundary `execution.py`
+    actually calls, so an approved proposal always gets back a real
+    `DeliveryOutcome` rather than a bare `Notification`.
     """
 
     name: str = "abstract"
+    channel: NotificationChannel = NotificationChannel.IN_APP
+    #: Can this provider send arbitrary human-written prose?
+    supports_freeform: bool = True
+    #: Must every send carry `template_name`/`template_params`? (WhatsApp: True)
+    requires_template: bool = False
 
     @abstractmethod
     def deliver(self, notification: Notification, now: datetime) -> Notification:
         """Return the notification marked delivered. Must never raise."""
         raise NotImplementedError
+
+    def deliver_with_outcome(
+        self, notification: Notification, approval: ApprovalRecord, now: datetime
+    ) -> tuple[Notification, DeliveryOutcome]:
+        """Default: delegate to `deliver()` and report success/failure from
+        whether `delivered_at` was actually set. A real provider (Gmail,
+        WhatsApp) overrides this to report a provider message id and a
+        genuine `delivered` outcome instead of inferring one."""
+        delivered_notification = self.deliver(notification, now)
+        outcome = DeliveryOutcome(
+            delivered=delivered_notification.delivered_at is not None,
+            provider=self.name,
+        )
+        return delivered_notification, outcome
 
 
 class InAppNotificationProvider(NotificationDeliveryProvider):
@@ -142,6 +166,9 @@ class InAppNotificationProvider(NotificationDeliveryProvider):
     """
 
     name = "in-app-mock"
+    channel = NotificationChannel.IN_APP
+    supports_freeform = True
+    requires_template = False
 
     def deliver(self, notification: Notification, now: datetime) -> Notification:
         if notification.channel is not NotificationChannel.IN_APP:

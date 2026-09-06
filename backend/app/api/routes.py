@@ -8,6 +8,8 @@ CSV, EMR API) joins at exactly that line.
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 
 from .models import (
@@ -45,6 +47,8 @@ def _fail(status: int, code: str, message: str, details: list[str] | None = None
 
 @router.get("/health", response_model=HealthResponse)
 def health(request: Request) -> HealthResponse:
+    from ..comms.factory import active_providers
+
     service = _service(request)
     return HealthResponse(
         status="ok",
@@ -53,16 +57,43 @@ def health(request: Request) -> HealthResponse:
         repository=type(service.repository).__name__,
         persistence_backend=getattr(request.app.state, "persistence_backend", None),
         persistence_degraded=getattr(request.app.state, "persistence_degraded", False),
+        obligations_enabled=getattr(request.app.state, "obligations", None) is not None,
+        delivery_providers=active_providers(),
     )
+
+
+def _detect_obligations(request: Request, result: ScreeningResult) -> None:
+    """Runs the missing-lab detector against the just-completed screening and
+    reconciles it against the obligation store. Best-effort: a detection
+    failure must never turn a successful screening into a 5xx, and it never
+    runs before the screening result has actually been persisted — so a
+    detector bug can never corrupt or block Phase 1's own contract.
+
+    `docs/FINAL_IMPLEMENTATION_PLAN.md` §4 diagram: the obligation layer sits
+    downstream of `ScreeningResult`, wired in here rather than inside
+    `ScreeningService.screen()`, which keeps `service.py` free of any import
+    from `obligations/` (the module dependency table is one-directional).
+    """
+    obligations = getattr(request.app.state, "obligations", None)
+    if obligations is None:
+        return
+    try:
+        obligations.service.detect_from_screening(result)
+    except Exception:  # noqa: BLE001 - detection is advisory to the screening call
+        logging.getLogger("app.obligations").exception(
+            "Obligation detection failed for result %s", result.result_id
+        )
 
 
 @router.post("/screen", response_model=ScreeningResult, responses=_ERRORS)
 def screen(request: Request, payload: ScreenRequest) -> ScreeningResult:
     """Screen a canonical Patient against a canonical Trial."""
     try:
-        return _service(request).screen(payload.patient, payload.trial)
+        result = _service(request).screen(payload.patient, payload.trial)
     except RepositoryError as exc:
         _fail(503, "PERSISTENCE_FAILED", "The screening result could not be saved.", [str(exc)])
+    _detect_obligations(request, result)
+    return result
 
 
 @router.post("/screen/pdf", response_model=ScreeningResult, responses=_ERRORS)
@@ -85,9 +116,11 @@ async def screen_pdf(
         _fail(422, exc.code, exc.message, exc.details)
 
     try:
-        return _service(request).screen(patient, trial)
+        result = _service(request).screen(patient, trial)
     except RepositoryError as exc:
         _fail(503, "PERSISTENCE_FAILED", "The screening result could not be saved.", [str(exc)])
+    _detect_obligations(request, result)
+    return result
 
 
 @router.get("/results", response_model=list[ScreeningResult], responses=_ERRORS)

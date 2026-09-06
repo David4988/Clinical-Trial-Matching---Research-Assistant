@@ -45,7 +45,7 @@ and press *Load demo cohort* for Phase 2.
 
 ```bash
 cd backend
-.venv/Scripts/python -m pytest tests -q     # 629 tests, no network by default (add a local Postgres for the DB-backed ones)
+.venv/Scripts/python -m pytest tests -q     # 668 tests, no network by default (add a local Postgres for the DB-backed ones; a local Ollama for the one live model test)
 .venv/Scripts/python scripts/smoke_test.py  # end-to-end against a running server
 ```
 
@@ -326,7 +326,7 @@ backend/
     service.py     Phase 1 orchestration
   fixtures/        canonical JSON + generated demo PDFs
   scripts/         generate_demo_pdf.py, smoke_test.py
-  tests/           629 tests
+  tests/           668 tests
 frontend/
   src/
     types/         TypeScript mirror of the canonical schema

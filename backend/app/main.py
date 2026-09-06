@@ -15,8 +15,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .api.monitoring_routes import router as monitoring_router
+from .api.obligation_routes import router as obligation_router
 from .api.routes import router
 from .monitoring.context import MonitoringContext
+from .obligations.context import ObligationContext
 from .repository.factory import build_repositories
 from .risk.factory import build_risk_provider
 from .service import ScreeningService
@@ -48,6 +50,7 @@ def allowed_origins() -> list[str]:
 def create_app(
     service: ScreeningService | None = None,
     monitoring: MonitoringContext | None = None,
+    obligations: ObligationContext | None = None,
 ) -> FastAPI:
     app = FastAPI(
         title="Clinical Trial Matching & Research Assistant",
@@ -98,8 +101,25 @@ def create_app(
         ),
         risk_provider=build_risk_provider(),
     )
+    # Same rule as `repositories` above: only auto-build when nothing was
+    # passed in. Every existing test constructs its own `service`/
+    # `monitoring`, so this stays inert for all 614+ of them — they get
+    # `app.state.obligations is None`, and `/screen`'s detection hook (in
+    # `api/routes.py`) already treats that as "obligations are not wired up
+    # for this app instance" rather than an error.
+    app.state.obligations = obligations
+    if obligations is None and service is None:
+        app.state.obligations = ObligationContext.build(
+            app.state.monitoring.repository,
+            obligation_repository=(
+                repositories.obligation_repository if repositories is not None else None
+            ),
+            screening_repository=app.state.service.repository,
+        )
+
     app.include_router(router)
     app.include_router(monitoring_router)
+    app.include_router(obligation_router)
 
     # Every failure leaves through one of these three handlers, so the client
     # always receives {"error": {code, message, details}} and never a traceback.

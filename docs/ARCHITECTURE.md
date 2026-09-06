@@ -174,6 +174,8 @@ locator. PDF-derived facts cite `page 1, line 12`.
 | `extraction/`  | `schema/`                         |
 | `repository/`  | `schema/` (+ SQLAlchemy in `sql_repo.py`/`sql_monitoring.py` only) |
 | `db/`          | `schema/` — the only package that imports SQLAlchemy itself |
+| `agent/model/` | `schema/` only                    |
+| `agent/`       | `schema/`, `agent/model/`, `agent/facade.py` — never `repository/`, `comms/`, or `obligations/service.py` |
 | `service.py`   | all of the above                  |
 | `api/`         | `service.py`, `schema/`           |
 
@@ -182,6 +184,13 @@ persistence layer added in `docs/FINAL_IMPLEMENTATION_PLAN.md` §9. Nothing
 above this line changed: `service.py` still holds a `Repository`, never an
 engine or a session, and the JSON implementations remain a fully supported
 fallback (`repository/factory.py`).
+
+`agent/` (§12) is the investigation layer: `agent/facade.py` is the only
+file in that package that touches `repository/`, and it exposes read
+methods only — no write path exists from `agent/` to any repository.
+`AgentModelProvider` (`agent/model/provider.py`) is what the rest of the
+application sees; `LocalProvider`'s Ollama specifics
+(`agent/model/local_provider.py`) never leak past that file.
 
 If `engine/` ever needs to import from `extraction/` or `ai/`, the boundary
 has been broken.

@@ -59,3 +59,8 @@ class HealthResponse(BaseModel):
     # `repository/factory.py`.
     persistence_backend: str | None = None
     persistence_degraded: bool = False
+    # Additive: the obligation layer's own health surface (§23.10).
+    # `obligations_enabled` is False only when the app was built with an
+    # explicit `service`/no `obligations` context (every existing test).
+    obligations_enabled: bool = False
+    delivery_providers: dict[str, str] = {}

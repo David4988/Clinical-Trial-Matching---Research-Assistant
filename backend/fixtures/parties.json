@@ -1,0 +1,32 @@
+[
+  {
+    "party_id": "SITE-03",
+    "display_name": "Site 03 — Coordinator",
+    "role": "SITE_COORDINATOR",
+    "site_id": "SITE-03",
+    "email": "coordinator@site03.example.org",
+    "phone": null,
+    "preferred_channel": "EMAIL",
+    "trial_ids": ["CT-001"]
+  },
+  {
+    "party_id": "INV-01",
+    "display_name": "Dr. Anjali Rao — Principal Investigator",
+    "role": "INVESTIGATOR",
+    "site_id": "SITE-03",
+    "email": "anjali.rao@site03.example.org",
+    "phone": null,
+    "preferred_channel": "EMAIL",
+    "trial_ids": ["CT-001"]
+  },
+  {
+    "party_id": "LAB-01",
+    "display_name": "Central Renal Panel Lab",
+    "role": "LAB",
+    "site_id": null,
+    "email": "results@central-lab.example.org",
+    "phone": null,
+    "preferred_channel": "EMAIL",
+    "trial_ids": ["CT-001"]
+  }
+]

@@ -16,6 +16,7 @@ from typing import Any, Mapping
 from ..schema.clinical import Patient
 from ..schema.monitoring import AdverseEvent, Observation, TreatmentAssignment
 from ..schema.monitoring_result import MonitoringCycleResult, MonitoringEvent, Notification
+from ..schema.obligations import ApprovalRecord, Obligation, ObligationAction, ProposedAction, ResponsibleParty
 from ..schema.result import ScreeningResult
 from ..schema.trial import Trial
 
@@ -218,9 +219,294 @@ def notification_to_row(notification: Notification) -> dict[str, Any]:
         "channel": notification.channel.value,
         "audience": notification.audience.value,
         "created_at": notification.created_at,
+        "proposal_id": notification.proposal_id,
         "document": notification.model_dump(mode="json"),
     }
 
 
 def row_to_notification(row: Row) -> Notification:
     return Notification.model_validate(row["document"])
+
+
+# -- responsible parties -------------------------------------------------------
+
+
+def party_to_row(party: ResponsibleParty) -> dict[str, Any]:
+    return {
+        "party_id": party.party_id,
+        "display_name": party.display_name,
+        "role": party.role.value,
+        "site_id": party.site_id,
+        "email": party.email,
+        "phone": party.phone,
+        "preferred_channel": party.preferred_channel.value,
+        "trial_ids": party.trial_ids,
+    }
+
+
+def row_to_party(row: Row) -> ResponsibleParty:
+    return ResponsibleParty.model_validate(
+        {
+            "party_id": row["party_id"],
+            "display_name": row["display_name"],
+            "role": row["role"],
+            "site_id": row["site_id"],
+            "email": row["email"],
+            "phone": row["phone"],
+            "preferred_channel": row["preferred_channel"],
+            "trial_ids": row["trial_ids"],
+        }
+    )
+
+
+# -- obligations -----------------------------------------------------------
+
+
+def obligation_to_row(obligation: Obligation) -> dict[str, Any]:
+    resolution = obligation.resolution
+    return {
+        "obligation_id": obligation.obligation_id,
+        "obligation_key": obligation.obligation_key,
+        "trial_id": obligation.trial_id,
+        "patient_id": obligation.patient_id,
+        "type": obligation.type.value,
+        "status": obligation.status.value,
+        "priority": obligation.priority.value,
+        "requirement_ref": obligation.requirement_ref,
+        "requirement_text": obligation.requirement_text,
+        "protocol_id": obligation.protocol_id,
+        "source_ref": obligation.source_ref,
+        "detector_source": obligation.detector_source,
+        "occurrence": obligation.occurrence,
+        "title": obligation.title,
+        "detail": obligation.detail,
+        "evidence": [e.model_dump(mode="json") for e in obligation.evidence],
+        "first_detected_at": obligation.first_detected_at,
+        "last_confirmed_at": obligation.last_confirmed_at,
+        "due_at": obligation.due_at,
+        "responsible_party_id": obligation.responsible_party_id,
+        "escalation_count": obligation.escalation_count,
+        "action_count": obligation.action_count,
+        "last_action_at": obligation.last_action_at,
+        "resolved_at": obligation.resolved_at,
+        "resolution_kind": resolution.kind.value if resolution else None,
+        "resolution_by": resolution.by if resolution else None,
+        "resolution_note": resolution.note if resolution else None,
+        "resolution_at": resolution.at if resolution else None,
+    }
+
+
+def row_to_obligation(row: Row) -> Obligation:
+    resolution = None
+    if row["resolution_kind"] is not None:
+        resolution = {
+            "kind": row["resolution_kind"],
+            "by": row["resolution_by"],
+            "note": row["resolution_note"],
+            "at": row["resolution_at"],
+        }
+    return Obligation.model_validate(
+        {
+            "obligation_id": row["obligation_id"],
+            "obligation_key": row["obligation_key"],
+            "trial_id": row["trial_id"],
+            "patient_id": row["patient_id"],
+            "type": row["type"],
+            "status": row["status"],
+            "priority": row["priority"],
+            "requirement_ref": row["requirement_ref"],
+            "requirement_text": row["requirement_text"],
+            "protocol_id": row["protocol_id"],
+            "source_ref": row["source_ref"],
+            "detector_source": row["detector_source"],
+            "occurrence": row["occurrence"],
+            "title": row["title"],
+            "detail": row["detail"],
+            "evidence": row["evidence"],
+            "first_detected_at": row["first_detected_at"],
+            "last_confirmed_at": row["last_confirmed_at"],
+            "due_at": row["due_at"],
+            "responsible_party_id": row["responsible_party_id"],
+            "escalation_count": row["escalation_count"],
+            "action_count": row["action_count"],
+            "last_action_at": row["last_action_at"],
+            "resolved_at": row["resolved_at"],
+            "resolution": resolution,
+        }
+    )
+
+
+# -- obligation actions (follow-up ledger) ----------------------------------
+
+
+def obligation_action_to_row(action: ObligationAction) -> dict[str, Any]:
+    return {
+        "action_id": action.action_id,
+        "obligation_id": action.obligation_id,
+        "seq": action.seq,
+        "kind": action.kind.value,
+        "occurred_at": action.occurred_at,
+        "actor_kind": action.actor_kind.value,
+        "actor_name": action.actor_name,
+        "channel": action.channel.value if action.channel else None,
+        "recipient_party_id": action.recipient_party_id,
+        "ref_id": action.ref_id,
+        "note": action.note,
+        "payload": action.payload,
+    }
+
+
+def row_to_obligation_action(row: Row) -> ObligationAction:
+    return ObligationAction.model_validate(
+        {
+            "action_id": row["action_id"],
+            "obligation_id": row["obligation_id"],
+            "seq": row["seq"],
+            "kind": row["kind"],
+            "occurred_at": row["occurred_at"],
+            "actor_kind": row["actor_kind"],
+            "actor_name": row["actor_name"],
+            "channel": row["channel"],
+            "recipient_party_id": row["recipient_party_id"],
+            "ref_id": row["ref_id"],
+            "note": row["note"],
+            "payload": row["payload"],
+        }
+    )
+
+
+# -- proposed actions --------------------------------------------------------
+
+
+def proposed_action_to_row(proposal: ProposedAction) -> dict[str, Any]:
+    prov = proposal.provenance
+    dec = proposal.decision
+    ex = proposal.execution
+    return {
+        "proposal_id": proposal.proposal_id,
+        "obligation_ids": proposal.obligation_ids,
+        "trial_id": proposal.trial_id,
+        "patient_ids": proposal.patient_ids,
+        "action_type": proposal.action_type.value,
+        "status": proposal.status.value,
+        "recipient_party_id": proposal.recipient_party_id,
+        "channel": proposal.channel.value,
+        "subject": proposal.subject,
+        "body": proposal.body,
+        "reason": proposal.reason,
+        "evidence": [e.model_dump(mode="json") for e in proposal.evidence],
+        "template_name": proposal.template_name,
+        "template_params": proposal.template_params,
+        "created_at": proposal.created_at,
+        "prov_generated_by": prov.generated_by,
+        "prov_provider_kind": prov.provider_kind.value,
+        "prov_model_name": prov.model_name,
+        "prov_prompt_version": prov.prompt_version,
+        "prov_latency_ms": prov.latency_ms,
+        "prov_degraded": prov.degraded,
+        "prov_tools_called": prov.tools_called,
+        "prov_evidence_ids": prov.evidence_ids,
+        "prov_unresolved": prov.unresolved,
+        "dec_outcome": dec.outcome if dec else None,
+        "dec_reviewer": dec.reviewer if dec else None,
+        "dec_note": dec.note if dec else None,
+        "dec_decided_at": dec.decided_at if dec else None,
+        "dec_edited_subject": dec.edited_subject if dec else None,
+        "dec_edited_body": dec.edited_body if dec else None,
+        "exec_executed_at": ex.executed_at if ex else None,
+        "exec_provider": ex.provider if ex else None,
+        "exec_channel": ex.channel.value if ex else None,
+        "exec_notification_id": ex.notification_id if ex else None,
+        "exec_provider_message_id": ex.provider_message_id if ex else None,
+        "exec_provider_thread_id": ex.provider_thread_id if ex else None,
+        "exec_delivery_status": ex.delivery_status.value if ex else None,
+        "exec_error": ex.error if ex else None,
+    }
+
+
+def row_to_proposed_action(row: Row) -> ProposedAction:
+    decision = None
+    if row["dec_outcome"] is not None:
+        decision = {
+            "outcome": row["dec_outcome"],
+            "reviewer": row["dec_reviewer"],
+            "note": row["dec_note"],
+            "decided_at": row["dec_decided_at"],
+            "edited_subject": row["dec_edited_subject"],
+            "edited_body": row["dec_edited_body"],
+        }
+    execution = None
+    if row["exec_executed_at"] is not None:
+        execution = {
+            "executed_at": row["exec_executed_at"],
+            "provider": row["exec_provider"],
+            "channel": row["exec_channel"],
+            "notification_id": row["exec_notification_id"],
+            "provider_message_id": row["exec_provider_message_id"],
+            "provider_thread_id": row["exec_provider_thread_id"],
+            "delivery_status": row["exec_delivery_status"] or "UNKNOWN",
+            "error": row["exec_error"],
+        }
+    return ProposedAction.model_validate(
+        {
+            "proposal_id": row["proposal_id"],
+            "obligation_ids": row["obligation_ids"],
+            "trial_id": row["trial_id"],
+            "patient_ids": row["patient_ids"],
+            "action_type": row["action_type"],
+            "status": row["status"],
+            "recipient_party_id": row["recipient_party_id"],
+            "channel": row["channel"],
+            "subject": row["subject"],
+            "body": row["body"],
+            "reason": row["reason"],
+            "evidence": row["evidence"],
+            "template_name": row["template_name"],
+            "template_params": row["template_params"],
+            "created_at": row["created_at"],
+            "provenance": {
+                "generated_by": row["prov_generated_by"],
+                "provider_kind": row["prov_provider_kind"],
+                "model_name": row["prov_model_name"],
+                "prompt_version": row["prov_prompt_version"],
+                "latency_ms": row["prov_latency_ms"],
+                "tools_called": row["prov_tools_called"],
+                "evidence_ids": row["prov_evidence_ids"],
+                "degraded": row["prov_degraded"],
+                "unresolved": row["prov_unresolved"],
+            },
+            "decision": decision,
+            "execution": execution,
+        }
+    )
+
+
+# -- approval records ---------------------------------------------------------
+
+
+def approval_record_to_row(approval: ApprovalRecord) -> dict[str, Any]:
+    return {
+        "proposal_id": approval.proposal_id,
+        "approved_by": approval.approved_by,
+        "approved_at": approval.approved_at,
+        "channel": approval.channel.value,
+        "subject": approval.subject,
+        "body": approval.body,
+        "template_name": approval.template_name,
+        "template_params": approval.template_params,
+    }
+
+
+def row_to_approval_record(row: Row) -> ApprovalRecord:
+    return ApprovalRecord.model_validate(
+        {
+            "proposal_id": row["proposal_id"],
+            "approved_by": row["approved_by"],
+            "approved_at": row["approved_at"],
+            "channel": row["channel"],
+            "subject": row["subject"],
+            "body": row["body"],
+            "template_name": row["template_name"],
+            "template_params": row["template_params"],
+        }
+    )

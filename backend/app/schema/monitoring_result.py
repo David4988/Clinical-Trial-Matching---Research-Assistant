@@ -234,6 +234,9 @@ class Notification(BaseModel):
     intervention_id: str | None = None
     delivered_at: datetime | None = None
     delivery_provider: str | None = None
+    # NEW — set when this notification carries an obligation-layer
+    # ApprovalRecord's execution rather than a monitoring intervention.
+    proposal_id: str | None = None
 
     @property
     def is_delivered(self) -> bool:

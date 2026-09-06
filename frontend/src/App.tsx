@@ -16,6 +16,7 @@ import { ScreeningHeader } from "./components/ScreeningHeader";
 import { UploadPanel } from "./components/UploadPanel";
 import { MonitoringApp } from "./components/monitoring/MonitoringApp";
 import type { MonitoringFocus } from "./components/monitoring/MonitoringApp";
+import { WorkQueueApp } from "./components/queue/WorkQueueApp";
 import type {
   ApiError,
   ReviewDecision,
@@ -37,7 +38,7 @@ import type { TreatmentAssignment } from "./types/monitoring";
  * recorded review, and a review that asked for more review blocks enrolment.
  */
 
-type Mode = "screening" | "monitoring";
+type Mode = "screening" | "monitoring" | "queue";
 
 type View =
   | { kind: "upload" }
@@ -160,6 +161,8 @@ export default function App() {
         <ErrorBoundary key={mode}>
           {mode === "monitoring" ? (
             <MonitoringApp focus={focus} />
+          ) : mode === "queue" ? (
+            <WorkQueueApp />
           ) : view.kind === "report" ? (
             <div className="space-y-6">
               {/* Evidence workspace: the case on the left, the criteria being
@@ -288,7 +291,9 @@ function Header({
             <div className="mt-1 text-[10px] tracking-[0.12em] text-paper/55">
               {mode === "screening"
                 ? "PHASE 1 · RULES AUTHORITATIVE"
-                : "PHASE 2 · PROTOCOL AUTHORITATIVE"}
+                : mode === "monitoring"
+                  ? "PHASE 2 · PROTOCOL AUTHORITATIVE"
+                  : "OBLIGATIONS · HUMAN APPROVAL REQUIRED"}
             </div>
           </div>
         </div>
@@ -304,6 +309,11 @@ function Header({
               label="Monitoring"
               active={mode === "monitoring"}
               onClick={() => onMode("monitoring")}
+            />
+            <ModeButton
+              label="Work Queue"
+              active={mode === "queue"}
+              onClick={() => onMode("queue")}
             />
           </nav>
 

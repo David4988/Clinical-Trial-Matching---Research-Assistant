@@ -124,12 +124,16 @@ class NotificationChannel(str, Enum):
 
     The others are declared so the contract is stable when real delivery
     infrastructure arrives; generating for them is not the same as sending.
+    WHATSAPP was added for the obligation layer's communication providers
+    (`docs/FINAL_IMPLEMENTATION_PLAN.md` §16) — there is exactly one channel
+    enum in this codebase, never re-declared elsewhere.
     """
 
     IN_APP = "IN_APP"
     EMAIL = "EMAIL"
     SMS = "SMS"
     PUSH = "PUSH"
+    WHATSAPP = "WHATSAPP"
 
 
 class AdverseEventSeverity(str, Enum):
@@ -172,3 +176,9 @@ class MonitoringEventType(str, Enum):
     NEXT_DOSE_ASSESSED = "NEXT_DOSE_ASSESSED"
     ADVERSE_EVENT_RECORDED = "ADVERSE_EVENT_RECORDED"
     INVESTIGATOR_REVIEW_RECORDED = "INVESTIGATOR_REVIEW_RECORDED"
+    OBLIGATION_RAISED = "OBLIGATION_RAISED"
+    OBLIGATION_RESOLVED = "OBLIGATION_RESOLVED"
+    OBLIGATION_DISMISSED = "OBLIGATION_DISMISSED"
+    PROPOSAL_CREATED = "PROPOSAL_CREATED"
+    PROPOSAL_DECIDED = "PROPOSAL_DECIDED"
+    PROPOSAL_EXECUTED = "PROPOSAL_EXECUTED"

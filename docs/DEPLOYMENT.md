@@ -83,6 +83,15 @@ Unset locally: the client falls back to `/api` and Vite's dev proxy forwards to
 | `DATA_DIR` | only if `DATABASE_URL` is unset | `/var/data` — the disk mount path for the JSON fallback. Unset with no `DATABASE_URL` either, the app writes to `backend/data/`, wiped on every deploy. |
 | `FRONTEND_ORIGIN` | yes | The Vercel production origin. Comma-separate to allow several. `localhost:5173` is always allowed; the list is never `*`. |
 | `PYTHON_VERSION` | recommended | `3.11.9`, matching the version the model artifact is loaded under. |
+| `MODEL_PROVIDER` | no | `template` (default) \| `local` \| `hosted` — which `AgentModelProvider` answers `/obligations/{id}/investigate`. Omitting it runs the deterministic template drafter, which is a real, tested floor, not a placeholder. |
+| `LOCAL_MODEL_ENDPOINT` | only if `MODEL_PROVIDER=local` | The Ollama (or compatible) HTTP endpoint, e.g. `http://127.0.0.1:11434`. Never reachable from Render directly — `local` is a developer-machine configuration, reached over an SSH tunnel or similar; it is not meant to be set in production. |
+| `LOCAL_MODEL_NAME` | only if `MODEL_PROVIDER=local` | The model name as Ollama knows it, e.g. `qwen3.5:9b`. Never hard-coded in application code. |
+| `AGENT_TIMEOUT_SECONDS` | no | Defaults to `90`. Per-request timeout for a `local`/`hosted` model call; on timeout the proposal still returns as a usable `DRAFT`, drafted by the template provider instead, with `provenance.degraded: true`. |
+
+An unreachable `LOCAL_MODEL_ENDPOINT` at startup is probed once and logged
+once; the application always boots and the obligation workflow always works,
+falling back to the template provider for the whole run rather than
+refusing to start or retrying the probe on every request.
 
 Running with `DATABASE_URL` set still benefits from the disk as a safety net
 during the Postgres migration window — keep both configured until the team is
