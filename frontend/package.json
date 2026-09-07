@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "smoke:render": "node scripts/render-smoke.mjs",
     "acceptance:browser": "node scripts/browser-acceptance.mjs",
+    "acceptance:work-queue": "node scripts/acceptance-work-queue.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

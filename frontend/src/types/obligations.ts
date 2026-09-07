@@ -109,6 +109,8 @@ export interface ResponsibleParty {
   party_id: string;
   display_name: string;
   role: string;
+  email: string | null;
+  phone: string | null;
   preferred_channel: string;
 }
 

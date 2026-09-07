@@ -10,6 +10,7 @@ import {
   recordInvestigatorReview,
   seedDemo,
 } from "../../api/monitoring";
+import { fetchQueue } from "../../api/obligations";
 import type { ApiError } from "../../types/canonical";
 import type {
   InvestigatorAction,
@@ -19,6 +20,7 @@ import type {
   MonitoringEvent,
   TrialOverview,
 } from "../../types/monitoring";
+import type { QueueItem } from "../../types/obligations";
 import { InvestigatorPanel } from "./InvestigatorPanel";
 import { ModelBadge } from "./ModelBadge";
 import { PatientMonitor } from "./PatientMonitor";
@@ -53,6 +55,10 @@ export function MonitoringApp({ focus }: { focus?: MonitoringFocus | null }) {
     focus ? { kind: "patient", patientId: focus.patientId } : { kind: "overview" },
   );
   const [overview, setOverview] = useState<TrialOverview | null>(null);
+  //: Open obligations for the board's status map — best-effort. `[]` when
+  //: the obligation layer isn't wired up for this app instance, same
+  //: tolerance `fetchModel` already has for a missing provenance endpoint.
+  const [queueItems, setQueueItems] = useState<QueueItem[]>([]);
   const [cycle, setCycle] = useState<MonitoringCycleResult | null>(null);
   const [timeline, setTimeline] = useState<MonitoringEvent[]>([]);
   const [reviews, setReviews] = useState<InvestigatorReview[]>([]);
@@ -80,6 +86,13 @@ export function MonitoringApp({ focus }: { focus?: MonitoringFocus | null }) {
       setError(asApiError(err));
     } finally {
       setBusy(false);
+    }
+    // Best-effort and separate from the block above: a trial that hasn't
+    // wired up the obligation layer must not stop the board from loading.
+    try {
+      setQueueItems((await fetchQueue(TRIAL_ID)).items);
+    } catch {
+      setQueueItems([]);
     }
   }, []);
 
@@ -236,7 +249,9 @@ export function MonitoringApp({ focus }: { focus?: MonitoringFocus | null }) {
       {busy && !overview && !cycle && <Loading />}
 
       {view.kind === "overview" ? (
-        overview && <TrialOverviewView overview={overview} onSelect={loadPatient} />
+        overview && (
+          <TrialOverviewView overview={overview} queueItems={queueItems} onSelect={loadPatient} />
+        )
       ) : cycle ? (
         <div className="space-y-8">
           <PatientMonitor cycle={cycle} />

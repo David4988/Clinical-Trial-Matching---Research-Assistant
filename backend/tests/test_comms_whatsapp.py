@@ -39,7 +39,11 @@ def _notification() -> Notification:
     )
 
 
-def _approval(template_name: str | None = "trialguard_evidence_request", recipient_phone: str | None = "+15551234567") -> ApprovalRecord:
+def _approval(
+    template_name: str | None = "trialguard_evidence_request",
+    recipient_phone: str | None = "+15551234567",
+    session_active: bool = False,
+) -> ApprovalRecord:
     return ApprovalRecord(
         proposal_id="PA-1",
         approved_by="Dr. Rao",
@@ -48,8 +52,9 @@ def _approval(template_name: str | None = "trialguard_evidence_request", recipie
         subject="s",
         body="b",
         template_name=template_name,
-        template_params=["P-3311", "INC-04", "CT-001"],
+        template_params=["P-3311", "INC-04", "CT-001"] if template_name else [],
         recipient_phone=recipient_phone,
+        session_active=session_active,
     )
 
 
@@ -142,7 +147,7 @@ def test_refuses_without_template_before_any_request(monkeypatch):
     provider = WhatsAppProvider()
     _, outcome = provider.deliver_with_outcome(_notification(), _approval(template_name=None), NOW)
     assert outcome.delivered is False
-    assert outcome.error == "TEMPLATE_REQUIRED"
+    assert outcome.error == "TEMPLATE_OR_SESSION_REQUIRED"
     assert called is False
 
 
@@ -189,3 +194,76 @@ def test_duplicate_send_is_suppressed(monkeypatch):
     assert first.delivered is True
     _, second = provider.deliver_with_outcome(_notification(), approval, NOW)
     assert second.error == "DUPLICATE_SEND_SUPPRESSED"
+
+
+# -- WhatsApp SESSION mode (customer-initiated, free-form) ----------------------
+
+
+def test_session_mode_rejected_when_no_active_session_before_any_request(monkeypatch):
+    called = False
+
+    def fail_if_called(*a, **k):
+        nonlocal called
+        called = True
+
+    monkeypatch.setattr(whatsapp_client, "send_session_message", fail_if_called)
+    provider = WhatsAppProvider()
+    approval = _approval(template_name=None, session_active=False)
+    _, outcome = provider.deliver_with_outcome(_notification(), approval, NOW)
+    assert outcome.delivered is False
+    assert outcome.error == "TEMPLATE_OR_SESSION_REQUIRED"
+    assert called is False  # rejected BEFORE any API call, per the spec
+
+
+def test_session_mode_sends_freeform_body_when_session_active(monkeypatch):
+    captured = {}
+
+    def fake_send_session(**kwargs):
+        captured.update(kwargs)
+        return {"messages": [{"id": "wamid.session1"}]}
+
+    monkeypatch.setattr(whatsapp_client, "send_session_message", fake_send_session)
+    provider = WhatsAppProvider()
+    approval = _approval(template_name=None, session_active=True)
+    notification, outcome = provider.deliver_with_outcome(_notification(), approval, NOW)
+
+    assert outcome.delivered is True
+    assert outcome.provider_message_id == "wamid.session1"
+    assert outcome.provider == "whatsapp-session"
+    assert captured["body"] == approval.body
+    assert notification.delivery_provider == "whatsapp-session"
+
+
+def test_session_mode_failure_degrades_without_raising(monkeypatch):
+    def fail(**k):
+        raise whatsapp_client.WhatsAppClientError("HTTP 470: message outside allowed window")
+
+    monkeypatch.setattr(whatsapp_client, "send_session_message", fail)
+    provider = WhatsAppProvider()
+    approval = _approval(template_name=None, session_active=True)
+    _, outcome = provider.deliver_with_outcome(_notification(), approval, NOW)
+    assert outcome.delivered is False
+    assert "WHATSAPP_SEND_FAILED" in outcome.error
+
+
+def test_template_mode_is_used_even_with_an_active_session_if_template_name_is_set(monkeypatch):
+    # An explicit template_name always means template mode — session_active
+    # only matters when template_name is absent.
+    monkeypatch.setattr(whatsapp_client, "send_template_message", lambda **k: {"messages": [{"id": "wamid.t1"}]})
+    provider = WhatsAppProvider()
+    approval = _approval(template_name="trialguard_evidence_request", session_active=True)
+    _, outcome = provider.deliver_with_outcome(_notification(), approval, NOW)
+    assert outcome.provider == "whatsapp-template"
+
+
+def test_send_session_message_payload_is_freeform_text(monkeypatch):
+    captured = {}
+
+    def fake_post(url, headers, json, timeout):
+        captured.update(json)
+        return httpx.Response(200, json={"messages": [{"id": "wamid.1"}]}, request=httpx.Request("POST", url))
+
+    monkeypatch.setattr("app.comms.whatsapp_client.httpx.post", fake_post)
+    whatsapp_client.send_session_message("token", "phone-id", "+1555", "Thanks, will do.")
+    assert captured["type"] == "text"
+    assert captured["text"]["body"] == "Thanks, will do."

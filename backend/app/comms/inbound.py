@@ -28,7 +28,7 @@ from datetime import datetime, timezone
 from ..agent.classify import classify_response
 from ..obligations.service import ObligationError, ObligationService
 from ..repository.obligation_base import ObligationRepository
-from ..schema.obligation_enums import ActorKind, ObligationActionKind
+from ..schema.obligation_enums import ActorKind, ObligationActionKind, ResponseIntent
 from ..schema.obligations import IncomingMessage, ObligationAction
 
 logger = logging.getLogger("app.comms.inbound")
@@ -45,6 +45,14 @@ def _extract_gmail_header(payload: dict, name: str) -> str | None:
     return None
 
 
+def _extract_email_address(from_header: str) -> str:
+    """`"Site 03 Coordinator <coordinator@site03.example.org>"` -> the bare
+    address. Returns the input unchanged if there is no angle-bracket form."""
+    if "<" in from_header and ">" in from_header:
+        return from_header.split("<", 1)[1].split(">", 1)[0].strip()
+    return from_header.strip()
+
+
 def _extract_gmail_body(payload: dict) -> str:
     """Walks MIME parts for the first `text/plain` body. Returns "" rather
     than raising if the shape is unexpected — an unparseable body is stored
@@ -56,6 +64,19 @@ def _extract_gmail_body(payload: dict) -> str:
         if text:
             return text
     return ""
+
+
+def _resolve_party_by_address(repository: ObligationRepository, email: str | None = None, phone: str | None = None) -> str | None:
+    """The conversation-to-party association step (WhatsApp customer-initiated
+    demo flow, step 3): a deterministic lookup by address against the party
+    registry — never a model guess. `None` (unresolved) is a valid, expected
+    outcome, same stance as `parties.resolve()` for obligations."""
+    for party in repository.list_parties():
+        if email and party.email and party.email.lower() == email.lower():
+            return party.party_id
+        if phone and party.phone and party.phone == phone:
+            return party.party_id
+    return None
 
 
 def _b64_decode(data: str) -> str:
@@ -124,6 +145,7 @@ def process_gmail_message(
     payload = raw_message.get("payload", {})
     thread_id = raw_message.get("threadId")
     from_header = _extract_gmail_header(payload, "From") or ""
+    from_address = _extract_email_address(from_header) if from_header else None
     body_text = _extract_gmail_body(payload)
 
     obligation_id = None
@@ -136,12 +158,15 @@ def process_gmail_message(
         classification, confidence = classify_response(body_text)
         _append_response_ledger_entry(repository, obligation_service, obligation_id, classification, confidence, now)
 
+    from_party_id = _resolve_party_by_address(repository, email=from_address) if from_address else None
+
     message = IncomingMessage(
         message_id=_new_id("IM"),
         channel="EMAIL",
         provider_message_id=provider_message_id,
         provider_thread_id=thread_id,
-        from_party_id=None,  # resolved by party email lookup is a future refinement; unmatched-by-party is valid
+        from_party_id=from_party_id,
+        from_address=from_address,
         obligation_id=obligation_id,
         received_at=now,
         body_text=body_text,
@@ -205,6 +230,8 @@ def process_whatsapp_message(
 
     body_text = (raw_message.get("text") or {}).get("body", "")
     context_id = (raw_message.get("context") or {}).get("id")
+    from_phone = raw_message.get("from")  # E.164, no leading "+" per Meta's webhook convention
+    from_address = f"+{from_phone}" if from_phone and not from_phone.startswith("+") else from_phone
 
     obligation_id = None
     classification = None
@@ -216,12 +243,15 @@ def process_whatsapp_message(
         classification, confidence = classify_response(body_text)
         _append_response_ledger_entry(repository, obligation_service, obligation_id, classification, confidence, now)
 
+    from_party_id = _resolve_party_by_address(repository, phone=from_address) if from_address else None
+
     message = IncomingMessage(
         message_id=_new_id("IM"),
         channel="WHATSAPP",
         provider_message_id=provider_message_id,
         provider_thread_id=None,  # WhatsApp has no thread concept; context.id is the match key instead
-        from_party_id=None,
+        from_party_id=from_party_id,
+        from_address=from_address,
         obligation_id=obligation_id,
         received_at=now,
         body_text=body_text,

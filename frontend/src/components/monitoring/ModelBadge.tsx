@@ -24,9 +24,9 @@ export function ModelBadge({ model }: { model: ModelProvenance }) {
   return (
     <section
       aria-label="Risk model provenance"
-      className="border border-rule bg-panel"
+      className="rounded-[6px] border border-rule/70 bg-paper"
     >
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2">
         <div className="flex items-center gap-2.5">
           {live ? (
             <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden>
@@ -47,7 +47,7 @@ export function ModelBadge({ model }: { model: ModelProvenance }) {
             >
               {live ? "LIVE MODEL" : "DETERMINISTIC"}
             </div>
-            <div className="readout text-[15px] font-medium leading-tight">
+            <div className="readout text-[13px] font-medium leading-tight">
               {model.model_version}
             </div>
           </div>

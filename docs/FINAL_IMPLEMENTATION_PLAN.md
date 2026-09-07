@@ -2183,13 +2183,25 @@ network-free and fast.
 
 ## 16. Communication Architecture
 
-### 16.1 One abstraction, three providers
+> **Communication-strategy update (superseding this section's original
+> channel neutrality):** **Gmail is PRIMARY.** It is live-verified end to
+> end through the real pipeline and is the default external channel and the
+> main demo path. **WhatsApp is SECONDARY** — kept fully working, not
+> removed, but positioned as the low-friction customer-initiated demo route
+> rather than the primary one, because business-initiated template sends
+> are blocked on external Meta account/billing/template-approval state that
+> is outside this codebase's control. Nothing about the abstraction below
+> changed to make this true — it was already channel-agnostic; only the
+> *default* changed. See §16.5 (default channel resolution) and §18.2a
+> (WhatsApp session mode).
+
+### 16.1 One abstraction, two live channels behind it (plus In-App)
 
 ```
 Approved Action  →  ExecutionService  →  NotificationDeliveryProvider
-                                          ├── In-App    (existing)
-                                          ├── Gmail
-                                          └── WhatsApp
+                                          ├── In-App    (existing, always available)
+                                          ├── Gmail     (PRIMARY — live-verified)
+                                          └── WhatsApp  (SECONDARY — template + session modes)
 ```
 
 The ABC already exists in
@@ -2216,16 +2228,40 @@ class DeliveryOutcome(BaseModel):
     error: str | None = None
 ```
 
+`ApprovalRecord` gained one more field to carry the WhatsApp mode decision
+without the provider ever touching a repository itself:
+
+```python
+class ApprovalRecord(BaseModel):
+    ...
+    session_active: bool = False   # NEW — was a WhatsApp customer-service
+                                    # window open at approval time? Always
+                                    # False for every non-WhatsApp channel.
+```
+
+Resolved deterministically by `ObligationProposalService.approve()` from
+`ObligationRepository.has_active_whatsapp_session(phone, now)` — a pure
+lookup against `incoming_messages`, never a model guess and never something
+`WhatsAppProvider` computes itself (providers stay pure functions of their
+inputs). `template_name is None and session_active` together are what let
+the provider send free-form; `template_name is None and not session_active`
+is the reject-before-any-API-call case.
+
 `InAppNotificationProvider` stays exactly where it is, untouched. `comms/`
 imports the ABC from there; the dependency points one way.
 
 ### 16.2 The complete extent of channel awareness in the obligation layer
 
 ```
-if provider.requires_template and approval.template_name is None:
+if provider.requires_template and approval.template_name is None
+                                and not approval.session_active:
     → refuse BEFORE any API call: 422 CHANNEL_REQUIRES_TEMPLATE
       obligation untouched, proposal untouched
 ```
+
+The `session_active` clause is the only change this update made to the
+precondition. Every channel other than WhatsApp never sets `session_active`,
+so this line is unchanged behaviour for them.
 
 That is the whole of it. `execution.py` does not import `comms/`; it receives
 a provider from `comms/factory.py::build_delivery_provider(channel)` — a
@@ -2247,8 +2283,9 @@ its own wire format from the `ApprovalRecord`:
 ApprovalRecord (post-edit, carries everything)
    ├── InAppProvider    → subject + body, verbatim
    ├── GmailProvider    → RFC 2822 MIME built from subject + body
-   └── WhatsAppProvider → template_name + template_params
-                          (ignores body; refuses if template_name is None)
+   └── WhatsAppProvider → template_name is set  → template + template_params
+                          template_name is None → body, IF session_active
+                          (refuses before any API call otherwise)
 ```
 
 Provider-specific formatting lives **only** in the provider. Neither the agent
@@ -2268,9 +2305,44 @@ backend/app/comms/
     signatures.py         X-Hub-Signature-256 HMAC validation
 ```
 
+### 16.5 Default channel resolution — email is primary
+
+`obligations/channel_policy.py::resolve_channel` — a pure function, same
+shape as `parties.resolve()` and `rules.py::priority_for`:
+
+```python
+def resolve_channel(party, has_active_whatsapp_session, whatsapp_template_available) -> NotificationChannel:
+    if party and party.email:
+        return EMAIL
+    if party and party.phone and has_active_whatsapp_session:
+        return WHATSAPP
+    if party and party.phone and whatsapp_template_available:
+        return WHATSAPP
+    return IN_APP
+```
+
+This computes only the **default** — the channel a `ProposedAction` is
+drafted with (`ObligationProposalService.propose()`). A researcher's
+explicit choice at `approve(channel=...)` always wins and never routes back
+through this function — `Do not silently change an existing
+researcher-selected channel` is enforced structurally by `propose()` never
+being called again between draft and approval, not by this function
+special-casing anything. `has_active_whatsapp_session` and
+`whatsapp_template_available` are resolved by the caller (a repository
+lookup and a `comms.whatsapp_provider.configured()` check respectively) —
+`channel_policy.py` itself does no I/O.
+
 ---
 
 ## 17. Gmail Integration
+
+**Status: PRIMARY, LIVE VERIFIED.** A real send has been run through this
+exact pipeline — `POST /screen` → obligation → `/investigate` →
+`/proposals/{id}/approve` → `ExecutionService` → `GmailProvider` → the real
+Gmail API — and returned a genuine message id and thread id with
+`delivery_status: SENT`. This is the default and primary channel for the
+demo; nothing about it changed in the communication-strategy update beyond
+being declared primary.
 
 ### 17.1 Architecture
 
@@ -2397,10 +2469,63 @@ instinct as recipients being deterministic: *the model writes prose, the
 application supplies the facts.*
 
 **Honest consequence, surfaced rather than hidden:** editing the email body
-does **not** change what WhatsApp sends. The approval screen shows the
-**actual rendered WhatsApp message** alongside the editable draft whenever
-WhatsApp is the selected channel. Hiding this would let a researcher believe
-they had edited something they had not.
+does **not** change what WhatsApp sends, UNLESS a session is open (§18.2a),
+in which case it does. The approval screen shows the **actual rendered
+WhatsApp message** alongside the editable draft whenever WhatsApp is the
+selected channel. Hiding this would let a researcher believe they had
+edited something they had not.
+
+### 18.2a Session mode — the customer-initiated exception
+
+**Communication-strategy update.** §18.2's "every outbound WhatsApp message
+must be a template" is the correct default, but it has one real exception
+Meta's own platform defines: **when the customer messages TrialGuard
+first**, a 24-hour customer-service window opens in which free-form text is
+allowed. WhatsApp is repositioned as the SECONDARY channel specifically
+because this is the low-friction demo path — no template approval needed —
+while business-initiated template sends remain blocked on external Meta
+account/billing/approval state.
+
+```
+Site coordinator                                  TrialGuard
+      │  sends a WhatsApp message first                │
+      ├───────────────────────────────────────────────►│
+      │                       comms/inbound.py records an
+      │                       IncomingMessage (from_address = phone),
+      │                       associates it with a party where possible
+      │                       (deterministic address match, never a model)
+      │                                                  │
+      │            session window now open (24h)         │
+      │                                                  │
+      │  researcher reviews the obligation, approves     │
+      │  a WhatsApp response with NO template            │
+      │                                                  │
+      │◄───────────────────── WhatsAppProvider sends the ┤
+      │   free-form ApprovalRecord.body,                 │
+      │   because session_active is True                 │
+```
+
+**No new `NotificationChannel` member.** Per the project's existing
+modeling convention (a free-text `provider` string already distinguishes
+`"in-app-fallback"` from `"gmail"` in `comms/factory.py`), the delivery
+*mode* is represented the same way: `DeliveryOutcome.provider` /
+`ProposalExecution.provider` is `"whatsapp-template"` or `"whatsapp-session"`
+depending on which path executed — `NotificationChannel.WHATSAPP` names the
+channel; the provider string names the mode. `WhatsAppProvider` picks the
+mode itself, deterministically, from `approval.template_name is None`:
+
+- `template_name` set → template mode (§18.1/§18.2, unchanged).
+- `template_name` is `None` and `approval.session_active` → session mode:
+  `whatsapp_client.send_session_message` with the free-form body.
+- `template_name` is `None` and no active session → **rejected before any
+  API call**, `error="TEMPLATE_OR_SESSION_REQUIRED"` — never a guessed send.
+
+`has_active_whatsapp_session(phone, now, window_hours=24)` is a plain
+`incoming_messages` lookup (`ObligationRepository`, §9.4's
+`inbound_idempotent` table, now carrying a `from_address` column) — never
+cached, never assumed, always re-checked at approval time since a window
+open when a proposal was drafted may have closed by the time it is
+approved, and vice versa.
 
 ### 18.3 One template or one per type
 

@@ -398,6 +398,9 @@ approval_records = Table(
     # invented by a provider or a model (docs/FINAL_IMPLEMENTATION_PLAN.md §16).
     Column("recipient_email", String, nullable=True),
     Column("recipient_phone", String, nullable=True),
+    # NEW: was a WhatsApp customer-service window open at approval time?
+    # Always False for non-WhatsApp channels.
+    Column("session_active", Boolean, nullable=False, server_default="false"),
 )
 
 incoming_messages = Table(
@@ -408,6 +411,9 @@ incoming_messages = Table(
     Column("provider_message_id", String, nullable=False),
     Column("provider_thread_id", String, nullable=True),
     Column("from_party_id", String, ForeignKey("responsible_parties.party_id"), nullable=True),
+    # NEW: the raw sender address (email header value or WhatsApp phone
+    # number) — what the WhatsApp session-window check keys on.
+    Column("from_address", String, nullable=True),
     Column("obligation_id", String, ForeignKey("obligations.obligation_id"), nullable=True),
     Column("received_at", DateTime(timezone=True), nullable=False),
     Column("body_text", String, nullable=False),
@@ -424,4 +430,5 @@ incoming_messages = Table(
     UniqueConstraint("channel", "provider_message_id", name="inbound_idempotent"),
     Index("ix_incoming_messages_obligation", "obligation_id"),
     Index("ix_incoming_messages_thread", "provider_thread_id"),
+    Index("ix_incoming_messages_channel_from_received", "channel", "from_address", "received_at"),
 )

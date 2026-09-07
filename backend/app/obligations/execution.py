@@ -42,9 +42,14 @@ class ExecutionService:
     ) -> ProposalExecution:
         now = now or datetime.now(timezone.utc)
 
-        if provider.requires_template and approval.template_name is None:
+        # `session_active` is the WhatsApp session-window escape hatch
+        # (docs/FINAL_IMPLEMENTATION_PLAN.md §16, comms strategy update): a
+        # customer-initiated conversation open right now may carry a
+        # free-form reply with no template at all. Any other channel/provider
+        # simply never sets it, so this line changes nothing for them.
+        if provider.requires_template and approval.template_name is None and not approval.session_active:
             raise ChannelRequiresTemplateError(
-                f"{approval.channel.value} requires an approved template; none was set."
+                f"{approval.channel.value} requires an approved template or an active session; neither was set."
             )
 
         # `provider.channel`, not `approval.channel`: `comms/factory.py`

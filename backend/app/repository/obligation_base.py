@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from contextlib import AbstractContextManager
+from datetime import datetime
 
 from .base import RepositoryError  # noqa: F401  (re-exported for obligation callers)
 from ..schema.obligations import (
@@ -124,3 +125,10 @@ class ObligationRepository(ABC):
     def find_proposal_by_provider_message_id(self, provider_message_id: str) -> ProposedAction | None:
         """Deterministic matching, priority 1 for WhatsApp: the `wamid` a
         reply's `context.id` points back to."""
+
+    @abstractmethod
+    def has_active_whatsapp_session(self, phone: str, now: datetime, window_hours: float = 24.0) -> bool:
+        """True iff an inbound WhatsApp message from `phone` arrived within
+        `window_hours` — the customer-service window Meta's Cloud API opens
+        for free-form replies after a customer-initiated message. Computed
+        from `incoming_messages`, never assumed or cached."""

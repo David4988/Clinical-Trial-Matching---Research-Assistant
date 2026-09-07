@@ -1,5 +1,8 @@
-import type { OverviewPatient, RiskLevel, TrialOverview } from "../../types/monitoring";
-import { DoseToken, RiskChip, RiskRail, RiskToken } from "./RiskMark";
+import type { OverviewPatient, TrialOverview } from "../../types/monitoring";
+import type { QueueItem } from "../../types/obligations";
+import { DoseToken, RiskRail, RiskToken } from "./RiskMark";
+import { PatientStatusMap } from "./PatientStatusMap";
+import { TrialOperationsOverview } from "./TrialOperationsOverview";
 
 /**
  * The board: how many patients, at what risk, and who needs looking at first.
@@ -8,69 +11,77 @@ import { DoseToken, RiskChip, RiskRail, RiskToken } from "./RiskMark";
  * The full roster sits underneath for context.
  */
 
-const LEVELS: RiskLevel[] = ["GREEN", "AMBER", "RED", "UNKNOWN"];
-
 export function TrialOverviewView({
   overview,
+  queueItems,
   onSelect,
 }: {
   overview: TrialOverview;
+  /** Open obligations for this trial, already computed by the Work Queue
+   * read model (`GET /obligations/queue`). Optional and defaults to empty:
+   * the board still works, just without the "why" line on each tile, if the
+   * obligation layer is not wired up for this app instance. */
+  queueItems?: QueueItem[];
   onSelect: (patientId: string) => void;
 }) {
+  const needAttention = overview.requiring_attention.length;
+
   return (
-    <section className="space-y-6">
-      <div className="animate-rise border border-rule bg-panel">
-        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-rule p-4">
+    <section className="space-y-9">
+      <div className="panel-raised animate-rise overflow-hidden">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 px-6 pt-5">
           <div>
-            <div className="eyebrow mb-1">Trial board</div>
-            <div className="readout text-[28px] font-semibold leading-none">
+            <div className="text-[11px] tracking-[0.04em] text-ink-faint">Trial</div>
+            <div className="readout text-[38px] font-semibold leading-none text-ink">
               {overview.trial_id}
             </div>
           </div>
-          <div className="text-right">
-            <div className="eyebrow mb-1">Protocol</div>
-            <div className="readout text-[12px] text-ink-mid">
-              {overview.protocol_id}
-            </div>
-          </div>
+          <p className="max-w-[22rem] pb-1.5 font-sans text-[12px] leading-relaxed text-ink-faint">
+            <span className="readout text-ink-mid">{overview.protocol_id}</span> · thresholds are
+            synthetic and demonstrate the pipeline, not clinical guidance.
+          </p>
         </div>
 
-        <div className="p-4">
-
-        <p className="border-l-2 border-caution/50 bg-caution-wash pl-3 py-1.5 font-sans text-[12px] leading-relaxed text-ink-mid">
-          {overview.protocol_label}. Every threshold in this view is synthetic and
-          exists to demonstrate the pipeline — it is not clinical guidance.
-        </p>
-
-        <div className="mt-4 grid grid-cols-2 gap-4 border-t border-rule pt-4 sm:grid-cols-4">
-          <Tally label="Patients" value={overview.total_patients} />
-          <Tally label="Active treatments" value={overview.active_treatments} />
-          <Tally
-            label="Need attention"
-            value={overview.requiring_attention.length}
-            alert={overview.requiring_attention.length > 0}
+        <div className="mt-5 grid grid-cols-2 border-t border-rule sm:grid-cols-4">
+          <Metric
+            label="Patients"
+            value={overview.total_patients}
+            caption={`enrolled on ${overview.trial_id}`}
           />
-          <Tally
+          <Metric
+            label="Active treatments"
+            value={overview.active_treatments}
+            caption="course currently running"
+          />
+          <Metric
+            label="Need attention"
+            value={needAttention}
+            caption="red, amber or unassessable"
+            alert={needAttention > 0}
+          />
+          <Metric
             label="Unassessable"
             value={overview.risk_counts.UNKNOWN ?? 0}
-            hint="data not trustworthy"
+            caption="data not trustworthy"
           />
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-rule pt-4">
-          {LEVELS.map((level) => (
-            <RiskChip key={level} level={level} count={overview.risk_counts[level] ?? 0} />
-          ))}
-        </div>
         </div>
       </div>
 
-      {overview.requiring_attention.length > 0 && (
+      <TrialOperationsOverview overview={overview} queueItems={queueItems ?? []} onSelect={onSelect} />
+
+      <PatientStatusMap
+        patients={overview.patients}
+        queueItems={queueItems ?? []}
+        onSelect={onSelect}
+      />
+
+      {needAttention > 0 && (
         <div>
-          <h2 className="eyebrow mb-2">
-            Requiring attention ({overview.requiring_attention.length})
-          </h2>
-          <div className="border border-rule bg-panel">
+          <div className="mb-3 flex items-baseline justify-between gap-3">
+            <h2 className="section-title">Requiring attention</h2>
+            <span className="text-[12px] text-ink-faint">{needAttention} of {overview.patients.length}</span>
+          </div>
+          <div className="panel-raised overflow-hidden">
             {overview.requiring_attention.map((patient, index) => (
               <PatientRow
                 key={patient.treatment_id}
@@ -84,16 +95,16 @@ export function TrialOverviewView({
       )}
 
       <div>
-        <div className="mb-2 flex items-baseline justify-between">
-          <h2 className="eyebrow">All patients</h2>
-          <span className="text-[11px] text-ink-faint">
+        <div className="mb-3 flex items-baseline justify-between gap-3">
+          <h2 className="section-title text-ink-mid">All patients</h2>
+          <span className="text-[12px] text-ink-faint">
             {overview.patients.length} enrolled
           </span>
         </div>
         {overview.patients.length === 0 ? (
           <EmptyRoster />
         ) : (
-          <div className="border border-rule bg-panel">
+          <div className="overflow-hidden rounded-[6px] border border-rule bg-panel">
             {overview.patients.map((patient, index) => (
               <PatientRow
                 key={patient.treatment_id}
@@ -109,28 +120,36 @@ export function TrialOverviewView({
   );
 }
 
-function Tally({
+/** One figure in the executive snapshot. The caption says what the number
+ * counts — "need attention" in particular is otherwise a threshold the
+ * reader has to guess at, and it is simply the backend's own rule. */
+function Metric({
   label,
   value,
+  caption,
   alert,
-  hint,
 }: {
   label: string;
   value: number;
+  caption: string;
   alert?: boolean;
-  hint?: string;
 }) {
   return (
-    <div>
-      <div className="eyebrow mb-0.5">{label}</div>
+    <div className="border-rule px-6 py-5 [&:not(:nth-child(2n+1))]:border-l sm:[&:not(:first-child)]:border-l">
+      <div className="flex items-center gap-1.5">
+        {alert && (
+          <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-alert" aria-hidden />
+        )}
+        <div className="font-sans text-[12px] font-medium text-ink-mid">{label}</div>
+      </div>
       <div
-        className={`readout text-[30px] font-semibold leading-none ${
+        className={`readout mt-1.5 text-[40px] font-semibold leading-none ${
           alert ? "text-alert" : "text-ink"
         }`}
       >
         {value}
       </div>
-      {hint && <div className="text-[10px] text-ink-faint">{hint}</div>}
+      <div className="mt-1.5 text-[11px] leading-snug text-ink-faint">{caption}</div>
     </div>
   );
 }

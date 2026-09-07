@@ -11,6 +11,8 @@ instead of a silent duplicate.
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
+
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
@@ -294,3 +296,19 @@ class SqlObligationRepository(SessionScopedRepository, ObligationRepository):
         except SQLAlchemyError as exc:
             raise RepositoryError(f"Could not read proposal by provider message id: {exc}") from exc
         return mappers.row_to_proposed_action(row) if row else None
+
+    def has_active_whatsapp_session(self, phone: str, now: datetime, window_hours: float = 24.0) -> bool:
+        cutoff = now - timedelta(hours=window_hours)
+        query = (
+            select(incoming_messages.c.message_id)
+            .where(incoming_messages.c.channel == "WHATSAPP")
+            .where(incoming_messages.c.from_address == phone)
+            .where(incoming_messages.c.received_at >= cutoff)
+            .limit(1)
+        )
+        try:
+            with self._session() as session:
+                row = session.execute(query).first()
+        except SQLAlchemyError as exc:
+            raise RepositoryError(f"Could not check WhatsApp session state: {exc}") from exc
+        return row is not None

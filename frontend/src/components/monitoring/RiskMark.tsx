@@ -27,6 +27,22 @@ const TOKEN: Record<RiskLevel, string> = {
   UNKNOWN: "text-ink-mid border-rule-strong border-dashed bg-panel",
 };
 
+/** Border + wash only (no text colour) — for tinting a whole surface, e.g.
+ * a population-map tile, rather than a small pill. Same per-level decision
+ * as `TOKEN`, so a tile and its token never disagree about what a level
+ * looks like. UNKNOWN stays unwashed and dashed, on purpose: it is the one
+ * level `TOKEN` also renders as absence rather than a fill. */
+const TILE_TONE: Record<RiskLevel, string> = {
+  GREEN: "border-safe/40 bg-safe-wash",
+  AMBER: "border-caution/40 bg-caution-wash",
+  RED: "border-alert/40 bg-alert-wash",
+  UNKNOWN: "border-rule-strong border-dashed bg-panel",
+};
+
+export function riskTileTone(level: RiskLevel): string {
+  return TILE_TONE[level];
+}
+
 export function RiskRail({ level }: { level: RiskLevel }) {
   return <div className={`w-[3px] shrink-0 self-stretch ${RAIL[level]}`} />;
 }
@@ -55,6 +71,19 @@ export function RiskDisplay({ level }: { level: RiskLevel }) {
         {level}
       </span>
     </span>
+  );
+}
+
+/** Just the mark: the same solid/striped/hatched fill every other risk
+ * surface uses. Exported so a legend can lay swatch, name, count and share
+ * out into aligned columns without re-deciding what a level looks like. */
+export function RiskSwatch({ level, size = 12 }: { level: RiskLevel; size?: number }) {
+  return (
+    <span
+      className={`inline-block shrink-0 rounded-[2px] border border-rule-strong ${RAIL[level]}`}
+      style={{ width: size, height: size }}
+      aria-hidden
+    />
   );
 }
 

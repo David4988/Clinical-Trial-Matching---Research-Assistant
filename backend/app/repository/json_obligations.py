@@ -14,6 +14,7 @@ import json
 import os
 import tempfile
 from contextlib import AbstractContextManager
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -221,3 +222,13 @@ class JsonObligationRepository(ObligationRepository):
             if proposal.execution and proposal.execution.provider_message_id == provider_message_id:
                 return proposal
         return None
+
+    def has_active_whatsapp_session(self, phone: str, now: datetime, window_hours: float = 24.0) -> bool:
+        cutoff = now - timedelta(hours=window_hours)
+        for raw in self._load()["incoming_messages"].values():
+            if raw.get("channel") != "WHATSAPP" or raw.get("from_address") != phone:
+                continue
+            received_at = datetime.fromisoformat(raw["received_at"])
+            if received_at >= cutoff:
+                return True
+        return False

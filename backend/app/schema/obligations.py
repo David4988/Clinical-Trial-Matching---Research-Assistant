@@ -187,6 +187,14 @@ class ApprovalRecord(BaseModel):
     # provider reports that as its own delivery failure rather than guessing.
     recipient_email: str | None = None
     recipient_phone: str | None = None
+    # NEW, additive: was a WhatsApp customer-service window open at approval
+    # time? Resolved deterministically by `ObligationProposalService.approve()`
+    # from `ObligationRepository.has_active_whatsapp_session()` — never
+    # inferred by a provider or a model. False for every non-WhatsApp
+    # channel, and False for WhatsApp whenever no session exists, which is
+    # what makes `template_name is None and not session_active` a safe
+    # "reject before any API call" precondition (`obligations/execution.py`).
+    session_active: bool = False
 
 
 class ResponsibleParty(BaseModel):
@@ -252,6 +260,12 @@ class IncomingMessage(BaseModel):
     provider_message_id: str
     provider_thread_id: str | None = None
     from_party_id: str | None = None
+    # NEW, additive: the raw sender address (an email header value, or a
+    # WhatsApp phone number) — never resolved to a party by matching alone,
+    # but what `has_active_whatsapp_session()` keys on to find "did this
+    # phone number message us recently", independent of whether the party
+    # registry could name whose number it is.
+    from_address: str | None = None
     obligation_id: str | None = None
     received_at: datetime
     body_text: str

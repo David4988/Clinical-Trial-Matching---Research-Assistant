@@ -46,8 +46,12 @@
   --color-signal-deep: #05615d;
   --color-signal-wash: #e6f4f2;
 
-  /* Secondary — provenance, evidence, references */
+  /* Secondary — provenance, evidence, references. `blue-mid` completes the
+     ramp so operational work (open / awaiting / closed) can be shown as one
+     hue at three strengths, leaving safe/caution/alert to mean the
+     participant and nothing else. */
   --color-blue: #27578a;
+  --color-blue-mid: #88a3bf;
   --color-blue-wash: #ebf1f7;
 
   /* Clinical state */
@@ -62,6 +66,15 @@
   --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
 
   --ease-emphasis: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Surfaces. The console was flat by construction — every panel a 1px rule,
+     every section the same weight. These give the operations screen a way to
+     say "this one matters more" without introducing a second palette: a small
+     radius, and two shadows soft enough to read as paper lifting rather than
+     as a card kit. Used on the monitoring board's focal surfaces only. */
+  --radius-panel: 6px;
+  --shadow-raised: 0 1px 2px rgba(11, 26, 36, 0.04), 0 1px 3px rgba(11, 26, 36, 0.06);
+  --shadow-focal: 0 1px 2px rgba(11, 26, 36, 0.05), 0 4px 12px rgba(11, 26, 36, 0.07);
 }
 
 :root {
@@ -100,6 +113,34 @@ body {
 .readout {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
+}
+
+/* Section heading for the operations board. Deliberately NOT `.eyebrow`:
+   when every section on a screen wears the same tracked-out uppercase label,
+   nothing outranks anything. Sentence case in the human voice, so the
+   uppercase treatment is left to mean "micro-label inside a panel". */
+.section-title {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.011em;
+  color: var(--color-ink);
+}
+
+/* Surfaces on the operations board. `panel-raised` is ordinary content;
+   `panel-focal` is the one element on the screen that should read first. */
+.panel-raised {
+  background: var(--color-panel);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-raised);
+}
+
+.panel-focal {
+  background: var(--color-panel);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-focal);
 }
 
 /* -- marks ---------------------------------------------------------------- */

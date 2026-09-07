@@ -85,13 +85,18 @@ def test_whatsapp_provider_refuses_without_template():
         NOW,
     )
     assert outcome.delivered is False
-    assert outcome.error == "TEMPLATE_REQUIRED"
+    assert outcome.error == "TEMPLATE_OR_SESSION_REQUIRED"
 
 
 def test_whatsapp_provider_declares_template_required_capability():
     provider = WhatsAppProvider()
+    # requires_template stays True: a template is required UNLESS a session
+    # is active (checked via ApprovalRecord.session_active, not this flag).
     assert provider.requires_template is True
-    assert provider.supports_freeform is False
+    # supports_freeform is True now — only inside an active session, which
+    # this static capability flag cannot express; deliver_with_outcome is
+    # the precise gate.
+    assert provider.supports_freeform is True
 
 
 def test_in_app_provider_delivers_only_in_app_channel():

@@ -503,6 +503,7 @@ def approval_record_to_row(approval: ApprovalRecord) -> dict[str, Any]:
         "template_params": approval.template_params,
         "recipient_email": approval.recipient_email,
         "recipient_phone": approval.recipient_phone,
+        "session_active": approval.session_active,
     }
 
 
@@ -519,6 +520,7 @@ def row_to_approval_record(row: Row) -> ApprovalRecord:
             "template_params": row["template_params"],
             "recipient_email": row["recipient_email"],
             "recipient_phone": row["recipient_phone"],
+            "session_active": row["session_active"],
         }
     )
 
@@ -533,6 +535,7 @@ def incoming_message_to_row(message: IncomingMessage) -> dict[str, Any]:
         "provider_message_id": message.provider_message_id,
         "provider_thread_id": message.provider_thread_id,
         "from_party_id": message.from_party_id,
+        "from_address": message.from_address,
         "obligation_id": message.obligation_id,
         "received_at": message.received_at,
         "body_text": message.body_text,
@@ -549,6 +552,7 @@ def row_to_incoming_message(row: Row) -> IncomingMessage:
             "provider_message_id": row["provider_message_id"],
             "provider_thread_id": row["provider_thread_id"],
             "from_party_id": row["from_party_id"],
+            "from_address": row["from_address"],
             "obligation_id": row["obligation_id"],
             "received_at": row["received_at"],
             "body_text": row["body_text"],

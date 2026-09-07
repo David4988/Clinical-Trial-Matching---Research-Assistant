@@ -16,15 +16,17 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from . import ids, templates
+from . import channel_policy, ids, templates
 from .execution import ChannelRequiresTemplateError, ExecutionService
 from .service import ObligationError, ObligationService
 from ..agent.investigate import investigate as run_investigation
 from ..agent.model.provider import AgentModelProvider
 from ..agent.model.template_provider import TemplateProvider
 from ..comms.factory import build_delivery_provider
+from ..comms.whatsapp_provider import configured as whatsapp_configured
 from ..repository.obligation_base import ObligationRepository
 from ..agent.prompts import BANNED_PHRASES, PROMPT_VERSION
+from ..schema.monitoring_enums import NotificationChannel
 from ..schema.obligation_enums import ActorKind, ObligationActionKind, ObligationStatus, ProposalStatus, ProviderKind
 from ..schema.obligations import (
     ApprovalRecord,
@@ -89,10 +91,15 @@ class ObligationProposalService:
 
         party = self.repository.get_party(obligation.responsible_party_id) if obligation.responsible_party_id else None
         recipient_party_id = party.party_id if party else "UNROUTED"
-        channel = party.preferred_channel if party else None
-        from ..schema.monitoring_enums import NotificationChannel
 
-        channel = channel or NotificationChannel.IN_APP
+        # Default channel resolution — Gmail/email is PRIMARY (communication
+        # strategy update): email wins whenever the party has one; WhatsApp
+        # (session first, then template) and in-app are the fallbacks.
+        # This is only the DRAFT's suggested channel — a researcher's
+        # explicit choice at `approve(channel=...)` always overrides it and
+        # never routes back through this function.
+        has_session = bool(party and party.phone and self.repository.has_active_whatsapp_session(party.phone, now))
+        channel = channel_policy.resolve_channel(party, has_session, whatsapp_configured())
 
         if self.facade is not None:
             run = run_investigation(obligation, self.facade, self.model_provider, now)
@@ -253,6 +260,19 @@ class ObligationProposalService:
             else None
         )
 
+        # WhatsApp session/template mode selection (communication-strategy
+        # update): re-checked HERE, at approval time, with the current
+        # clock — a window open when the draft was proposed may have closed
+        # since, and one that was closed may since have opened. When a
+        # session is open, prefer the researcher-approved free-form
+        # subject/body over the rigid template; the provider's own
+        # precondition (`obligations/execution.py`) refuses to send at all
+        # when neither a template nor a session is available.
+        session_active = False
+        if final_channel is NotificationChannel.WHATSAPP and recipient and recipient.phone:
+            session_active = self.repository.has_active_whatsapp_session(recipient.phone, now)
+        use_session_mode = final_channel is NotificationChannel.WHATSAPP and session_active
+
         approval = ApprovalRecord(
             proposal_id=proposal_id,
             approved_by=reviewer.strip(),
@@ -260,10 +280,11 @@ class ObligationProposalService:
             channel=final_channel,
             subject=final_subject,
             body=final_body,
-            template_name=proposal.template_name,
-            template_params=proposal.template_params,
+            template_name=None if use_session_mode else proposal.template_name,
+            template_params=[] if use_session_mode else proposal.template_params,
             recipient_email=recipient.email if recipient else None,
             recipient_phone=recipient.phone if recipient else None,
+            session_active=session_active,
         )
 
         provider = build_delivery_provider(final_channel)

@@ -5,6 +5,7 @@ import {
   dismissObligation,
   fetchLedger,
   fetchObligation,
+  fetchParties,
   fetchQueue,
   investigate,
   rejectProposal,
@@ -16,7 +17,15 @@ import type {
   ProposedAction,
   QueueItem,
   QueueResponse,
+  ResponsibleParty,
 } from "../../types/obligations";
+
+/** Email is PRIMARY: shown first, selected by default whenever available. */
+const CHANNEL_OPTIONS: { value: string; label: string }[] = [
+  { value: "EMAIL", label: "Email" },
+  { value: "WHATSAPP", label: "WhatsApp" },
+  { value: "IN_APP", label: "In-App" },
+];
 
 /**
  * The Work Queue: "what needs my attention right now?" — the researcher
@@ -46,6 +55,7 @@ export function WorkQueueApp() {
   const [obligation, setObligation] = useState<Obligation | null>(null);
   const [ledger, setLedger] = useState<ObligationAction[]>([]);
   const [proposal, setProposal] = useState<ProposedAction | null>(null);
+  const [parties, setParties] = useState<ResponsibleParty[]>([]);
   const [error, setError] = useState<ApiError | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -70,14 +80,23 @@ export function WorkQueueApp() {
     }
   }, []);
 
-  const loadItem = useCallback(async (id: string) => {
+  const loadItem = useCallback(async (id: string, resetProposal = true) => {
     setBusy(true);
     setError(null);
-    setProposal(null);
+    // Only a genuine navigation to a (possibly different) obligation should
+    // drop the proposal on screen — `resetProposal = false` is how
+    // `onInvestigate`/`onApprove`/`onReject` refresh the obligation/ledger
+    // without wiping the very state they just set. Skipping this the first
+    // time was the whole bug: this function's own `setProposal(null)` ran
+    // synchronously right after `setProposal(freshProposal)`, in the same
+    // React batch, so the fresh proposal was overwritten before it ever
+    // painted — "Draft a request" silently reverted with nothing shown.
+    if (resetProposal) setProposal(null);
     try {
-      const [ob, actions] = await Promise.all([fetchObligation(id), fetchLedger(id)]);
+      const [ob, actions, partyList] = await Promise.all([fetchObligation(id), fetchLedger(id), fetchParties(TRIAL_ID)]);
       setObligation(ob);
       setLedger(actions);
+      setParties(partyList);
     } catch (err) {
       setError(asApiError(err));
     } finally {
@@ -95,7 +114,7 @@ export function WorkQueueApp() {
     setError(null);
     try {
       setProposal(await investigate(id));
-      await loadItem(id);
+      await loadItem(id, false);
     } catch (err) {
       setError(asApiError(err));
     } finally {
@@ -103,12 +122,12 @@ export function WorkQueueApp() {
     }
   }
 
-  async function onApprove(proposalId: string, reviewer: string, note: string) {
+  async function onApprove(proposalId: string, reviewer: string, note: string, channel?: string) {
     setBusy(true);
     setError(null);
     try {
-      setProposal(await approveProposal(proposalId, reviewer, note));
-      if (view.kind === "item") await loadItem(view.id);
+      setProposal(await approveProposal(proposalId, reviewer, note, channel));
+      if (view.kind === "item") await loadItem(view.id, false);
     } catch (err) {
       setError(asApiError(err));
     } finally {
@@ -121,7 +140,7 @@ export function WorkQueueApp() {
     setError(null);
     try {
       setProposal(await rejectProposal(proposalId, reviewer, note));
-      if (view.kind === "item") await loadItem(view.id);
+      if (view.kind === "item") await loadItem(view.id, false);
     } catch (err) {
       setError(asApiError(err));
     } finally {
@@ -148,6 +167,7 @@ export function WorkQueueApp() {
         obligation={obligation}
         ledger={ledger}
         proposal={proposal}
+        parties={parties}
         busy={busy}
         error={error}
         onBack={() => setView({ kind: "list" })}
@@ -265,6 +285,7 @@ function ObligationDetail({
   obligation,
   ledger,
   proposal,
+  parties,
   busy,
   error,
   onBack,
@@ -276,16 +297,18 @@ function ObligationDetail({
   obligation: Obligation | null;
   ledger: ObligationAction[];
   proposal: ProposedAction | null;
+  parties: ResponsibleParty[];
   busy: boolean;
   error: ApiError | null;
   onBack: () => void;
   onInvestigate: () => void;
-  onApprove: (proposalId: string, reviewer: string, note: string) => void;
+  onApprove: (proposalId: string, reviewer: string, note: string, channel?: string) => void;
   onReject: (proposalId: string, reviewer: string, note: string) => void;
   onDismiss: (reviewer: string, note: string) => void;
 }) {
   const [reviewer, setReviewer] = useState("");
   const [note, setNote] = useState("");
+  const [channel, setChannel] = useState<string | null>(null);
 
   if (!obligation) {
     return (
@@ -298,6 +321,12 @@ function ObligationDetail({
 
   const terminal = obligation.status === "RESOLVED" || obligation.status === "DISMISSED";
   const pendingProposal = proposal && proposal.status === "DRAFT" ? proposal : null;
+  const recipientParty = pendingProposal ? parties.find((p) => p.party_id === pendingProposal.recipient_party_id) : undefined;
+  // Email is PRIMARY: the backend already drafts with EMAIL whenever the
+  // party has one (docs/FINAL_IMPLEMENTATION_PLAN.md comms-strategy update).
+  // `channel` here is only the researcher's override, once they touch the
+  // selector — until then the proposal's own default is shown and used.
+  const selectedChannel = channel ?? pendingProposal?.channel ?? "EMAIL";
 
   return (
     <div className="space-y-4">
@@ -376,10 +405,36 @@ function ObligationDetail({
           ) : (
             <div className="mt-2 space-y-2">
               <ProvenanceBadge proposal={pendingProposal} />
-              <div className="border border-rule p-3">
+
+              <div className="flex flex-wrap items-start gap-4">
+                <label className="flex flex-col text-[11px] text-ink-mid">
+                  Channel
+                  <select
+                    value={selectedChannel}
+                    onChange={(e) => setChannel(e.target.value)}
+                    className="mt-0.5 border border-rule-strong bg-panel px-2 py-1 text-[12px] text-ink"
+                  >
+                    {CHANNEL_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <div className="text-[11px] text-ink-mid">
-                  To: {pendingProposal.recipient_party_id} · Channel: {pendingProposal.channel}
+                  <div className="text-[10px] tracking-[0.08em] text-ink-faint">RECIPIENT</div>
+                  <div className="text-ink">{recipientParty?.display_name ?? pendingProposal.recipient_party_id}</div>
+                  <div>
+                    {selectedChannel === "EMAIL"
+                      ? recipientParty?.email ?? "no email on file"
+                      : selectedChannel === "WHATSAPP"
+                        ? recipientParty?.phone ?? "no phone on file"
+                        : "delivered in-app"}
+                  </div>
                 </div>
+              </div>
+
+              <div className="border border-rule p-3">
                 <div className="mt-1 font-sans text-[13px] font-semibold text-ink">{pendingProposal.subject}</div>
                 <p className="mt-1 whitespace-pre-wrap font-sans text-[13px] leading-relaxed text-ink">
                   {pendingProposal.body}
@@ -406,7 +461,7 @@ function ObligationDetail({
                 <button
                   type="button"
                   disabled={busy || !reviewer.trim() || !note.trim()}
-                  onClick={() => onApprove(pendingProposal.proposal_id, reviewer, note)}
+                  onClick={() => onApprove(pendingProposal.proposal_id, reviewer, note, selectedChannel)}
                   className="border border-ink bg-ink px-3 py-1.5 text-[12px] text-paper disabled:opacity-50"
                 >
                   Approve &amp; send

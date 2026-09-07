@@ -76,12 +76,14 @@ export function approveProposal(
   proposalId: string,
   reviewer: string,
   note: string,
+  channel?: string,
   editedSubject?: string,
   editedBody?: string,
 ): Promise<ProposedAction> {
   return post<ProposedAction>(`/proposals/${encodeURIComponent(proposalId)}/approve`, {
     reviewer,
     note,
+    channel: channel || null,
     edited_subject: editedSubject || null,
     edited_body: editedBody || null,
   });

@@ -60,3 +60,34 @@ def send_template_message(
     if response.status_code != 200:
         raise WhatsAppClientError(f"WhatsApp send failed: HTTP {response.status_code}: {response.text[:400]}")
     return response.json()
+
+
+def send_session_message(
+    access_token: str,
+    phone_number_id: str,
+    to: str,
+    body: str,
+    timeout: float = 30.0,
+) -> dict:
+    """Free-form text, valid ONLY inside an open customer-service window
+    (Meta re-opens a 24h window on every customer-initiated message).
+    Callers must check that window is open — `WhatsAppProvider` does this
+    via `ApprovalRecord.session_active` — before calling this function;
+    Meta itself also rejects the call outside the window (error #131047),
+    so an unchecked call fails loudly either way, never silently.
+    """
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": to,
+        "type": "text",
+        "text": {"body": body},
+    }
+    response = httpx.post(
+        f"{GRAPH_API_BASE}/{phone_number_id}/messages",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=payload,
+        timeout=timeout,
+    )
+    if response.status_code != 200:
+        raise WhatsAppClientError(f"WhatsApp session send failed: HTTP {response.status_code}: {response.text[:400]}")
+    return response.json()
